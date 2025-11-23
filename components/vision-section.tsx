@@ -44,12 +44,17 @@ export function VisionSection() {
               viewport={{ once: true }}
             >
               <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tighter">
-                The Ecosystem
+                The Vision
               </h2>
               <p className="text-muted-foreground text-lg leading-relaxed">
                 We are building the foundational layer for Algerian AI
                 applications. A complete suite of tools designed to digitize our
                 dialect.
+                <br />
+                The ultimate goal is to build a <strong>
+                  AI ecosystem{" "}
+                </strong>{" "}
+                that truly comprehends our language and culture.
               </p>
             </motion.div>
           </div>

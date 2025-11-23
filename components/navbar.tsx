@@ -17,10 +17,16 @@ export function Navbar() {
         >
           Vision
         </Link>
+        <Link
+          href="#process"
+          className="text-sm font-medium hover:text-neutral-600 transition-colors"
+        >
+          Process
+        </Link>
         <Link href="#waitlist">
           <Button
             size="sm"
-            className="rounded-full px-6 bg-black text-white hover:bg-neutral-800 transition-colors"
+            className="rounded-sm px-6 bg-black text-white hover:bg-neutral-800 transition-colors"
           >
             Join Waitlist
           </Button>
