@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export function Navbar() {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-white/50 backdrop-blur-md border-b border-neutral-200/50">
+    <nav className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg rounded-full max-w-4xl w-[calc(100%-3rem)]">
       <div className="flex items-center gap-2">
         <Link href="/" className="text-xl font-bold tracking-tighter">
           Awras
@@ -17,7 +17,7 @@ export function Navbar() {
           Vision
         </Link>
         <Link href="#waitlist">
-          <Button size="sm" className="rounded-full px-6">
+          <Button size="sm" className="rounded-full px-6 bg-black text-white hover:bg-neutral-800 transition-colors">
             Join Waitlist
           </Button>
         </Link>
