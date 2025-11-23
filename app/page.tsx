@@ -5,11 +5,14 @@ import { Footer } from "@/components/footer";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white text-black selection:bg-black selection:text-white">
-      <Hero />
-      <VisionSection />
-      <WaitlistSection />
-      <Footer />
+    <main className="min-h-screen bg-white text-black selection:bg-black selection:text-white relative">
+      <div className="squares-background" />
+      <div className="relative z-10">
+        <Hero />
+        <VisionSection />
+        <WaitlistSection />
+        <Footer />
+      </div>
     </main>
   );
 }
