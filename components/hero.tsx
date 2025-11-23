@@ -22,7 +22,7 @@ export function Hero() {
             Awras
           </h1>
           <p className="text-xl md:text-2xl text-black/70 font-light leading-relaxed max-w-2xl mx-auto">
-            The first open ecosystem dedicated to preserving and empowering the
+            Toward an ecosystem dedicated to preserving and empowering the
             Algerian dialect (Darija) through advanced Artificial Intelligence.
           </p>
         </div>

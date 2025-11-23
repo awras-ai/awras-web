@@ -1,5 +1,6 @@
 import { Hero } from "@/components/hero";
 import { VisionSection } from "@/components/vision-section";
+import { ProcessSection } from "@/components/process-section";
 import { WaitlistSection } from "@/components/waitlist-section";
 import { Footer } from "@/components/footer";
 import { Navbar } from "@/components/navbar";
@@ -12,6 +13,7 @@ export default function Home() {
       <div className="relative z-10">
         <Hero />
         <VisionSection />
+        <ProcessSection />
         <WaitlistSection />
         <Footer />
       </div>
