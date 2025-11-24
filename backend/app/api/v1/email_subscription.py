@@ -11,13 +11,9 @@ from app.schemas.email_subscription import (
     SubscriptionCountResponse,
 )
 from app.services.email_subscription import EmailSubscriptionService
-from slowapi import Limiter
-from slowapi.util import get_remote_address
+from app.core.limiter import limiter
 
 router = APIRouter(prefix="/waitlist", tags=["Waitlist"])
-
-
-limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post(
@@ -25,7 +21,7 @@ limiter = Limiter(key_func=get_remote_address)
     response_model=EmailSubscriptionResponse,
     summary="Add email to waitlist",
 )
-@limiter.limit("5/minute")
+@limiter.limit("10/minute")
 async def subscribe_email(
     request: Request,
     subscription: EmailSubscriptionCreate,
@@ -60,7 +56,7 @@ async def subscribe_email(
     response_model=SubscriptionCountResponse,
     summary="Get waitlist count",
 )
-@limiter.limit("10/minute")
+@limiter.limit("30/minute")
 async def get_waitlist_count(
     request: Request,
     db: Session = Depends(get_db),

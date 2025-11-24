@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str
 
+    # Redis (for rate limiting)
+    REDIS_URL: str
+
     # CORS
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:3001"]
 
