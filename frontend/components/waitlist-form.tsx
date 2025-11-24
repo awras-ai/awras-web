@@ -66,7 +66,8 @@ export function WaitlistForm() {
             </button>
           </div>
           <p className="text-xs text-muted-foreground font-light px-2">
-            Join 2,000+ others interested in Algerian AI. No spam, ever.
+            We should write how many people have already joined the waitlist
+            here.
           </p>
         </form>
       )}

@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { WaitlistForm } from "./waitlist-form";
 
 export function Hero() {
   return (
@@ -27,15 +28,13 @@ export function Hero() {
           </p>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
-          <Link
-            href="#waitlist"
-            className="inline-flex h-13 items-center justify-center rounded-sm bg-black px-8 text-sm font-semibold text-white shadow-lg hover:shadow-xl hover:bg-black/90 transition-all duration-300 group"
-          >
-            Join the Waitlist
-            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-          </Link>
+        {/* Waitlist Form */}
+        <div className="pt-8">
+          <WaitlistForm />
+        </div>
+
+        {/* Secondary CTA */}
+        <div className="pt-4">
           <Link
             href="#vision"
             className="inline-flex h-13 items-center justify-center rounded-sm border border-black/20 bg-white px-8 text-sm font-semibold text-black hover:bg-black/5 shadow-sm hover:shadow-md transition-all duration-300"
