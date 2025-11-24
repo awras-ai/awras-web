@@ -1,0 +1,1 @@
+- use uv for all the commands that you will run for the backend

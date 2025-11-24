@@ -1,7 +1,18 @@
 [project]
-name = "backend"
-version = "0.1.0"
-description = "Add your description here"
+name = "awras-backend"
+version = "1.0.0"
+description = "AWRAS Backend API for managing email subscriptions and waitlist"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "alembic>=1.17.2",
+    "fastapi>=0.121.3",
+    "sqlalchemy>=2.0.44",
+    "uvicorn>=0.38.0",
+    "pydantic>=2.10.3",
+    "pydantic-settings>=2.6.1",
+    "python-multipart>=0.0.17",
+    "email-validator>=2.2.0",
+    "python-dotenv>=1.0.1",
+    "psycopg2-binary>=2.9.10",
+]
