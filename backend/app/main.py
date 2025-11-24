@@ -1,9 +1,13 @@
 """
 Main FastAPI application.
 """
-from fastapi import FastAPI
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from app.core.config import get_settings
 from app.db.database import init_db
@@ -23,13 +27,16 @@ async def lifespan(app: FastAPI):
     print("✓ Application shutdown")
 
 
+limiter = Limiter(get_remote_address)
 # Create FastAPI application
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description="AWRAS API for managing email subscriptions and waitlist",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Configure CORS
 app.add_middleware(
@@ -45,16 +52,18 @@ app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/", tags=["Health"])
-async def root():
+@limiter.limit("10/second")
+async def root(request: Request):
     """Root endpoint - API health check."""
     return {
         "name": settings.APP_NAME,
         "version": settings.APP_VERSION,
-        "status": "healthy"
+        "status": "healthy",
     }
 
 
 @app.get("/health", tags=["Health"])
+@limiter.limit("10/second")
 async def health_check():
     """Health check endpoint."""
     return {"status": "healthy"}

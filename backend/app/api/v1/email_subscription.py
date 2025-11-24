@@ -2,9 +2,8 @@
 Email subscription API endpoints.
 """
 
-from fastapi import APIRouter, Depends, status, Query, Response
+from fastapi import APIRouter, Depends, status, Query, Response, Request
 from sqlalchemy.orm import Session
-
 from app.db.database import get_db
 from app.schemas.email_subscription import (
     EmailSubscriptionCreate,
@@ -12,8 +11,13 @@ from app.schemas.email_subscription import (
     SubscriptionCountResponse,
 )
 from app.services.email_subscription import EmailSubscriptionService
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 router = APIRouter(prefix="/waitlist", tags=["Waitlist"])
+
+
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post(
@@ -21,10 +25,12 @@ router = APIRouter(prefix="/waitlist", tags=["Waitlist"])
     response_model=EmailSubscriptionResponse,
     summary="Add email to waitlist",
 )
+@limiter.limit("5/minute")
 async def subscribe_email(
-    subscription: EmailSubscriptionCreate, 
+    request: Request,
+    subscription: EmailSubscriptionCreate,
     response: Response,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ) -> EmailSubscriptionResponse:
     """
     Add an email to the waitlist.
@@ -33,19 +39,19 @@ async def subscribe_email(
     - **success**: True if added successfully, False if email already exists
     - **message**: Description of the result
     - **email**: The email address (only if success=True)
-    
+
     Status codes:
     - 201: Email successfully added to waitlist
     - 409: Email already exists (conflict)
     """
     result = EmailSubscriptionService.add_email(db, subscription)
-    
+
     # Set appropriate status code based on success
     if result.success:
         response.status_code = status.HTTP_201_CREATED
     else:
         response.status_code = status.HTTP_409_CONFLICT
-    
+
     return result
 
 
@@ -54,6 +60,7 @@ async def subscribe_email(
     response_model=SubscriptionCountResponse,
     summary="Get waitlist count",
 )
+@limiter.limit("10/minute")
 async def get_waitlist_count(
     db: Session = Depends(get_db),
 ) -> SubscriptionCountResponse:
