@@ -1,0 +1,77 @@
+services:
+  # PostgreSQL database
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+  # # FastAPI backend
+  # backend:
+  #   build:
+  #     context: ./backend/
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+  #     - CORS_ORIGINS=["http://localhost:3000","http://localhost","http://frontend:3000"]
+  #   ports:
+  #     - "8000:8000"
+  #   restart: unless-stopped
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+
+  # Next.js application
+  frontend:
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      # backend:
+      #   condition: service_started
+    # Don't expose ports directly - Nginx will handle this
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      # - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

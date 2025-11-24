@@ -1,36 +1,31 @@
 """
 Pydantic schemas for email subscription.
 """
+
 from pydantic import BaseModel, EmailStr, Field
-from datetime import datetime
 from typing import Optional
 
 
 class EmailSubscriptionCreate(BaseModel):
     """Schema for creating an email subscription."""
+
     email: EmailStr = Field(..., description="Email address to subscribe")
-    source: Optional[str] = Field(default="waitlist", description="Source of subscription")
+    source: Optional[str] = Field(
+        default="waitlist", description="Source of subscription"
+    )
 
 
 class EmailSubscriptionResponse(BaseModel):
     """Schema for email subscription response."""
-    id: int
-    email: str
-    subscribed_at: datetime
-    is_active: bool
-    source: str
-    
-    class Config:
-        from_attributes = True
+
+    success: bool = Field(..., description="Whether the operation was successful")
+    message: str = Field(..., description="Response message")
+    email: Optional[str] = Field(
+        None, description="The email address (only if success=True)"
+    )
 
 
-class EmailSubscriptionList(BaseModel):
-    """Schema for listing email subscriptions."""
-    total: int
-    subscriptions: list[EmailSubscriptionResponse]
+class SubscriptionCountResponse(BaseModel):
+    """Schema for subscription count response."""
 
-
-class MessageResponse(BaseModel):
-    """Generic message response."""
-    message: str
-    success: bool = True
+    count: int = Field(..., description="Total number of registered emails")

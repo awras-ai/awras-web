@@ -2,97 +2,65 @@
 Email subscription API endpoints.
 """
 
-from fastapi import APIRouter, Depends, status, Query
+from fastapi import APIRouter, Depends, status, Query, Response
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.schemas.email_subscription import (
     EmailSubscriptionCreate,
     EmailSubscriptionResponse,
-    EmailSubscriptionList,
-    MessageResponse,
+    SubscriptionCountResponse,
 )
 from app.services.email_subscription import EmailSubscriptionService
 
-router = APIRouter(prefix="/emails", tags=["Email Subscriptions"])
+router = APIRouter(prefix="/waitlist", tags=["Waitlist"])
 
 
 @router.post(
     "/subscribe",
-    response_model=MessageResponse,
-    status_code=status.HTTP_201_CREATED,
-    summary="Subscribe to waitlist",
+    response_model=EmailSubscriptionResponse,
+    summary="Add email to waitlist",
 )
 async def subscribe_email(
-    subscription: EmailSubscriptionCreate, db: Session = Depends(get_db)
-) -> MessageResponse:
-    """
-    Subscribe an email to the waitlist.
-
-    - **email**: Valid email address
-    - **source**: Source of subscription (default: waitlist)
-    """
-    EmailSubscriptionService.create_subscription(db, subscription)
-    return MessageResponse(
-        message="Successfully subscribed to the waitlist!", success=True
-    )
-
-
-@router.get(
-    "/subscriptions",
-    response_model=EmailSubscriptionList,
-    summary="Get all subscriptions",
-)
-async def get_subscriptions(
-    skip: int = Query(0, ge=0, description="Number of records to skip"),
-    limit: int = Query(100, ge=1, le=1000, description="Maximum records to return"),
-    active_only: bool = Query(True, description="Filter active subscriptions only"),
-    db: Session = Depends(get_db),
-) -> EmailSubscriptionList:
-    """
-    Get all email subscriptions with pagination.
-    """
-    subscriptions, total = EmailSubscriptionService.get_all_subscriptions(
-        db, skip=skip, limit=limit, active_only=active_only
-    )
-    return EmailSubscriptionList(total=total, subscriptions=subscriptions)
-
-
-@router.get(
-    "/subscriptions/{email}",
-    response_model=EmailSubscriptionResponse,
-    summary="Get subscription by email",
-)
-async def get_subscription(
-    email: str, db: Session = Depends(get_db)
+    subscription: EmailSubscriptionCreate, 
+    response: Response,
+    db: Session = Depends(get_db)
 ) -> EmailSubscriptionResponse:
-    """Get a specific email subscription."""
-    subscription = EmailSubscriptionService.get_subscription_by_email(db, email)
-    if not subscription:
-        from fastapi import HTTPException
+    """
+    Add an email to the waitlist.
 
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Email not found"
-        )
-    return subscription
+    Returns:
+    - **success**: True if added successfully, False if email already exists
+    - **message**: Description of the result
+    - **email**: The email address (only if success=True)
+    
+    Status codes:
+    - 201: Email successfully added to waitlist
+    - 409: Email already exists (conflict)
+    """
+    result = EmailSubscriptionService.add_email(db, subscription)
+    
+    # Set appropriate status code based on success
+    if result.success:
+        response.status_code = status.HTTP_201_CREATED
+    else:
+        response.status_code = status.HTTP_409_CONFLICT
+    
+    return result
 
 
-@router.delete(
-    "/subscriptions/{subscription_id}",
-    response_model=MessageResponse,
-    summary="Unsubscribe email",
+@router.get(
+    "/count",
+    response_model=SubscriptionCountResponse,
+    summary="Get waitlist count",
 )
-async def unsubscribe_email(
-    subscription_id: int, db: Session = Depends(get_db)
-) -> MessageResponse:
+async def get_waitlist_count(
+    db: Session = Depends(get_db),
+) -> SubscriptionCountResponse:
     """
-    Unsubscribe an email (soft delete).
-    """
-    deleted = EmailSubscriptionService.delete_subscription(db, subscription_id)
-    if not deleted:
-        from fastapi import HTTPException
+    Get the total count of emails registered in the waitlist.
 
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found"
-        )
-    return MessageResponse(message="Successfully unsubscribed", success=True)
+    Returns:
+    - **count**: Total number of registered emails
+    """
+    return EmailSubscriptionService.get_count(db)
