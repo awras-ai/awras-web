@@ -62,6 +62,7 @@ async def subscribe_email(
 )
 @limiter.limit("10/minute")
 async def get_waitlist_count(
+    request: Request,
     db: Session = Depends(get_db),
 ) -> SubscriptionCountResponse:
     """
