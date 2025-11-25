@@ -51,16 +51,26 @@ export function WaitlistForm() {
   return (
     <div className="w-full max-w-2xl mx-auto">
       {subscription.isSuccess ? (
-        <div className="flex flex-col items-center justify-center">
-          <p className="text-xs text-muted-foreground font-light px-2 text-center">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <p className="text-sm text-foreground font-medium text-center">
+            Thank you for joining the waitlist!
+          </p>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground font-light px-2">
             {countLoading ? (
               "Loading..."
             ) : (
               <>
-                <span className="font-bold text-foreground">{count}+</span>{" "}
-                builders have already joined the waitlist
+                <div className="relative">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <div className="absolute inset-0 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+                </div>
+                <span className="font-bold text-foreground">{count}</span>{" "}
+                People have already joined the waitlist.
               </>
             )}
+          </div>
+          <p className="text-xs text-muted-foreground font-light px-2 text-center">
+            We'll contact you as soon as we launch!
           </p>
         </div>
       ) : (
@@ -98,16 +108,20 @@ export function WaitlistForm() {
             </p>
           )}
 
-          <p className="text-xs text-muted-foreground font-light px-2 text-center">
+          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground font-light px-2">
             {countLoading ? (
               "Loading..."
             ) : (
               <>
-                <span className="font-bold text-foreground">{count}+</span>{" "}
-                builders have already joined the waitlist
+                <div className="relative">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <div className="absolute inset-0 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+                </div>
+                <span className="font-bold text-foreground">{count}</span>{" "}
+                People have already joined the waitlist.
               </>
             )}
-          </p>
+          </div>
         </form>
       )}
     </div>
