@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
-import { Loader2, Check } from "lucide-react";
+import React, { useEffect } from "react";
+import { Loader2 } from "lucide-react";
+import confetti from "canvas-confetti";
 import { useWaitlist } from "@/hooks/useWaitlist";
 
 export function WaitlistForm() {
@@ -15,23 +16,52 @@ export function WaitlistForm() {
     handleReset,
   } = useWaitlist();
 
+  // Trigger confetti on successful subscription
+  useEffect(() => {
+    if (subscription.isSuccess) {
+      const duration = 1500;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+      const randomInRange = (min: number, max: number) =>
+        Math.random() * (max - min) + min;
+
+      const interval = window.setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+        });
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+        });
+      }, 250);
+    }
+  }, [subscription.isSuccess]);
+
   return (
     <div className="w-full max-w-2xl mx-auto">
       {subscription.isSuccess ? (
-        <div className="flex flex-col items-center justify-center p-8 md:p-10 bg-black text-white border border-border text-center animate-in fade-in zoom-in duration-300 rounded-lg">
-          <div className="h-14 w-14 bg-white text-black rounded-full flex items-center justify-center mb-6">
-            <Check className="h-8 w-8" />
-          </div>
-          <h3 className="text-2xl font-black mb-3">You are on the list!</h3>
-          <p className="text-white/80 font-light mb-8 max-w-sm">
-            Thank you for joining Awras. We will email you as soon as we launch.
+        <div className="flex flex-col items-center justify-center">
+          <p className="text-xs text-muted-foreground font-light px-2 text-center">
+            {countLoading ? (
+              "Loading..."
+            ) : (
+              <>
+                <span className="font-bold text-foreground">{count}+</span>{" "}
+                builders have already joined the waitlist
+              </>
+            )}
           </p>
-          <button
-            onClick={handleReset}
-            className="text-sm font-semibold underline underline-offset-4 hover:text-white/70"
-          >
-            Add another email
-          </button>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
