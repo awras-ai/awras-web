@@ -53,7 +53,7 @@ export function WaitlistForm() {
       {subscription.isSuccess ? (
         <div className="flex flex-col items-center justify-center gap-4">
           <p className="text-sm text-foreground font-medium text-center">
-            Thank you for joining the waitlist!
+            Thank you for joining the waitlist, We will contact you soon!
           </p>
           <div className="flex items-center gap-2 text-xs text-muted-foreground font-light px-2">
             {countLoading ? (
@@ -64,14 +64,12 @@ export function WaitlistForm() {
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <div className="absolute inset-0 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
                 </div>
-                <span className="font-bold text-foreground">{count}</span>{" "}
-                People have already joined the waitlist.
+                <span className="font-semibold text-foreground">
+                  {count} People have already joined the waitlist.
+                </span>
               </>
             )}
           </div>
-          <p className="text-xs text-muted-foreground font-light px-2 text-center">
-            We'll contact you as soon as we launch!
-          </p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -117,8 +115,9 @@ export function WaitlistForm() {
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <div className="absolute inset-0 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
                 </div>
-                <span className="font-bold text-foreground">{count}</span>{" "}
-                People have already joined the waitlist.
+                <span className="font-semibold text-foreground">
+                  {count} People have already joined the waitlist.
+                </span>
               </>
             )}
           </div>
