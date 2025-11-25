@@ -14,7 +14,7 @@ export default function Home() {
         <Hero />
         <VisionSection />
         <ProcessSection />
-        <WaitlistSection />
+        {/* <WaitlistSection /> */}
         <Footer />
       </div>
     </main>

@@ -1,45 +1,40 @@
 "use client";
 
-import type React from "react";
-import { useState } from "react";
+import React from "react";
 import { Loader2, Check } from "lucide-react";
+import { useWaitlist } from "@/hooks/useWaitlist";
 
 export function WaitlistForm() {
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus("loading");
-
-    setTimeout(() => {
-      console.log("[v0] Mock API request: Email collected", email);
-      setStatus("success");
-      setEmail("");
-    }, 1500);
-  };
+  const {
+    email,
+    setEmail,
+    count,
+    countLoading,
+    subscription,
+    handleSubmit,
+    handleReset,
+  } = useWaitlist();
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      {status === "success" ? (
-        <div className="flex flex-col items-center justify-center p-8 md:p-10 bg-black text-white border border-border text-center animate-in fade-in zoom-in duration-300">
-          <div className="h-14 w-14 bg-white text-black flex items-center justify-center mb-6">
-            <Check className="h-7 w-7" />
+      {subscription.isSuccess ? (
+        <div className="flex flex-col items-center justify-center p-8 md:p-10 bg-black text-white border border-border text-center animate-in fade-in zoom-in duration-300 rounded-lg">
+          <div className="h-14 w-14 bg-white text-black rounded-full flex items-center justify-center mb-6">
+            <Check className="h-8 w-8" />
           </div>
-          <h3 className="text-2xl font-black mb-3">You're on the list!</h3>
+          <h3 className="text-2xl font-black mb-3">You are on the list!</h3>
           <p className="text-white/80 font-light mb-8 max-w-sm">
-            Thank you for joining Awras. We'll keep you updated on our progress
-            and be the first to know when we launch.
+            Thank you for joining Awras. We will email you as soon as we launch.
           </p>
           <button
-            onClick={() => setStatus("idle")}
-            className="text-sm font-semibold underline underline-offset-4 hover:text-white/70 transition-colors"
+            onClick={handleReset}
+            className="text-sm font-semibold underline underline-offset-4 hover:text-white/70"
           >
-            Register another email
+            Add another email
           </button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="email"
@@ -47,15 +42,16 @@ export function WaitlistForm() {
               placeholder="Enter your email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 rounded-sm border border-border bg-white px-6 py-4 text-base outline-none transition-all placeholder:text-muted-foreground focus:border-foreground/50 focus:ring-2 focus:ring-foreground/10 disabled:cursor-not-allowed disabled:opacity-50"
-              disabled={status === "loading"}
+              disabled={subscription.isPending}
+              className="flex-1 rounded-sm border border-border bg-white px-6 py-4 text-base outline-none placeholder:text-muted-foreground focus:border-foreground/50 focus:ring-2 focus:ring-foreground/10 disabled:opacity-50"
             />
+
             <button
               type="submit"
-              disabled={status === "loading"}
-              className="inline-flex items-center justify-center rounded-sm bg-black px-8 py-4 text-base font-semibold text-white transition-all hover:shadow-lg hover:bg-black/90 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 whitespace-nowrap"
+              disabled={subscription.isPending || !email.trim()}
+              className="inline-flex items-center justify-center rounded-sm bg-black px-8 py-4 text-base font-semibold text-white hover:bg-black/90 focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 transition-all whitespace-nowrap"
             >
-              {status === "loading" ? (
+              {subscription.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Joining...
@@ -65,9 +61,22 @@ export function WaitlistForm() {
               )}
             </button>
           </div>
-          <p className="text-xs text-muted-foreground font-light px-2">
-            We should write how many people have already joined the waitlist
-            here.
+
+          {subscription.isError && (
+            <p className="text-sm text-red-500 px-2 animate-in slide-in-from-top">
+              {subscription.error.message}
+            </p>
+          )}
+
+          <p className="text-xs text-muted-foreground font-light px-2 text-center">
+            {countLoading ? (
+              "Loading..."
+            ) : (
+              <>
+                <span className="font-bold text-foreground">{count}+</span>{" "}
+                builders have already joined the waitlist
+              </>
+            )}
           </p>
         </form>
       )}
