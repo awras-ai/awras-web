@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 export function Navbar() {
   return (
@@ -22,14 +21,6 @@ export function Navbar() {
           className="text-sm font-medium hover:text-neutral-600 transition-colors"
         >
           Process
-        </Link>
-        <Link href="#waitlist">
-          <Button
-            size="sm"
-            className="rounded-sm px-6 bg-black text-white hover:bg-neutral-800 transition-colors"
-          >
-            Join Waitlist
-          </Button>
         </Link>
       </div>
     </nav>
