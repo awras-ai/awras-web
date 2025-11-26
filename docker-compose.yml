@@ -18,17 +18,6 @@ services:
       timeout: 10s
       retries: 3
 
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: admin@admin.com
-  #     PGADMIN_DEFAULT_PASSWORD: admin
-  #   ports:
-  #     - "8080:80"
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - postgres
-
   redis:
     image: redis:7-alpine
     container_name: redis

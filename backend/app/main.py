@@ -33,6 +33,8 @@ app = FastAPI(
     version=settings.APP_VERSION,
     description="AWRAS API for managing email subscriptions and waitlist",
     lifespan=lifespan,
+    docs_url="/docs" if settings.DEBUG else None,
+    redoc_url="/redoc" if settings.DEBUG else None,
 )
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
