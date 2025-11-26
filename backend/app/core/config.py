@@ -21,8 +21,7 @@ class Settings(BaseSettings):
     REDIS_URL: str
 
     # CORS
-    CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:3001"]
-
+    CORS_ORIGINS: list[str]
     # API
     API_V1_PREFIX: str = "/api/v1"
 
