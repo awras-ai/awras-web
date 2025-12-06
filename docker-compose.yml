@@ -17,6 +17,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - app_internal_network
 
   redis:
     image: redis:7-alpine
@@ -24,6 +26,9 @@ services:
     command: redis-server --save 60 1 --loglevel warning
     ports:
       - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - app_internal_network
+
   # # FastAPI backend
   backend:
     container_name: backend
@@ -43,6 +48,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+    networks:
+      - app_internal_network
 
   # Next.js application
   frontend:
@@ -64,6 +71,12 @@ services:
         condition: service_healthy
       # backend:
       #   condition: service_started
+    networks:
+      - app_internal_network
 
 volumes:
   postgres_data:
+
+networks:
+  app_internal_network:
+    driver: bridge
