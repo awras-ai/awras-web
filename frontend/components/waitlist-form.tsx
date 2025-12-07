@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useWaitlist } from "@/hooks/useWaitlist";
+import { toast } from "sonner";
 
 export function WaitlistForm() {
   const {
@@ -47,7 +48,16 @@ export function WaitlistForm() {
       }, 250);
     }
   }, [subscription.isSuccess]);
+  useEffect(() => {
+    if (subscription.isError) {
+      // Check if the error object and message exist before calling toast
+      const errorMessage =
+        (subscription.error as Error)?.message || "An unknown error occurred.";
 
+      // Call the toast function here
+      toast.error(errorMessage);
+    }
+  }, [subscription.isError, subscription.error]);
   return (
     <div className="w-full max-w-2xl mx-auto">
       {subscription.isSuccess ? (
@@ -99,13 +109,7 @@ export function WaitlistForm() {
               )}
             </button>
           </div>
-
-          {subscription.isError && (
-            <p className="text-sm text-red-500 px-2 animate-in slide-in-from-top">
-              {subscription.error.message}
-            </p>
-          )}
-
+          {/* {subscription.isError && toast.error(subscription.error.message)} */}
           <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground font-light px-2">
             {countLoading ? (
               "Loading..."
