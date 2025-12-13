@@ -23,15 +23,15 @@ export function Footer() {
               Connect
             </h4>
             <div className="flex items-center gap-6">
+              {/* <Link */}
+              {/*   href="#" */}
+              {/*   className="text-white/60 hover:text-white transition-colors" */}
+              {/* > */}
+              {/*   <span className="sr-only">Twitter</span> */}
+              {/*   <Twitter className="h-5 w-5" /> */}
+              {/* </Link> */}
               <Link
-                href="#"
-                className="text-white/60 hover:text-white transition-colors"
-              >
-                <span className="sr-only">Twitter</span>
-                <Twitter className="h-5 w-5" />
-              </Link>
-              <Link
-                href="#"
+                href="https://github.com/awras-ai"
                 className="text-white/60 hover:text-white transition-colors"
               >
                 <span className="sr-only">GitHub</span>
