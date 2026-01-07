@@ -59,3 +59,49 @@ export function hslToHex(hslStr: string): string {
 
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
+
+/**
+ * Detect if text is right-to-left (RTL) based on the first word
+ * Checks for Arabic, Hebrew, and other RTL scripts
+ */
+export function isRTLText(text?: string): boolean {
+  if (!text || typeof text !== 'string') return false;
+
+  // Get first word (trim whitespace, split by whitespace)
+  const trimmed = text.trim();
+  if (!trimmed.length) return false;
+
+  const firstWordMatch = trimmed.match(/^[\p{L}\p{M}]+/u);
+  if (!firstWordMatch) return false;
+
+  const firstWord = firstWordMatch[0];
+  if (!firstWord.length) return false;
+
+  // Check first character for RTL scripts
+  const firstChar = firstWord.charAt(0);
+  const charCode = firstChar.charCodeAt(0);
+
+  // Arabic ranges
+  if (charCode >= 0x0600 && charCode <= 0x06FF) return true; // Arabic
+  if (charCode >= 0x0750 && charCode <= 0x077F) return true; // Arabic Supplement
+  if (charCode >= 0x08A0 && charCode <= 0x08FF) return true; // Arabic Extended-A
+  if (charCode >= 0xFB50 && charCode <= 0xFDFF) return true; // Arabic Presentation Forms-A
+  if (charCode >= 0xFE70 && charCode <= 0xFEFF) return true; // Arabic Presentation Forms-B
+
+  // Hebrew range
+  if (charCode >= 0x0590 && charCode <= 0x05FF) return true; // Hebrew
+
+  // Syriac range
+  if (charCode >= 0x0700 && charCode <= 0x074F) return true; // Syriac
+
+  // Thaana (Dhivehi/Maldivian)
+  if (charCode >= 0x0780 && charCode <= 0x07BF) return true; // Thaana
+
+  // N'Ko
+  if (charCode >= 0x07C0 && charCode <= 0x07FF) return true; // N'Ko
+
+  // Mandaic
+  if (charCode >= 0x0840 && charCode <= 0x085F) return true; // Mandaic
+
+  return false;
+}

@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn, isRTLText } from '@/lib/utils';
 import { PropsWithChildren, useMemo } from 'react';
 
 import type { IStep } from '@chainlit/react-client';
@@ -14,16 +14,25 @@ import { Translator } from 'components/i18n';
 interface Props {
   step: IStep;
   isRunning?: boolean;
+  isRTL?: boolean;
 }
 
 export default function Step({
   step,
   children,
-  isRunning
+  isRunning,
+  isRTL: propIsRTL
 }: PropsWithChildren<Props>) {
   const using = useMemo(() => {
     return isRunning && step.start && !step.end && !step.isError;
   }, [step, isRunning]);
+
+  const isRTL = useMemo(() => {
+    if (propIsRTL !== undefined) return propIsRTL;
+    // Check output first, then input for RTL detection
+    const text = step.output || step.input;
+    return isRTLText(text);
+  }, [propIsRTL, step.output, step.input]);
 
   const hasContent = step.input || step.output || step.steps?.length;
   const isError = step.isError;
@@ -32,7 +41,13 @@ export default function Step({
   // If there's no content, just render the status without accordion
   if (!hasContent) {
     return (
-      <div className="flex flex-col flex-grow w-0">
+      <div
+        dir={isRTL ? 'rtl' : 'ltr'}
+        className={cn(
+          'flex flex-col flex-grow w-0',
+          isRTL && 'text-right'
+        )}
+      >
         <p
           className={cn(
             'flex items-center gap-1 font-medium',
@@ -57,7 +72,13 @@ export default function Step({
   }
 
   return (
-    <div className="flex flex-col flex-grow w-0">
+    <div
+      dir={isRTL ? 'rtl' : 'ltr'}
+      className={cn(
+        'flex flex-col flex-grow w-0',
+        isRTL && 'text-right'
+      )}
+    >
       <Accordion
         type="single"
         collapsible
@@ -85,7 +106,15 @@ export default function Step({
             )}
           </AccordionTrigger>
           <AccordionContent>
-            <div className="flex-grow mt-4 ml-1 pl-4 border-l-2 border-primary">
+            <div
+              dir={isRTL ? 'rtl' : 'ltr'}
+              className={cn(
+                'flex-grow mt-4 border-primary',
+                isRTL
+                  ? 'mr-1 pr-4 border-r-2 text-right'
+                  : 'ml-1 pl-4 border-l-2'
+              )}
+            >
               {children}
             </div>
           </AccordionContent>

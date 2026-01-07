@@ -18,7 +18,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - app_internal_network
+      - awras_internal_network
 
   redis:
     image: redis:7-alpine
@@ -27,7 +27,7 @@ services:
     ports:
       - "${REDIS_PORT:-6379}:6379"
     networks:
-      - app_internal_network
+      - awras_internal_network
 
   # # FastAPI backend
   backend:
@@ -36,10 +36,12 @@ services:
       context: ./backend/
       dockerfile: Dockerfile
     #NOTE: in docker we should never use urls with the localhost (always use with the container name)
-    environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
-      - CORS_ORIGINS=${CORS_ORIGINS}
+    env_file:
+      - .env
+    # environment:
+    #   DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    #   REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+    #   CORS_ORIGINS: ${CORS_ORIGINS}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     restart: unless-stopped
@@ -49,7 +51,7 @@ services:
       redis:
         condition: service_started
     networks:
-      - app_internal_network
+      - awras_internal_network
 
   # Next.js application
   frontend:
@@ -72,11 +74,27 @@ services:
       # backend:
       #   condition: service_started
     networks:
-      - app_internal_network
+      - awras_internal_network
+  chat_app:
+    build:
+      context: ./chat_app
+      dockerfile: Dockerfile
+    container_name: chat_app
+    ports:
+      - "${FRONTEND_PORT_NUMBER:-5173}:80"
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+    restart: always
+    depends_on:
+      - postgres
+      - frontend
+      - backend
+    networks:
+      - awras_internal_network
 
 volumes:
   postgres_data:
 
 networks:
-  app_internal_network:
+  awras_internal_network:
     driver: bridge

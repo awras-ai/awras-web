@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn, isRTLText } from '@/lib/utils';
 import { MessageContext } from 'contexts/MessageContext';
 import { memo, useContext, useMemo, useRef } from 'react';
 
@@ -55,6 +55,11 @@ const Message = memo(
     const skip = toolCallSkip || hiddenSkip;
     const showInputSection = Boolean(message.input && message.showInput);
     const shouldRenderOutput = !showInputSection || Boolean(message.output);
+    const isRTL = useMemo(() => {
+      // Check output first, then input for RTL detection
+      const text = message.output || message.input;
+      return isRTLText(text);
+    }, [message.output, message.input]);
 
     const userMessageContent = useMemo(
       () => (
@@ -105,7 +110,13 @@ const Message = memo(
                   </UserMessage>
                 </div>
               ) : (
-                <div className="ai-message flex gap-4 w-full">
+                <div
+                  dir={isRTL ? 'rtl' : 'ltr'}
+                  className={cn(
+                    'ai-message flex gap-4 w-full',
+                    isRTL && 'text-right'
+                  )}
+                >
                   {!isStep || !indent ? (
                     <MessageAvatar
                       author={message.metadata?.avatarName || message.name}
@@ -114,7 +125,7 @@ const Message = memo(
                   ) : null}
                   {/* Display the step and its children */}
                   {isStep ? (
-                    <Step step={message} isRunning={isRunning}>
+                    <Step step={message} isRunning={isRunning} isRTL={isRTL}>
                       {showInputSection ? (
                         <MessageContent
                           elements={elements}
@@ -153,7 +164,13 @@ const Message = memo(
                     </Step>
                   ) : (
                     // Display an assistant message
-                    <div className="flex flex-col items-start min-w-[150px] flex-grow gap-2">
+                    <div
+                      dir={isRTL ? 'rtl' : 'ltr'}
+                      className={cn(
+                        'flex flex-col items-start min-w-[150px] flex-grow gap-2',
+                        isRTL && 'text-right'
+                      )}
+                    >
                       <MessageContent
                         ref={contentRef}
                         elements={elements}
