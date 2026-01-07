@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from chainlit.utils import mount_chainlit
 
 from app.core.config import get_settings
 from app.core.limiter import limiter
@@ -68,3 +69,6 @@ async def root(request: Request):
 async def health_check(request: Request):
     """Health check endpoint."""
     return {"status": "healthy"}
+
+
+mount_chainlit(app, target="./app/chainlit_app.py", path="/chat")
