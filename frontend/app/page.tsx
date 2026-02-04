@@ -1,9 +1,10 @@
 import { Hero } from "@/components/hero";
 import { VisionSection } from "@/components/vision-section";
 import { ProcessSection } from "@/components/process-section";
-import { WaitlistSection } from "@/components/waitlist-section";
+import { ProcessTimelineSection } from "@/components/process-timeline-section";
 import { Footer } from "@/components/footer";
 import { Navbar } from "@/components/navbar";
+import { FAQSection } from "@/components/faq-section";
 
 export default function Home() {
   return (
@@ -14,7 +15,8 @@ export default function Home() {
         <Hero />
         <VisionSection />
         <ProcessSection />
-        {/* <WaitlistSection /> */}
+        {/* <ProcessTimelineSection /> */}
+        <FAQSection />
         <Footer />
       </div>
     </main>
