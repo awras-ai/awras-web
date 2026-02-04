@@ -50,6 +50,11 @@ class Settings(BaseSettings):
     # Frontend URL (for verification links and redirects)
     FRONTEND_URL: str = "http://localhost:5173"
 
+    # Email Verification
+    REQUIRE_EMAIL_VERIFICATION: bool = (
+        False  # Set True to require email verification before login
+    )
+
     class Config:
         env_file = ".env"
         case_sensitive = True

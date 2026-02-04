@@ -1,8 +1,8 @@
 """adding session and chainlit data presistance layer
 
-Revision ID: 495c2d5618a9
+Revision ID: 83d767bf1044
 Revises: 2849e39212e1
-Create Date: 2026-02-03 15:52:01.902463
+Create Date: 2026-02-03 16:50:55.025407
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '495c2d5618a9'
+revision: str = '83d767bf1044'
 down_revision: Union[str, Sequence[str], None] = '2849e39212e1'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

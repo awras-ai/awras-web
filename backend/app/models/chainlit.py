@@ -4,6 +4,9 @@ Chainlit data layer models.
 These models match the schema required by Chainlit's SQLAlchemy data layer:
 https://docs.chainlit.io/data-layers/sqlalchemy
 
+IMPORTANT: Do not add SQLAlchemy relationships here - Chainlit manages
+these tables directly and handles relationships at runtime.
+
 Tables:
 - threads: Chat conversation threads
 - steps: Individual messages/steps within threads
@@ -12,11 +15,9 @@ Tables:
 """
 
 import uuid
-from typing import Optional
 
 from sqlalchemy import ARRAY, Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB, UUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
 
@@ -47,21 +48,6 @@ class Thread(Base):
     tags = Column(ARRAY(String))
     metadata_ = Column("metadata", JSONB)
 
-    # Relationships
-    user = relationship("User", back_populates="threads", foreign_keys=[user_id])
-    steps = relationship(
-        "Step", back_populates="thread", cascade="all, delete-orphan", lazy="dynamic"
-    )
-    elements = relationship(
-        "Element", back_populates="thread", cascade="all, delete-orphan", lazy="dynamic"
-    )
-    feedbacks = relationship(
-        "Feedback",
-        back_populates="thread",
-        cascade="all, delete-orphan",
-        lazy="dynamic",
-    )
-
     def __repr__(self) -> str:
         return f"<Thread {self.id} - {self.name}>"
 
@@ -77,7 +63,7 @@ class Step(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
-    type_ = Column("type", String, nullable=False)  # reserved word fix
+    type_ = Column("type", String, nullable=False)
     thread_id = Column(
         "threadId",
         UUID(as_uuid=True),
@@ -102,23 +88,6 @@ class Step(Base):
     indent = Column(Integer)
     default_open = Column("defaultOpen", Boolean)
 
-    # Relationships
-    thread = relationship("Thread", back_populates="steps")
-    elements = relationship(
-        "Element",
-        back_populates="step",
-        cascade="all, delete-orphan",
-        lazy="dynamic",
-        foreign_keys="Element.for_id",
-    )
-    feedbacks = relationship(
-        "Feedback",
-        back_populates="step",
-        cascade="all, delete-orphan",
-        lazy="dynamic",
-        foreign_keys="Feedback.for_id",
-    )
-
     def __repr__(self) -> str:
         return f"<Step {self.id} - {self.type_}: {self.name}>"
 
@@ -136,7 +105,7 @@ class Element(Base):
     thread_id = Column(
         "threadId", UUID(as_uuid=True), ForeignKey("threads.id", ondelete="CASCADE")
     )
-    type_ = Column("type", String)  # reserved word fix
+    type_ = Column("type", String)
     url = Column(String)
     chainlit_key = Column("chainlitKey", String)
     name = Column(String, nullable=False)
@@ -148,11 +117,7 @@ class Element(Base):
     for_id = Column("forId", UUID(as_uuid=True))
     mime = Column(String)
     props = Column(JSONB)
-    autoPlay: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
-
-    # Relationships
-    thread = relationship("Thread", back_populates="elements")
-    step = relationship("Step", back_populates="elements", foreign_keys=[for_id])
+    auto_play = Column("autoPlay", Boolean)
 
     def __repr__(self) -> str:
         return f"<Element {self.id} - {self.name}>"
@@ -180,12 +145,8 @@ class Feedback(Base):
         ForeignKey("threads.id", ondelete="CASCADE"),
         nullable=False,
     )
-    value = Column(Integer, nullable=False)  # 1 = positive, -1 = negative
+    value = Column(Integer, nullable=False)
     comment = Column(String)
-
-    # Relationships
-    thread = relationship("Thread", back_populates="feedbacks")
-    step = relationship("Step", back_populates="feedbacks", foreign_keys=[for_id])
 
     def __repr__(self) -> str:
         return f"<Feedback {self.id} - value: {self.value}>"
