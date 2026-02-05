@@ -32,11 +32,11 @@ class EmailService:
         identifier: str,
     ) -> bool:
         """
-        Send email verification link to user.
+        Send email verification OTP to user.
 
         Args:
             to_email: Recipient email address
-            token: Verification token
+            token: Verification OTP (6 digits)
             identifier: User's username for personalization
 
         Returns:
@@ -45,70 +45,86 @@ class EmailService:
         if not EmailService._get_client():
             return False
 
-        verification_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
-
         html_content = f"""
         <!DOCTYPE html>
         <html>
         <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {{
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    line-height: 1.6;
+                    color: #000;
+                    background-color: #fff;
+                    margin: 0;
+                    padding: 20px;
+                }}
+                .container {{
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 40px;
+                }}
+                .otp {{
+                    font-size: 32px;
+                    font-weight: bold;
+                    letter-spacing: 5px;
+                    margin: 30px 0;
+                    text-align: center;
+                    padding: 20px;
+                    display: inline-block;
+                }}
+                .footer {{
+                    margin-top: 40px;
+                    font-size: 12px;
+                    border-top: 1px solid #000;
+                    padding-top: 20px;
+                }}
+            </style>
         </head>
-        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0;">
-                <h1 style="color: white; margin: 0; font-size: 24px;">Welcome to AWRAS!</h1>
-            </div>
-            <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-                <p>Hi <strong>{identifier}</strong>,</p>
-                <p>Thanks for signing up! Please verify your email address to complete your registration.</p>
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="{verification_url}" 
-                       style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                              color: white; 
-                              padding: 14px 30px; 
-                              text-decoration: none; 
-                              border-radius: 5px; 
-                              display: inline-block;
-                              font-weight: bold;">
-                        Verify Email Address
-                    </a>
+        <body>
+            <div class="container">
+                <h1 style="margin-top: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 1px;">AWRAS Verification</h1>
+                
+                <p>Hello {identifier},</p>
+                
+                <p>Please use the following code to verify your email address:</p>
+                
+                <div style="text-align: center;">
+                    <div class="otp">{token}</div>
                 </div>
-                <p style="color: #666; font-size: 14px;">
-                    If the button doesn't work, copy and paste this link into your browser:
-                    <br>
-                    <a href="{verification_url}" style="color: #667eea; word-break: break-all;">{verification_url}</a>
-                </p>
-                <p style="color: #666; font-size: 14px;">
-                    This link will expire in {settings.EMAIL_VERIFICATION_EXPIRE_HOURS} hours.
-                </p>
-                <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
-                <p style="color: #999; font-size: 12px;">
-                    If you didn't create an account with AWRAS, you can safely ignore this email.
-                </p>
+                
+                <p>This code will expire in {settings.EMAIL_VERIFICATION_EXPIRE_HOURS} hours.</p>
+                
+                <p>If you didn't request this code, you can safely ignore this email.</p>
+                
+                <div class="footer">
+                    AWRAS AI - An AI that understands our language 🇩🇿
+                </div>
             </div>
         </body>
         </html>
         """
 
         text_content = f"""
-Welcome to AWRAS!
+AWRAS VERIFICATION
 
-Hi {identifier},
+Hello {identifier},
 
-Thanks for signing up! Please verify your email address to complete your registration.
+Please use the following code to verify your email address:
 
-Click here to verify: {verification_url}
+{token}
 
-This link will expire in {settings.EMAIL_VERIFICATION_EXPIRE_HOURS} hours.
+This code will expire in {settings.EMAIL_VERIFICATION_EXPIRE_HOURS} hours.
 
-If you didn't create an account with AWRAS, you can safely ignore this email.
+If you didn't request this code, you can safely ignore this email.
         """
 
         try:
             params: resend.Emails.SendParams = {
                 "from": settings.EMAIL_FROM,
                 "to": [to_email],
-                "subject": "Verify your AWRAS account",
+                "subject": f"Your AWRAS verification code: {token}",
                 "html": html_content,
                 "text": text_content,
             }
@@ -128,11 +144,11 @@ If you didn't create an account with AWRAS, you can safely ignore this email.
         identifier: str,
     ) -> bool:
         """
-        Send password reset link to user.
+        Send password reset OTP to user.
 
         Args:
             to_email: Recipient email address
-            token: Password reset token
+            token: Password reset OTP (6 digits)
             identifier: User's username for personalization
 
         Returns:
@@ -141,70 +157,88 @@ If you didn't create an account with AWRAS, you can safely ignore this email.
         if not EmailService._get_client():
             return False
 
-        reset_url = f"{settings.FRONTEND_URL}/reset-password?token={token}"
-
         html_content = f"""
         <!DOCTYPE html>
         <html>
         <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {{
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    line-height: 1.6;
+                    color: #000;
+                    background-color: #fff;
+                    margin: 0;
+                    padding: 20px;
+                }}
+                .container {{
+                    max-width: 600px;
+                    margin: 0 auto;
+                    border: 1px solid #000;
+                    padding: 40px;
+                }}
+                .otp {{
+                    font-size: 32px;
+                    font-weight: bold;
+                    letter-spacing: 5px;
+                    margin: 30px 0;
+                    text-align: center;
+                    border: 2px solid #000;
+                    padding: 20px;
+                    display: inline-block;
+                }}
+                .footer {{
+                    margin-top: 40px;
+                    font-size: 12px;
+                    border-top: 1px solid #000;
+                    padding-top: 20px;
+                }}
+            </style>
         </head>
-        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0;">
-                <h1 style="color: white; margin: 0; font-size: 24px;">Password Reset Request</h1>
-            </div>
-            <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-                <p>Hi <strong>{identifier}</strong>,</p>
-                <p>We received a request to reset your password. Click the button below to create a new password.</p>
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="{reset_url}" 
-                       style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                              color: white; 
-                              padding: 14px 30px; 
-                              text-decoration: none; 
-                              border-radius: 5px; 
-                              display: inline-block;
-                              font-weight: bold;">
-                        Reset Password
-                    </a>
+        <body>
+            <div class="container">
+                <h1 style="margin-top: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 1px;">Password Reset</h1>
+                
+                <p>Hello {identifier},</p>
+                
+                <p>We received a request to reset your password. Use the following code to proceed:</p>
+                
+                <div style="text-align: center;">
+                    <div class="otp">{token}</div>
                 </div>
-                <p style="color: #666; font-size: 14px;">
-                    If the button doesn't work, copy and paste this link into your browser:
-                    <br>
-                    <a href="{reset_url}" style="color: #667eea; word-break: break-all;">{reset_url}</a>
-                </p>
-                <p style="color: #666; font-size: 14px;">
-                    This link will expire in 1 hour.
-                </p>
-                <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
-                <p style="color: #999; font-size: 12px;">
-                    If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged.
-                </p>
+                
+                <p>This code will expire in 1 hour.</p>
+                
+                <p>If you didn't request a password reset, you can safely ignore this email.</p>
+                
+                <div class="footer">
+                    AWRAS AI - Automated Workflow & Reasoning Agent System
+                </div>
             </div>
         </body>
         </html>
         """
 
         text_content = f"""
-Password Reset Request
+PASSWORD RESET
 
-Hi {identifier},
+Hello {identifier},
 
-We received a request to reset your password. Click the link below to create a new password:
+We received a request to reset your password. Use the following code to proceed:
 
-{reset_url}
+{token}
 
-This link will expire in 1 hour.
+This code will expire in 1 hour.
 
-If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged.
+If you didn't request a password reset, you can safely ignore this email.
         """
 
         try:
             params: resend.Emails.SendParams = {
                 "from": settings.EMAIL_FROM,
                 "to": [to_email],
-                "subject": "Reset your AWRAS password",
+                "subject": f"Reset your AWRAS password: {token}",
                 "html": html_content,
                 "text": text_content,
             }
