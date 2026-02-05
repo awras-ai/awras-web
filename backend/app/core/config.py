@@ -55,6 +55,12 @@ class Settings(BaseSettings):
         False  # Set True to require email verification before login
     )
 
+    # Cloudflare R2
+    R2_ENDPOINT_URL: str = ""
+    R2_ACCESS_KEY_ID: str = ""
+    R2_SECRET_ACCESS_KEY: str = ""
+    R2_BUCKET_NAME: str = "awras"
+
     class Config:
         env_file = ".env"
         case_sensitive = True

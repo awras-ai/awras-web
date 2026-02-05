@@ -90,8 +90,8 @@ class User(Base):
 
     @staticmethod
     def generate_verification_token() -> str:
-        """Generate a secure verification token."""
-        return secrets.token_urlsafe(32)
+        """Generate a secure 6-digit numeric verification token."""
+        return "".join(secrets.choice("0123456789") for _ in range(6))
 
     def set_verification_token(self, hours: int = 24) -> str:
         """Set verification token with expiration."""

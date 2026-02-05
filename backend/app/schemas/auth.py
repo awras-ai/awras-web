@@ -2,7 +2,6 @@
 Pydantic schemas for authentication.
 """
 
-from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
@@ -88,6 +87,9 @@ class UserResponse(BaseModel):
     first_name: Optional[str] = Field(None, description="First name")
     last_name: Optional[str] = Field(None, description="Last name")
     is_verified: bool = Field(..., description="Email verification status")
+    profile_image_url: Optional[str] = Field(
+        None, description="Signed URL of the profile image"
+    )
     created_at: Optional[str] = Field(None, description="Account creation timestamp")
 
     class Config:
@@ -102,6 +104,16 @@ class AuthResponse(BaseModel):
     user: Optional[UserResponse] = Field(None, description="User data (if successful)")
     requires_verification: bool = Field(
         default=False, description="Whether email verification is required"
+    )
+
+
+class ProfileImageResponse(BaseModel):
+    """Schema for profile image upload response."""
+
+    success: bool = Field(..., description="Whether the operation was successful")
+    message: str = Field(..., description="Response message")
+    profile_image_url: Optional[str] = Field(
+        None, description="Signed URL of the uploaded profile image"
     )
 
 

@@ -4,7 +4,16 @@ Authentication API endpoints.
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Request,
+    Response,
+    status,
+    UploadFile,
+    File,
+)
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -18,9 +27,11 @@ from app.schemas.auth import (
     UserLogin,
     UserRegister,
     UserResponse,
+    ProfileImageResponse,
 )
 from app.services.auth import AuthService
 from app.services.email import EmailService
+from app.services.object_storage import storage_service
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 settings = get_settings()
@@ -84,6 +95,10 @@ def require_auth(request: Request, db: Session = Depends(get_db)) -> User:
 
 def user_to_response(user: User) -> UserResponse:
     """Convert User model to UserResponse schema."""
+    profile_image_url = None
+    if user.profile_image_path:
+        profile_image_url = storage_service.get_presigned_url(user.profile_image_path)
+
     return UserResponse(
         id=user.id,
         identifier=user.identifier,
@@ -91,6 +106,7 @@ def user_to_response(user: User) -> UserResponse:
         first_name=user.first_name,
         last_name=user.last_name,
         is_verified=user.is_verified,
+        profile_image_url=profile_image_url,
         created_at=user.created_at,
     )
 
@@ -370,3 +386,54 @@ async def get_me(
     Requires authentication.
     """
     return user_to_response(user)
+
+
+@router.post(
+    "/profile-image",
+    response_model=ProfileImageResponse,
+    summary="Upload profile image",
+)
+@limiter.limit("5/minute")
+async def upload_profile_image(
+    request: Request,
+    file: UploadFile = File(...),
+    user: User = Depends(require_auth),
+    db: Session = Depends(get_db),
+) -> ProfileImageResponse:
+    """
+    Upload a profile image for the authenticated user.
+
+    - Validates file type (image/*)
+    - Uploads to Cloudflare R2
+    - Updates user profile with image path
+    - Returns a signed URL for immediate display
+    """
+    # Validate file type
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File must be an image",
+        )
+
+    # Upload to R2
+    key = storage_service.upload_file(file, folder="profile-pictures")
+
+    if not key:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to upload image",
+        )
+
+    # Update user profile
+    user.profile_image_path = key
+    db.commit()
+    db.refresh(user)
+
+    # Generate signed URL
+    signed_url = storage_service.get_presigned_url(key)
+
+    return ProfileImageResponse(
+        success=True,
+        message="Profile image uploaded successfully",
+        profile_image_url=signed_url,
+    )
