@@ -19,7 +19,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useRegistration } from "../../signup/components/RegistrationContext";
-import { useVerifyEmail } from "@/hooks/useAuth";
+import { useVerifyEmail, useResendVerification } from "@/hooks/useAuth";
 
 const step2Schema = z.object({
   code: z.string().length(6, "Please enter the 6-digit code"),
@@ -33,6 +33,7 @@ interface Step2FormProps {
 export function Step2Form({ onNext, onBack }: Step2FormProps) {
   const { data } = useRegistration();
   const mutation = useVerifyEmail();
+  const resendMutation = useResendVerification();
 
   const form = useForm<z.infer<typeof step2Schema>>({
     resolver: zodResolver(step2Schema),
@@ -50,6 +51,10 @@ export function Step2Form({ onNext, onBack }: Step2FormProps) {
         },
       },
     );
+  }
+
+  function handleResend() {
+    resendMutation.mutate({ email: data.email });
   }
 
   return (
@@ -128,11 +133,34 @@ export function Step2Form({ onNext, onBack }: Step2FormProps) {
             <ChevronLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
+
+          <Button
+            type="button"
+            variant="link"
+            className="w-full"
+            onClick={handleResend}
+            disabled={resendMutation.isPending}
+          >
+            {resendMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              "Resend code"
+            )}
+          </Button>
         </div>
 
         {mutation.isError && (
           <p className="text-sm text-red-500 text-center">
             {mutation.error.message}
+          </p>
+        )}
+
+        {resendMutation.isSuccess && (
+          <p className="text-sm text-green-500 text-center">
+            Verification code resent successfully!
           </p>
         )}
       </form>

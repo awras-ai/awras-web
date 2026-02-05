@@ -1,13 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   registerUser,
   verifyEmail,
+  resendVerification,
   uploadProfilePicture,
   loginUser,
-  RegisterData,
-  VerifyEmailData,
-  UploadProfileData,
-  LoginData,
+  getCurrentUser,
 } from "@/lib/api/auth";
 
 export function useRegister() {
@@ -22,6 +20,12 @@ export function useVerifyEmail() {
   });
 }
 
+export function useResendVerification() {
+  return useMutation({
+    mutationFn: resendVerification,
+  });
+}
+
 export function useUploadProfile() {
   return useMutation({
     mutationFn: uploadProfilePicture,
@@ -31,5 +35,13 @@ export function useUploadProfile() {
 export function useLogin() {
   return useMutation({
     mutationFn: loginUser,
+  });
+}
+
+export function useCurrentUser() {
+  return useQuery({
+    queryKey: ["currentUser"],
+    queryFn: getCurrentUser,
+    retry: false,
   });
 }

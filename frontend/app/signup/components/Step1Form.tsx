@@ -27,7 +27,7 @@ const step1Schema = z.object({
 });
 
 interface Step1FormProps {
-  onNext: () => void;
+  onNext: (requiresVerification: boolean) => void;
 }
 
 export function Step1Form({ onNext }: Step1FormProps) {
@@ -47,9 +47,9 @@ export function Step1Form({ onNext }: Step1FormProps) {
 
   function onSubmit(values: z.infer<typeof step1Schema>) {
     mutation.mutate(values, {
-      onSuccess: () => {
+      onSuccess: (response) => {
         setData(values);
-        onNext();
+        onNext(response.requires_verification);
       },
     });
   }

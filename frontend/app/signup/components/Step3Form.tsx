@@ -36,10 +36,10 @@ export function Step3Form({ onComplete }: Step3FormProps) {
   const handleSubmit = () => {
     if (selectedFile) {
       mutation.mutate(
-        { file: selectedFile, userId: "user_" + Date.now() },
+        { file: selectedFile },
         {
           onSuccess: (result) => {
-            setData({ profilePicture: result.url });
+            setData({ profilePicture: result.profile_image_url });
             onComplete();
           },
         },

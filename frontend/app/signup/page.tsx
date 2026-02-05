@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 
 import {
@@ -20,6 +21,7 @@ import {
 
 export default function RegistrationPage() {
   const [step, setStep] = useState(1);
+  const router = useRouter();
 
   return (
     <RegistrationProvider>
@@ -40,7 +42,17 @@ export default function RegistrationPage() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
               >
-                {step === 1 && <Step1Form onNext={() => setStep(2)} />}
+                {step === 1 && (
+                  <Step1Form
+                    onNext={(requiresVerification) => {
+                      if (requiresVerification) {
+                        setStep(2);
+                      } else {
+                        setStep(3);
+                      }
+                    }}
+                  />
+                )}
                 {step === 2 && (
                   <Step2Form
                     onNext={() => setStep(3)}
@@ -50,7 +62,7 @@ export default function RegistrationPage() {
                 {step === 3 && (
                   <Step3Form
                     onComplete={() => {
-                      alert("Registration complete! Welcome aboard!");
+                      router.push("/dashboard");
                     }}
                   />
                 )}
