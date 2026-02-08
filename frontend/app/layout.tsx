@@ -14,10 +14,45 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Awras",
+  metadataBase: new URL("https://awras.io"),
+  title: {
+    default: "Awras - Preserving Algerian Darija with AI",
+    template: "%s | Awras",
+  },
   description:
-    "Toward an ecosystem dedicated to preserving and empowering the Algerian dialect (Darija) through advanced Artificial Intelligence.",
+    "An ecosystem dedicated to preserving and empowering the Algerian dialect (Darija) through advanced Artificial Intelligence.",
+  keywords: [
+    "Algeria",
+    "AI",
+    "Darija",
+    "Artificial Intelligence",
+    "NLP",
+    "North Africa",
+    "Maghreb",
+    "LLM",
+    "dz",
+    "hadra",
+    "hadretna",
+    "Language Preservation",
+  ],
+  authors: [{ name: "Awras Team" }],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://awras.io",
+    title: "Awras - The Future of Algerian AI",
+    description:
+      "Preserving and empowering Algerian Darija using state-of-the-art Artificial Intelligence.",
+    siteName: "Awras",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Awras - The Future of Algerian AI",
+    description:
+      "Preserving and empowering Algerian Darija using state-of-the-art Artificial Intelligence.",
+  },
 };
+
 
 export default function RootLayout({
   children,

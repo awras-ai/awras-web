@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { WaitlistForm } from "./waitlist-form";
 
+
 export function Hero() {
   return (
     <section className="relative flex flex-col items-center justify-center px-4 pt-32 pb-24 md:pt-48 md:pb-40 text-center overflow-hidden">

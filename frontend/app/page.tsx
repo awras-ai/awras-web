@@ -5,6 +5,7 @@ import { ProcessTimelineSection } from "@/components/process-timeline-section";
 import { Footer } from "@/components/footer";
 import { Navbar } from "@/components/navbar";
 import { FAQSection } from "@/components/faq-section";
+import { ModelComparisonSection } from "@/components/model-comparison";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       <div className="squares-background" />
       <div className="relative z-10">
         <Hero />
+        <ModelComparisonSection />
         <VisionSection />
         <ProcessSection />
         {/* <ProcessTimelineSection /> */}
