@@ -1,11 +1,11 @@
-import { cn } from '@/lib/utils';
-import { size } from 'lodash';
-import { Share2 } from 'lucide-react';
-import { useContext, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
-import { useSetRecoilState } from 'recoil';
-import { toast } from 'sonner';
+import { cn } from "@/lib/utils";
+import { size } from "lodash";
+import { Share2 } from "lucide-react";
+import { useContext, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useNavigate } from "react-router-dom";
+import { useSetRecoilState } from "recoil";
+import { toast } from "sonner";
 
 import {
   ChainlitContext,
@@ -15,12 +15,12 @@ import {
   useChatInteract,
   useChatMessages,
   useChatSession,
-  useConfig
-} from '@chainlit/react-client';
+  useConfig,
+} from "@chainlit/react-client";
 
-import Alert from '@/components/Alert';
-import { Loader } from '@/components/Loader';
-import ShareDialog from '@/components/share/ShareDialog';
+import Alert from "@/components/Alert";
+import { Loader } from "@/components/Loader";
+import ShareDialog from "@/components/share/ShareDialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,36 +29,36 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
-} from '@/components/ui/sidebar';
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger
-} from '@/components/ui/tooltip';
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-import { Translator } from '../i18n';
-import ThreadOptions from './ThreadOptions';
+import { Translator } from "../i18n";
+import ThreadOptions from "./ThreadOptions";
 
 interface ThreadListProps {
   threadHistory?: ThreadHistory;
@@ -71,7 +71,7 @@ export function ThreadList({
   threadHistory,
   error,
   isFetching,
-  isLoadingMore
+  isLoadingMore,
 }: ThreadListProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -103,10 +103,10 @@ export function ThreadList({
   const sortedTimeGroupKeys = useMemo(() => {
     if (!threadHistory?.timeGroupedThreads) return [];
     const fixedOrder = [
-      'Today',
-      'Yesterday',
-      'Previous 7 days',
-      'Previous 30 days'
+      "Today",
+      "Yesterday",
+      "Previous 7 days",
+      "Previous 30 days",
     ];
     return Object.keys(threadHistory.timeGroupedThreads).sort((a, b) => {
       const aIndex = fixedOrder.indexOf(a);
@@ -159,9 +159,9 @@ export function ThreadList({
       success: () => {
         setThreadHistory((prev) => ({
           ...prev,
-          threads: prev?.threads?.filter((t) => t.id !== threadIdToDelete)
+          threads: prev?.threads?.filter((t) => t.id !== threadIdToDelete),
         }));
-        navigate('/');
+        navigate("/");
         return (
           <Translator path="threadHistory.thread.actions.delete.success" />
         );
@@ -172,7 +172,7 @@ export function ThreadList({
         } else {
           return <span></span>;
         }
-      }
+      },
     });
   };
 
@@ -189,15 +189,15 @@ export function ThreadList({
         setThreadHistory((prev) => {
           const next = {
             ...prev,
-            threads: prev?.threads ? [...prev.threads] : undefined
+            threads: prev?.threads ? [...prev.threads] : undefined,
           };
           const threadIndex = next.threads?.findIndex(
-            (t) => t.id === threadIdToRename
+            (t) => t.id === threadIdToRename,
           );
-          if (typeof threadIndex === 'number' && next.threads) {
+          if (typeof threadIndex === "number" && next.threads) {
             next.threads[threadIndex] = {
               ...next.threads[threadIndex],
-              name: threadNewName
+              name: threadNewName,
             };
           }
           return next;
@@ -214,7 +214,7 @@ export function ThreadList({
         } else {
           return <span></span>;
         }
-      }
+      },
     });
   };
 
@@ -224,12 +224,12 @@ export function ThreadList({
       Yesterday: (
         <Translator path="threadHistory.sidebar.timeframes.yesterday" />
       ),
-      'Previous 7 days': (
+      "Previous 7 days": (
         <Translator path="threadHistory.sidebar.timeframes.previous7days" />
       ),
-      'Previous 30 days': (
+      "Previous 30 days": (
         <Translator path="threadHistory.sidebar.timeframes.previous30days" />
-      )
+      ),
     };
     return labels[group as keyof typeof labels] || group;
   };
@@ -282,7 +282,7 @@ export function ThreadList({
               value={threadNewName}
               onChange={(e) => setThreadNewName(e.target.value)}
               placeholder={t(
-                'threadHistory.thread.actions.rename.form.name.placeholder'
+                "threadHistory.thread.actions.rename.form.name.placeholder",
               )}
               autoFocus
             />
@@ -332,7 +332,7 @@ export function ThreadList({
                       >
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Link to={isResumed ? '' : `/thread/${thread.id}`}>
+                            <Link to={isResumed ? "" : `/thread/${thread.id}`}>
                               <SidebarMenuButton
                                 isActive={isSelected}
                                 className="relative h-9 group/thread"
@@ -352,7 +352,7 @@ export function ThreadList({
                                 </span>
                                 <div
                                   className={cn(
-                                    'absolute w-10 bottom-0 top-0 right-0 bg-gradient-to-l from-[hsl(var(--sidebar-background))] to-transparent'
+                                    "absolute w-10 bottom-0 top-0 right-0 bg-gradient-to-l from-[hsl(var(--sidebar-background))] to-transparent",
                                   )}
                                 />
                                 <ThreadOptions
@@ -369,9 +369,9 @@ export function ThreadList({
                                       : undefined
                                   }
                                   className={cn(
-                                    'absolute z-20 bottom-0 top-0 right-0 bg-sidebar-accent hover:bg-sidebar-accent hover:text-primary flex opacity-0 group-hover/thread:opacity-100',
+                                    "absolute z-20 bottom-0 top-0 right-0 bg-sidebar-accent hover:bg-sidebar-accent hover:text-primary flex opacity-0 group-hover/thread:opacity-100",
                                     isSelected &&
-                                      'bg-sidebar-accent opacity-100'
+                                      "bg-sidebar-accent opacity-100",
                                   )}
                                 />
                               </SidebarMenuButton>

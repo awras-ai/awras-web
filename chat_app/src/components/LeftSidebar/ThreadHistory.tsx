@@ -1,18 +1,20 @@
 import { uniqBy } from "lodash";
-import { useContext, useEffect, useRef, useState, useMemo } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
+
 import {
   ChainlitContext,
   threadHistoryState,
   useChatMessages,
-  useChatSession,
 } from "@chainlit/react-client";
+
 import {
   SidebarContent,
   SidebarGroup,
   SidebarMenu,
 } from "@/components/ui/sidebar";
+
 import { ThreadList } from "./ThreadList";
 
 const BATCH_SIZE = 35;
@@ -29,8 +31,6 @@ export function ThreadHistory() {
   const [isFetching, setIsFetching] = useState(false);
   const [shouldLoadMore, setShouldLoadMore] = useState(false);
 
-  const { chatProfile } = useChatSession();
-
   // Restore scroll position
   useEffect(() => {
     if (scrollRef.current) {
@@ -38,50 +38,66 @@ export function ThreadHistory() {
     }
   }, []);
 
+  // Handle first interaction
+  useEffect(() => {
+    const handleFirstInteraction = async () => {
+      if (!firstInteraction) return;
+
+      const isActualResume =
+        firstInteraction === "resume" &&
+        messages[0]?.output.toLowerCase() !== "resume";
+
+      if (isActualResume) return;
+
+      await fetchThreads(undefined, true);
+
+      const currentPage = new URL(window.location.href);
+      if (threadId && currentPage.pathname === "/") {
+        navigate(`/thread/${threadId}`);
+      }
+    };
+
+    handleFirstInteraction();
+  }, [firstInteraction]);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollHeight, clientHeight, scrollTop } = scrollRef.current;
+    const atBottom = scrollTop + clientHeight >= scrollHeight - 10;
+
+    _scrollTop = scrollTop;
+    setShouldLoadMore(atBottom);
+  };
+
   const fetchThreads = async (
     cursor?: string | number,
-    isLoadingMoreOverride = false,
-    reason = "unknown"
+    isLoadingMore = false,
   ) => {
-    if (!chatProfile) return;
-
     try {
-      setIsLoadingMore(!!cursor || isLoadingMoreOverride);
-      setIsFetching(!cursor && !isLoadingMoreOverride);
-
-      console.log(`📡 FETCHING | Reason: ${reason} | Profile: "${chatProfile}"`);
+      setIsLoadingMore(!!cursor || isLoadingMore);
+      setIsFetching(!cursor && !isLoadingMore);
 
       const { pageInfo, data } = await apiClient.listThreads(
         { first: BATCH_SIZE, cursor },
         {},
       );
 
-      // --- DEBUG LOGS FOR SERVER DATA ---
-      if (data && data.length > 0) {
-        console.log("🔍 INSPECTING FIRST THREAD FROM SERVER:");
-        console.log("ID:", data[0].id);
-        console.log("Metadata:", data[0].metadata);
-        console.log("Chat Profile in Metadata:", data[0].metadata?.chat_profile);
-      } else {
-        console.log("⚠️ Server returned 0 threads.");
-      }
-      // ----------------------------------
-
       setError(undefined);
 
-      setThreadHistory((prev) => {
-        const allThreads = uniqBy(
-          cursor ? (prev?.threads || []).concat(data) : data,
-          "id",
-        );
-        return {
+      // Prevent duplicate threads
+      const allThreads = uniqBy(
+        cursor ? threadHistory?.threads?.concat(data) : data,
+        "id",
+      );
+
+      if (allThreads) {
+        setThreadHistory((prev) => ({
           ...prev,
           pageInfo,
           threads: allThreads,
-        };
-      });
+        }));
+      }
     } catch (err) {
-      console.error("❌ Fetch Error:", err);
       setError(err instanceof Error ? err.message : "Unknown error occurred");
     } finally {
       setShouldLoadMore(false);
@@ -90,94 +106,32 @@ export function ThreadHistory() {
     }
   };
 
-  // 1. Fetch on Profile Change
+  // Initial fetch
   useEffect(() => {
-    if (chatProfile) {
-      console.log("👤 Profile Changed to:", chatProfile);
-      // Optional: Clear current list to avoid mixing while loading
-      setThreadHistory((prev) => ({ ...prev, threads: [] }));
-      fetchThreads(undefined, false, "Profile Switch");
+    if (!isFetching && !threadHistory?.threads && !error) {
+      fetchThreads();
     }
-  }, [chatProfile]);
+  }, [isFetching, threadHistory, error]);
 
-  // 2. Fetch on New Thread (with delay for DB persistence)
+  // Handle infinite scroll
   useEffect(() => {
-    if (threadId && chatProfile) {
-      const timeoutId = setTimeout(() => {
-        fetchThreads(undefined, false, "New Thread Created");
-      }, 1500);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [threadId]);
+    if (threadHistory?.pageInfo) {
+      const { hasNextPage, endCursor } = threadHistory.pageInfo;
 
-  // 3. Navigation Logic
-  useEffect(() => {
-    if (!firstInteraction || !threadId) return;
-
-    const isActualResume =
-      firstInteraction === "resume" &&
-      messages[0]?.output.toLowerCase() !== "resume";
-
-    if (isActualResume) return;
-
-    const currentPage = new URL(window.location.href);
-    if (currentPage.pathname === "/") {
-      navigate(`/thread/${threadId}`);
-    }
-  }, [firstInteraction, threadId]);
-
-  const handleScroll = () => {
-    if (!scrollRef.current) return;
-    const { scrollHeight, clientHeight, scrollTop } = scrollRef.current;
-    const atBottom = scrollTop + clientHeight >= scrollHeight - 10;
-    _scrollTop = scrollTop;
-    setShouldLoadMore(atBottom);
-  };
-
-  // 4. Infinite Scroll
-  useEffect(() => {
-    if (shouldLoadMore && !isLoadingMore && threadHistory?.pageInfo?.hasNextPage) {
-      fetchThreads(threadHistory.pageInfo.endCursor, false, "Infinite Scroll");
-    }
-  }, [shouldLoadMore, isLoadingMore]);
-
-  // --- FILTERING LOGIC ---
-  const filteredThreads = useMemo(() => {
-    const threads = threadHistory?.threads || [];
-    
-    // Log before filtering
-    console.log(`📊 Filtering ${threads.length} threads for profile: "${chatProfile}"`);
-
-    const result = threads.filter((thread) => {
-      // Safety check: handle missing metadata
-      const threadProfile = thread.metadata?.chat_profile;
-      
-      const isMatch = threadProfile === chatProfile;
-
-      // Log mismatches to help debug
-      if (!isMatch && threads.length < 5) { // Limit logs to avoiding spam
-         console.log(`❌ Hiding Thread ${thread.id.slice(0,4)}... | Got: "${threadProfile}" | Expected: "${chatProfile}"`);
+      if (shouldLoadMore && !isLoadingMore && hasNextPage && endCursor) {
+        fetchThreads(endCursor);
       }
-      
-      return isMatch;
-    });
-
-    console.log(`✅ Showing ${result.length} threads after filter.`);
-    return result;
-  }, [threadHistory, chatProfile]);
+    }
+  }, [shouldLoadMore, isLoadingMore, threadHistory]);
 
   return (
     <SidebarContent onScroll={handleScroll} ref={scrollRef}>
       <SidebarGroup>
         <SidebarMenu>
-          {chatProfile && threadHistory ? (
+          {threadHistory ? (
             <div id="thread-history" className="flex-grow">
               <ThreadList
-                // PASSING THE FILTERED LIST HERE
-                threadHistory={{
-                  ...threadHistory,
-                  threads: filteredThreads, // <--- This must be the filtered list
-                }}
+                threadHistory={threadHistory}
                 error={error}
                 isFetching={isFetching}
                 isLoadingMore={isLoadingMore}
