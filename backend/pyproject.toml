@@ -41,14 +41,14 @@ dependencies = [
   "pyjwt>=2.8.0,<3.0.0",
   "audioop-lts>=0.2.1,<0.3.0; python_version>='3.13'",
   "pydantic-settings>=2.10.1",
-  "asyncpg>=0.31.0",
+  # "asyncpg[binary]>=0.31.0",
   "openai>=1.0.0",
   "bcrypt>=4.0.0",
   "resend>=2.0.0",
   "boto3>=1.42.42",
+  "asyncpg>=0.31.0",
+  "psycopg>=3.3.2",
 ]
 
 [dependency-groups]
-dev = [
-    "ruff>=0.15.0",
-]
+dev = ["ruff>=0.15.0"]

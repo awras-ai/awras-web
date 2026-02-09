@@ -275,40 +275,40 @@ async def serve_public_file(
         raise HTTPException(status_code=404, detail="File not found")
 
 
-@router.get("/assets/{filename:path}")
-async def serve_asset_file(
-    filename: str,
-):
-    """Serve a file from assets dir."""
+# @router.get("/assets/{filename:path}")
+# async def serve_asset_file(
+#     filename: str,
+# ):
+#     """Serve a file from assets dir."""
+#
+#     base_path = Path(os.path.join(build_dir, "assets"))
+#     file_path = (base_path / filename).resolve()
+#
+#     if not is_path_inside(file_path, base_path):
+#         raise HTTPException(status_code=400, detail="Invalid filename")
+#
+#     if file_path.is_file():
+#         return FileResponse(file_path)
+#     else:
+#         raise HTTPException(status_code=404, detail="File not found")
 
-    base_path = Path(os.path.join(build_dir, "assets"))
-    file_path = (base_path / filename).resolve()
 
-    if not is_path_inside(file_path, base_path):
-        raise HTTPException(status_code=400, detail="Invalid filename")
-
-    if file_path.is_file():
-        return FileResponse(file_path)
-    else:
-        raise HTTPException(status_code=404, detail="File not found")
-
-
-@router.get("/copilot/{filename:path}")
-async def serve_copilot_file(
-    filename: str,
-):
-    """Serve a file from assets dir."""
-
-    base_path = Path(copilot_build_dir)
-    file_path = (base_path / filename).resolve()
-
-    if not is_path_inside(file_path, base_path):
-        raise HTTPException(status_code=400, detail="Invalid filename")
-
-    if file_path.is_file():
-        return FileResponse(file_path)
-    else:
-        raise HTTPException(status_code=404, detail="File not found")
+# @router.get("/copilot/{filename:path}")
+# async def serve_copilot_file(
+#     filename: str,
+# ):
+#     """Serve a file from assets dir."""
+#
+#     base_path = Path(copilot_build_dir)
+#     file_path = (base_path / filename).resolve()
+#
+#     if not is_path_inside(file_path, base_path):
+#         raise HTTPException(status_code=400, detail="Invalid filename")
+#
+#     if file_path.is_file():
+#         return FileResponse(file_path)
+#     else:
+#         raise HTTPException(status_code=404, detail="File not found")
 
 
 # -------------------------------------------------------------------------------
@@ -359,76 +359,76 @@ def replace_between_tags(
     return re.sub(pattern, start_tag + replacement + end_tag, text, flags=re.DOTALL)
 
 
-def get_html_template(root_path):
-    """
-    Get HTML template for the index view.
-    """
-    root_path = root_path.rstrip("/")  # Avoid duplicated / when joining with root path.
-
-    custom_theme = None
-    custom_theme_file_path = Path(public_dir) / "theme.json"
-    if (
-        is_path_inside(custom_theme_file_path, Path(public_dir))
-        and custom_theme_file_path.is_file()
-    ):
-        custom_theme = json.loads(custom_theme_file_path.read_text(encoding="utf-8"))
-
-    PLACEHOLDER = "<!-- TAG INJECTION PLACEHOLDER -->"
-    JS_PLACEHOLDER = "<!-- JS INJECTION PLACEHOLDER -->"
-    CSS_PLACEHOLDER = "<!-- CSS INJECTION PLACEHOLDER -->"
-
-    default_url = config.ui.custom_meta_url or "https://github.com/Chainlit/chainlit"
-    default_meta_image_url = (
-        "https://chainlit-cloud.s3.eu-west-3.amazonaws.com/logo/chainlit_banner.png"
-    )
-    meta_image_url = config.ui.custom_meta_image_url or default_meta_image_url
-    favicon_path = "/favicon"
-
-    tags = f"""<title>{config.ui.name}</title>
-    <link rel="icon" href="{favicon_path}" />
-    <meta name="description" content="{config.ui.description}">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="{config.ui.name}">
-    <meta property="og:description" content="{config.ui.description}">
-    <meta property="og:image" content="{meta_image_url}">
-    <meta property="og:url" content="{default_url}">
-    <meta property="og:root_path" content="{root_path}">"""
-
-    js = f"""<script>
-{f"window.theme = {json.dumps(custom_theme.get('variables'))};" if custom_theme and custom_theme.get("variables") else "undefined"}
-{f"window.transports = {json.dumps(config.project.transports)};" if config.project.transports else "undefined"}
-</script>"""
-
-    css = None
-    if config.ui.custom_css:
-        css = f"""<link rel="stylesheet" type="text/css" href="{config.ui.custom_css}" {config.ui.custom_css_attributes}>"""
-
-    if config.ui.custom_js:
-        js += f"""<script src="{config.ui.custom_js}" {config.ui.custom_js_attributes}></script>"""
-
-    font = None
-    if custom_theme and custom_theme.get("custom_fonts"):
-        font = "\n".join(
-            f"""<link rel="stylesheet" href="{font}">"""
-            for font in custom_theme.get("custom_fonts")
-        )
-
-    index_html_file_path = os.path.join(build_dir, "index.html")
-
-    with open(index_html_file_path, encoding="utf-8") as f:
-        content = f.read()
-        content = content.replace(PLACEHOLDER, tags)
-        if js:
-            content = content.replace(JS_PLACEHOLDER, js)
-        if css:
-            content = content.replace(CSS_PLACEHOLDER, css)
-        if font:
-            content = replace_between_tags(
-                content, "<!-- FONT START -->", "<!-- FONT END -->", font
-            )
-        content = content.replace('href="/', f'href="{root_path}/')
-        content = content.replace('src="/', f'src="{root_path}/')
-        return content
+# def get_html_template(root_path):
+#     """
+#     Get HTML template for the index view.
+#     """
+#     root_path = root_path.rstrip("/")  # Avoid duplicated / when joining with root path.
+#
+#     custom_theme = None
+#     custom_theme_file_path = Path(public_dir) / "theme.json"
+#     if (
+#         is_path_inside(custom_theme_file_path, Path(public_dir))
+#         and custom_theme_file_path.is_file()
+#     ):
+#         custom_theme = json.loads(custom_theme_file_path.read_text(encoding="utf-8"))
+#
+#     PLACEHOLDER = "<!-- TAG INJECTION PLACEHOLDER -->"
+#     JS_PLACEHOLDER = "<!-- JS INJECTION PLACEHOLDER -->"
+#     CSS_PLACEHOLDER = "<!-- CSS INJECTION PLACEHOLDER -->"
+#
+#     default_url = config.ui.custom_meta_url or "https://github.com/Chainlit/chainlit"
+#     default_meta_image_url = (
+#         "https://chainlit-cloud.s3.eu-west-3.amazonaws.com/logo/chainlit_banner.png"
+#     )
+#     meta_image_url = config.ui.custom_meta_image_url or default_meta_image_url
+#     favicon_path = "/favicon"
+#
+#     tags = f"""<title>{config.ui.name}</title>
+#     <link rel="icon" href="{favicon_path}" />
+#     <meta name="description" content="{config.ui.description}">
+#     <meta property="og:type" content="website">
+#     <meta property="og:title" content="{config.ui.name}">
+#     <meta property="og:description" content="{config.ui.description}">
+#     <meta property="og:image" content="{meta_image_url}">
+#     <meta property="og:url" content="{default_url}">
+#     <meta property="og:root_path" content="{root_path}">"""
+#
+#     js = f"""<script>
+# {f"window.theme = {json.dumps(custom_theme.get('variables'))};" if custom_theme and custom_theme.get("variables") else "undefined"}
+# {f"window.transports = {json.dumps(config.project.transports)};" if config.project.transports else "undefined"}
+# </script>"""
+#
+#     css = None
+#     if config.ui.custom_css:
+#         css = f"""<link rel="stylesheet" type="text/css" href="{config.ui.custom_css}" {config.ui.custom_css_attributes}>"""
+#
+#     if config.ui.custom_js:
+#         js += f"""<script src="{config.ui.custom_js}" {config.ui.custom_js_attributes}></script>"""
+#
+#     font = None
+#     if custom_theme and custom_theme.get("custom_fonts"):
+#         font = "\n".join(
+#             f"""<link rel="stylesheet" href="{font}">"""
+#             for font in custom_theme.get("custom_fonts")
+#         )
+#
+#     index_html_file_path = os.path.join(build_dir, "index.html")
+#
+#     with open(index_html_file_path, encoding="utf-8") as f:
+#         content = f.read()
+#         content = content.replace(PLACEHOLDER, tags)
+#         if js:
+#             content = content.replace(JS_PLACEHOLDER, js)
+#         if css:
+#             content = content.replace(CSS_PLACEHOLDER, css)
+#         if font:
+#             content = replace_between_tags(
+#                 content, "<!-- FONT START -->", "<!-- FONT END -->", font
+#             )
+#         content = content.replace('href="/', f'href="{root_path}/')
+#         content = content.replace('src="/', f'src="{root_path}/')
+#         return content
 
 
 def get_user_facing_url(url: URL):
@@ -1647,76 +1647,76 @@ async def get_file(
         raise HTTPException(status_code=404, detail="File not found")
 
 
-@router.get("/favicon")
-async def get_favicon():
-    """Get the favicon for the UI."""
-    custom_favicon_path = os.path.join(APP_ROOT, "public", "favicon.*")
-    files = glob.glob(custom_favicon_path)
-
-    if files:
-        favicon_path = files[0]
-    else:
-        favicon_path = os.path.join(build_dir, "favicon.svg")
-
-    media_type, _ = mimetypes.guess_type(favicon_path)
-
-    return FileResponse(favicon_path, media_type=media_type)
-
-
-@router.get("/logo")
-async def get_logo(theme: Optional[Theme] = Query(Theme.light)):
-    """Get the default logo for the UI."""
-    theme_value = theme.value if theme else Theme.light.value
-    logo_path = None
-
-    for path in [
-        os.path.join(APP_ROOT, "public", f"logo_{theme_value}.*"),
-        os.path.join(build_dir, "assets", f"logo_{theme_value}*.*"),
-    ]:
-        files = glob.glob(path)
-
-        if files:
-            logo_path = files[0]
-            break
-
-    if not logo_path:
-        logo_path = os.path.join(
-            os.path.dirname(__file__),
-            "frontend",
-            "dist",
-            f"logo_{theme_value}.svg",
-        )
-        logger.info("Missing custom logo. Falling back to default logo.")
-
-    media_type, _ = mimetypes.guess_type(logo_path)
-
-    return FileResponse(logo_path, media_type=media_type)
+# @router.get("/favicon")
+# async def get_favicon():
+#     """Get the favicon for the UI."""
+#     custom_favicon_path = os.path.join(APP_ROOT, "public", "favicon.*")
+#     files = glob.glob(custom_favicon_path)
+#
+#     if files:
+#         favicon_path = files[0]
+#     else:
+#         favicon_path = os.path.join(build_dir, "favicon.svg")
+#
+#     media_type, _ = mimetypes.guess_type(favicon_path)
+#
+#     return FileResponse(favicon_path, media_type=media_type)
 
 
-@router.get("/avatars/{avatar_id:str}")
-async def get_avatar(avatar_id: str):
-    """Get the avatar for the user based on the avatar_id."""
-    if not re.match(r"^[a-zA-Z0-9_ .-]+$", avatar_id):
-        raise HTTPException(status_code=400, detail="Invalid avatar_id")
+# @router.get("/logo")
+# async def get_logo(theme: Optional[Theme] = Query(Theme.light)):
+#     """Get the default logo for the UI."""
+#     theme_value = theme.value if theme else Theme.light.value
+#     logo_path = None
+#
+#     for path in [
+#         os.path.join(APP_ROOT, "public", f"logo_{theme_value}.*"),
+#         os.path.join(build_dir, "assets", f"logo_{theme_value}*.*"),
+#     ]:
+#         files = glob.glob(path)
+#
+#         if files:
+#             logo_path = files[0]
+#             break
+#
+#     if not logo_path:
+#         logo_path = os.path.join(
+#             os.path.dirname(__file__),
+#             "frontend",
+#             "dist",
+#             f"logo_{theme_value}.svg",
+#         )
+#         logger.info("Missing custom logo. Falling back to default logo.")
+#
+#     media_type, _ = mimetypes.guess_type(logo_path)
+#
+#     return FileResponse(logo_path, media_type=media_type)
 
-    if avatar_id == "default":
-        avatar_id = config.ui.name
 
-    avatar_id = avatar_id.strip().lower().replace(" ", "_").replace(".", "_")
-
-    base_path = Path(APP_ROOT) / "public" / "avatars"
-    avatar_pattern = f"{avatar_id}.*"
-
-    matching_files = base_path.glob(avatar_pattern)
-
-    if avatar_path := next(matching_files, None):
-        if not is_path_inside(avatar_path, base_path):
-            raise HTTPException(status_code=400, detail="Invalid filename")
-        media_type, _ = mimetypes.guess_type(str(avatar_path))
-
-        return FileResponse(avatar_path, media_type=media_type)
-
-    return await get_favicon()
+# @router.get("/avatars/{avatar_id:str}")
+# async def get_avatar(avatar_id: str):
+#     """Get the avatar for the user based on the avatar_id."""
+#     if not re.match(r"^[a-zA-Z0-9_ .-]+$", avatar_id):
+#         raise HTTPException(status_code=400, detail="Invalid avatar_id")
+#
+#     if avatar_id == "default":
+#         avatar_id = config.ui.name
+#
+#     avatar_id = avatar_id.strip().lower().replace(" ", "_").replace(".", "_")
+#
+#     base_path = Path(APP_ROOT) / "public" / "avatars"
+#     avatar_pattern = f"{avatar_id}.*"
+#
+#     matching_files = base_path.glob(avatar_pattern)
+#
+#     if avatar_path := next(matching_files, None):
+#         if not is_path_inside(avatar_path, base_path):
+#             raise HTTPException(status_code=400, detail="Invalid filename")
+#         media_type, _ = mimetypes.guess_type(str(avatar_path))
+#
+#         return FileResponse(avatar_path, media_type=media_type)
+#
+#     return await get_favicon()
 
 
 @router.head("/")
@@ -1725,16 +1725,16 @@ def status_check():
     return {"message": "Site is operational"}
 
 
-@router.get("/{full_path:path}")
-async def serve(request: Request):
-    """Serve the UI files."""
-    root_path = os.getenv("CHAINLIT_PARENT_ROOT_PATH", "") + os.getenv(
-        "CHAINLIT_ROOT_PATH", ""
-    )
-    html_template = get_html_template(root_path)
-    response = HTMLResponse(content=html_template, status_code=200)
-
-    return response
+# @router.get("/{full_path:path}")
+# async def serve(request: Request):
+#     """Serve the UI files."""
+#     root_path = os.getenv("CHAINLIT_PARENT_ROOT_PATH", "") + os.getenv(
+#         "CHAINLIT_ROOT_PATH", ""
+#     )
+#     html_template = get_html_template(root_path)
+#     response = HTMLResponse(content=html_template, status_code=200)
+#
+#     return response
 
 
 app.include_router(router)
