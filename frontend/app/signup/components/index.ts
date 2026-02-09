@@ -4,5 +4,4 @@ export {
 } from "../../signup/components/RegistrationContext";
 export { Step1Form } from "../../signup/components/Step1Form";
 export { Step2Form } from "../../signup/components/Step2Form";
-export { Step3Form } from "../../signup/components/Step3Form";
 export { RegistrationProgress } from "../../signup/components/RegistrationProgress";

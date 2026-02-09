@@ -108,6 +108,7 @@ export async function registerUser(
       first_name: data.firstName,
       last_name: data.lastName,
     }),
+    credentials: "include",
   });
 
   if (!res.ok) {
@@ -135,6 +136,7 @@ export async function verifyEmail(
     {
       method: "GET",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
     },
   );
 

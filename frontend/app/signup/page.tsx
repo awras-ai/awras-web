@@ -15,7 +15,6 @@ import {
   RegistrationProvider,
   Step1Form,
   Step2Form,
-  Step3Form,
   RegistrationProgress,
 } from "../signup/components";
 
@@ -44,23 +43,11 @@ export default function RegistrationPage() {
               >
                 {step === 1 && (
                   <Step1Form
-                    onNext={(requiresVerification) => {
-                      if (requiresVerification) {
-                        setStep(2);
-                      } else {
-                        setStep(3);
-                      }
-                    }}
+                    onNext={() => setStep(2)}
                   />
                 )}
                 {step === 2 && (
                   <Step2Form
-                    onNext={() => setStep(3)}
-                    onBack={() => setStep(1)}
-                  />
-                )}
-                {step === 3 && (
-                  <Step3Form
                     onComplete={() => {
                       router.push("/dashboard");
                     }}

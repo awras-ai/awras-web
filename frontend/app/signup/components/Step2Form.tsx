@@ -1,169 +1,138 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { Camera, User, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRegistration } from "../../signup/components/RegistrationContext";
-import { useVerifyEmail, useResendVerification } from "@/hooks/useAuth";
-
-const step2Schema = z.object({
-  code: z.string().length(6, "Please enter the 6-digit code"),
-});
+import { useUploadProfile } from "@/hooks/useAuth";
 
 interface Step2FormProps {
-  onNext: () => void;
-  onBack: () => void;
+  onComplete: () => void;
 }
 
-export function Step2Form({ onNext, onBack }: Step2FormProps) {
-  const { data } = useRegistration();
-  const mutation = useVerifyEmail();
-  const resendMutation = useResendVerification();
+export function Step2Form({ onComplete }: Step2FormProps) {
+  const { data, setData } = useRegistration();
+  const [preview, setPreview] = useState<string | null>(
+    data.profilePicture || null,
+  );
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const mutation = useUploadProfile();
 
-  const form = useForm<z.infer<typeof step2Schema>>({
-    resolver: zodResolver(step2Schema),
-    defaultValues: {
-      code: "",
-    },
-  });
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
-  function onSubmit(values: z.infer<typeof step2Schema>) {
-    mutation.mutate(
-      { code: values.code, email: data.email },
-      {
-        onSuccess: () => {
-          onNext();
+  const handleSubmit = () => {
+    if (selectedFile) {
+      mutation.mutate(
+        { file: selectedFile },
+        {
+          onSuccess: (result) => {
+            setData({ profilePicture: result.profile_image_url });
+            onComplete();
+          },
         },
-      },
-    );
-  }
-
-  function handleResend() {
-    resendMutation.mutate({ email: data.email });
-  }
+      );
+    } else {
+      onComplete();
+    }
+  };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="text-center space-y-2">
-          <p className="text-sm text-muted-foreground">
-            We&apos;ve sent a 6-digit verification code to
-          </p>
-          <p className="font-medium">{data.email}</p>
+    <div className="space-y-6">
+      <div className="text-center space-y-2">
+        <p className="text-sm text-muted-foreground">
+          Add a profile picture (optional)
+        </p>
+      </div>
+
+      <div className="flex flex-col items-center space-y-4">
+        <div
+          className="relative overflow-hidden rounded-full border-4 border-border"
+          style={{
+            width: "150px",
+            height: "150px",
+          }}
+        >
+          <Avatar
+            className="w-full h-full"
+            style={{ transform: `scale(${zoom})` }}
+          >
+            <AvatarImage
+              src={preview || ""}
+              alt="Profile preview"
+              className="object-cover"
+            />
+            <AvatarFallback className="text-4xl">
+              <User className="h-16 w-16" />
+            </AvatarFallback>
+          </Avatar>
         </div>
 
-        <FormField
-          control={form.control}
-          name="code"
-          render={({ field }) => (
-            <FormItem className="flex flex-col items-center">
-              <FormControl>
-                <InputOTP maxLength={6} {...field}>
-                  <InputOTPGroup className="gap-2">
-                    <InputOTPSlot
-                      index={0}
-                      className="border-2 border-black rounded-md"
-                    />
-                    <InputOTPSlot
-                      index={1}
-                      className="border-2 border-black rounded-md"
-                    />
-                    <InputOTPSlot
-                      index={2}
-                      className="border-2 border-black rounded-md"
-                    />
-                    <InputOTPSlot
-                      index={3}
-                      className="border-2 border-black rounded-md"
-                    />
-                    <InputOTPSlot
-                      index={4}
-                      className="border-2 border-black rounded-md"
-                    />
-                    <InputOTPSlot
-                      index={5}
-                      className="border-2 border-black rounded-md"
-                    />
-                  </InputOTPGroup>
-                </InputOTP>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="space-y-3">
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={mutation.isPending}
-          >
-            {mutation.isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Verifying...
-              </>
-            ) : (
-              "Verify Email"
-            )}
+        <label className="cursor-pointer">
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+          <Button variant="outline" type="button" asChild>
+            <span>
+              <Camera className="mr-2 h-4 w-4" />
+              {preview ? "Change Photo" : "Upload Photo"}
+            </span>
           </Button>
+        </label>
 
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-full"
-            onClick={onBack}
-            disabled={mutation.isPending}
-          >
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
-
-          <Button
-            type="button"
-            variant="link"
-            className="w-full"
-            onClick={handleResend}
-            disabled={resendMutation.isPending}
-          >
-            {resendMutation.isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Sending...
-              </>
-            ) : (
-              "Resend code"
-            )}
-          </Button>
-        </div>
-
-        {mutation.isError && (
-          <p className="text-sm text-red-500 text-center">
-            {mutation.error.message}
-          </p>
+        {preview && (
+          <div className="w-full space-y-2">
+            <label className="text-sm font-medium">Zoom</label>
+            <input
+              type="range"
+              min="1"
+              max="3"
+              step="0.1"
+              value={zoom}
+              onChange={(e) => setZoom(parseFloat(e.target.value))}
+              className="w-full"
+            />
+          </div>
         )}
+      </div>
 
-        {resendMutation.isSuccess && (
-          <p className="text-sm text-green-500 text-center">
-            Verification code resent successfully!
-          </p>
+      <Button
+        onClick={handleSubmit}
+        className="w-full"
+        disabled={mutation.isPending}
+      >
+        {mutation.isPending ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Uploading...
+          </>
+        ) : preview ? (
+          "Confirm & Continue"
+        ) : (
+          "Skip for now"
         )}
-      </form>
-    </Form>
+      </Button>
+
+      {mutation.isError && (
+        <p className="text-sm text-red-500 text-center">
+          {mutation.error.message}
+        </p>
+      )}
+    </div>
   );
 }
