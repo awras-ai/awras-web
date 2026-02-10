@@ -13,7 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+      - "127.0.0.1:${POSTGRES_OUTSIDE_PORT:-5432}:5432"
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
@@ -28,7 +28,7 @@ services:
     container_name: redis
     command: redis-server --save 60 1 --loglevel warning
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     networks:
       - awras_internal_network
 
@@ -42,8 +42,8 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
-      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      POSTGRES_PORT: "5432"
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       CORS_ORIGINS: ${CORS_ORIGINS}
       DEBUG: ${DEBUG:-False}
