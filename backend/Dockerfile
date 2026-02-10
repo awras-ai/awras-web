@@ -58,9 +58,9 @@ ENV PATH="/app/.venv/bin:$PATH"
 RUN echo '#!/bin/sh\n\
   # Wait for database to be ready\n\
   echo "Waiting for database on ${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}..."\n\
-  while ! nc -z ${POSTGRES_HOST:-postgres} ${POSTGRES_PORT:-5432}; do\n\
-  sleep 1\n\
-  done\n\
+  while ! python3 -c "import socket; socket.create_connection(('${POSTGRES_HOST:-postgres}', ${POSTGRES_PORT:-5432}), timeout=5)" 2>/dev/null; do\
+  sleep 1\
+  done\
   echo "Database is ready!"\n\
   \n\
   # Run migrations\n\
