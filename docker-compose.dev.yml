@@ -1,0 +1,118 @@
+services:
+  # PostgreSQL database
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - awras_internal_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    command: redis-server --save 60 1 --loglevel warning
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - awras_internal_network
+
+  # # FastAPI backend
+  backend:
+    container_name: backend
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    #NOTE: in docker we should never use urls with the localhost (always use with the container name)
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      DEBUG: ${DEBUG:-False}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
+      REQUIRE_EMAIL_VERIFICATION: ${REQUIRE_EMAIL_VERIFICATION:-False}
+      SESSION_SECRET_KEY: ${SESSION_SECRET_KEY}
+      SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-"session_id"}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-true} # Set to true in production (HTTPS)
+      SESSION_COOKIE_HTTPONLY: ${SESSION_COOKIE_HTTPONLY:-true}
+      SESSION_COOKIE_SAMESITE: ${SESSION_COOKIE_SAMESITE:-"lax"}
+      SESSION_COOKIE_DOMAIN: ${SESSION_COOKIE_DOMAIN} # Leave empty for localhost
+      SESSION_EXPIRE_DAYS: ${SESSION_EXPIRE_DAYS:-15}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      EMAIL_FROM: ${EMAIL_FROM:-"onboarding@resend.dev"}
+      EMAIL_VERIFICATION_EXPIRE_HOURS: ${EMAIL_VERIFICATION_EXPIRE_HOURS:-24}
+      R2_ENDPOINT_URL: ${R2_ENDPOINT_URL:-"https://<accountid>.r2.cloudflarestorage.com"}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-"<your_access_key_id>"}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-"<your_secret_access_key>"}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-"awras-profiles"}
+      CHAINLIT_AUTH_SECRET: ${CHAINLIT_AUTH_SECRET:-secret_ta3k}
+    # env_file:
+    #   - .env
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - awras_internal_network
+
+  # Next.js application
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_BACKEND_BASE_URL=${NEXT_PUBLIC_BACKEND_BASE_URL}
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - NEXT_PUBLIC_BACKEND_BASE_URL=${NEXT_PUBLIC_BACKEND_BASE_URL}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      # backend:
+      #   condition: service_started
+    networks:
+      - awras_internal_network
+  chat_app:
+    build:
+      context: ./chat_app
+      dockerfile: Dockerfile
+    container_name: chat_app
+    ports:
+      - "${FRONTEND_PORT_NUMBER:-5173}:80"
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+    restart: always
+    depends_on:
+      - postgres
+      - frontend
+      - backend
+    networks:
+      - awras_internal_network
+
+volumes:
+  postgres_data:
+
+networks:
+  awras_internal_network:
+    driver: bridge

@@ -1,5 +1,3 @@
-"use client";
-
 import { motion } from "framer-motion";
 import { Database, Brain, Rocket, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,32 +43,20 @@ export function ProcessSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           {/* Left Side: Title */}
           <div className="lg:col-span-4 lg:sticky lg:top-32">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tighter">
-                The Process
-              </h2>
-              <p className="text-muted-foreground text-lg leading-relaxed">
-                Our continuous loop of improvement ensures our AI models evolve
-                with the language, becoming more accurate and culturally
-                relevant through each iteration.
-              </p>
-            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tighter">
+              The Process
+            </h2>
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              Our continuous loop of improvement ensures our AI models evolve
+              with the language, becoming more accurate and culturally relevant
+              through each iteration.
+            </p>
           </div>
 
           {/* Right Side: Process Steps */}
           <div className="lg:col-span-8 grid grid-cols-1 gap-6">
             {processSteps.map((step, index) => (
-              <motion.div
-                key={step.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: step.delay }}
-              >
+              <div key={step.title} className="w-full">
                 <Card className="bg-secondary/30 border-border/40 shadow-none hover:bg-secondary/50 transition-colors duration-300">
                   <CardHeader className="flex flex-row items-center gap-4 pb-2">
                     <div className="relative">
@@ -92,24 +78,10 @@ export function ProcessSection() {
                     </p>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
-
-        {/* Process Loop Visualization */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.6 }}
-          className="mt-16 text-center"
-        >
-          <div className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-border/40 bg-secondary/20 text-muted-foreground text-sm font-medium">
-            <span className="flex h-2 w-2 rounded-full bg-black mr-3 animate-pulse"></span>
-            Continuous Improvement Loop
-          </div>
-        </motion.div>
       </div>
     </section>
   );

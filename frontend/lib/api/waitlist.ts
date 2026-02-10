@@ -20,7 +20,7 @@ export const fetchWaitlistCount = async (): Promise<number> => {
 /**
  * Subscribe an email to the waitlist
  */
-export const subscribeToWaitlist = async (email: string): Promise<any> => {
+export const subscribeToWaitlist = async (email: string): Promise<unknown> => {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}api/v1/waitlist/subscribe`,
     {

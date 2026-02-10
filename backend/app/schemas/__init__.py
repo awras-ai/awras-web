@@ -1,5 +1,13 @@
 """Schemas module."""
 
+from app.schemas.auth import (
+    AuthResponse,
+    MessageResponse,
+    ResendVerification,
+    UserLogin,
+    UserRegister,
+    UserResponse,
+)
 from app.schemas.email_subscription import (
     EmailSubscriptionCreate,
     EmailSubscriptionResponse,
@@ -7,6 +15,14 @@ from app.schemas.email_subscription import (
 )
 
 __all__ = [
+    # Auth schemas
+    "AuthResponse",
+    "MessageResponse",
+    "ResendVerification",
+    "UserLogin",
+    "UserRegister",
+    "UserResponse",
+    # Email subscription schemas
     "EmailSubscriptionCreate",
     "EmailSubscriptionResponse",
     "SubscriptionCountResponse",

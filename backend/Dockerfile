@@ -1,48 +1,73 @@
-# Stage 1: Builder stage
-FROM python:3.12-slim as builder
+# Stage 1: Builder stage for installing dependencies
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS builder
 
 # Set working directory
 WORKDIR /app
 
-# Install uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+# Install Python development headers for any packages that need compilation
+RUN apt-get update && apt-get install -y \
+  python3-dev \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy dependency files
-COPY pyproject.toml ./
+COPY pyproject.toml uv.lock ./
 
-# Create virtual environment and install project dependencies declared in pyproject.toml
-# `uv sync` reads pyproject.toml and installs the dependency set into the venv.
-RUN uv venv /opt/venv && \
-  uv pip install --python=/opt/venv/bin/python --no-cache \
-  fastapi uvicorn sqlalchemy alembic pydantic pydantic-settings python-multipart \
-  email-validator python-dotenv psycopg2-binary slowapi redis
+# Increase timeout and retries for network stability
+ENV UV_HTTP_TIMEOUT=600
+ENV UV_HTTP_RETRY=10
+ENV UV_CACHE_DIR=/tmp/uv-cache
+ENV UV_LINK_MODE=copy
+
+# Clear cache and install dependencies with retry logic and verbose output
+RUN rm -rf /tmp/uv-cache && \
+  echo "Attempting to install dependencies..." && \
+  uv sync --no-dev --verbose || ( \
+  echo "First attempt failed, cleaning cache and retrying with longer timeout..." && \
+  rm -rf /tmp/uv-cache ~/.cache/uv && \
+  UV_HTTP_TIMEOUT=1200 uv sync --no-dev --verbose \
+  )
 
 # Stage 2: Runtime stage
-FROM python:3.12-slim
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
-# Install curl for health checks
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+# Install runtime dependencies: libpq for PostgreSQL and netcat for health check
+RUN apt-get update && apt-get install -y \
+  libpq5 \
+  netcat-openbsd \
+  ffmpeg \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
-# Copy virtual environment from builder
-COPY --from=builder /opt/venv /opt/venv
+# Copy installed dependencies from builder
+COPY --from=builder /app/.venv ./.venv
 
-# Set PATH to use the virtual environment
-ENV PATH="/opt/venv/bin:$PATH"
+# Copy application code (respects .dockerignore)
+COPY . .
 
-# Copy application code and migrations
-COPY ./app ./app
-COPY ./alembic ./alembic
-COPY ./alembic.ini ./
+# Ensure .chainlit folder exists with its configs
+COPY .chainlit ./.chainlit
 
-# Expose port
-EXPOSE 8000
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV PATH="/app/.venv/bin:$PATH"
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8000/health || exit 1
+# Create entrypoint script for running migrations before starting app
+RUN echo '#!/bin/sh\n\
+  # Wait for database to be ready\n\
+  echo "Waiting for database on ${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}..."\n\
+  while ! nc -z ${POSTGRES_HOST:-postgres} ${POSTGRES_PORT:-5432}; do\n\
+  sleep 1\n\
+  done\n\
+  echo "Database is ready!"\n\
+  \n\
+  # Run migrations\n\
+  alembic upgrade head\n\
+  \n\
+  # Start the application\n\
+  exec uvicorn main:app --host 0.0.0.0 --port 8000\n\
+  ' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
 
-# Run migrations and then start the application
-CMD ["/bin/sh", "-c", "alembic upgrade head && /opt/venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+# Use entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]
