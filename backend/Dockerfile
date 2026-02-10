@@ -56,11 +56,11 @@ ENV PATH="/app/.venv/bin:$PATH"
 # Create entrypoint script for running migrations before starting app
 RUN echo '#!/bin/sh\n\
   # Wait for database to be ready\n\
-  echo "Waiting for database on ${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}..."\n\
-  while ! nc -z ${POSTGRES_HOST:-postgres} ${POSTGRES_PORT:-5432}; do\n\
-  sleep 1\n\
-  done\n\
-  echo "Database is ready!"\n\
+  # echo "Waiting for database on ${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}..."\n\
+  # while ! nc -z ${POSTGRES_HOST:-postgres} ${POSTGRES_PORT:-5432}; do\n\
+  # sleep 1\n\
+  # done\n\
+  # echo "Database is ready!"\n\
   \n\
   # Run migrations\n\
   alembic upgrade head\n\
