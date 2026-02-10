@@ -35,6 +35,9 @@ RUN pnpm run build
 FROM base AS runner
 WORKDIR /app
 
+# Install curl for healthcheck
+RUN apk add --no-cache curl
+
 ENV NODE_ENV production
 # Uncomment the following line in case you want to disable telemetry during runtime.
 # ENV NEXT_TELEMETRY_DISABLED 1
