@@ -39,12 +39,12 @@ services:
       context: ./backend/
       dockerfile: Dockerfile
     #NOTE: in docker we should never use urls with the localhost (always use with the container name)
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     environment:
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      POSTGRES_HOST: "postgres"
-      POSTGRES_PORT: "5432"
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST-postgres}:${POSTGRES_PORT-5432}/${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST-postgres}
+      POSTGRES_PORT: ${POSTGRES_PORT-5432}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       CORS_ORIGINS: ${CORS_ORIGINS}
       DEBUG: ${DEBUG:-False}
