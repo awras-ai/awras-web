@@ -37,7 +37,7 @@ services:
       dockerfile: Dockerfile
     #NOTE: in docker we should never use urls with the localhost (always use with the container name)
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       CORS_ORIGINS: ${CORS_ORIGINS}
       DEBUG: ${DEBUG:-False}

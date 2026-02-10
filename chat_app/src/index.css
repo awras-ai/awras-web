@@ -37,7 +37,8 @@ code {
     --destructive-foreground: 210 40% 98%;
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --primary: 0, 0%, 0%;
+    --primary: 0, 0%, 15%;
+    --primary-hover: 0, 0%, 0%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;

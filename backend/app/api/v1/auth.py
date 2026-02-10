@@ -60,6 +60,7 @@ def set_session_cookie(response: Response, token: str) -> None:
         samesite=settings.SESSION_COOKIE_SAMESITE,
         domain=settings.SESSION_COOKIE_DOMAIN,
         max_age=settings.SESSION_EXPIRE_DAYS * 24 * 60 * 60,  # Convert days to seconds
+        path="/",
     )
 
 
@@ -71,6 +72,7 @@ def clear_session_cookie(response: Response) -> None:
         secure=settings.SESSION_COOKIE_SECURE,
         samesite=settings.SESSION_COOKIE_SAMESITE,
         domain=settings.SESSION_COOKIE_DOMAIN,
+        path="/",
     )
 
 
