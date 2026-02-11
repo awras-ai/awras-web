@@ -115,7 +115,7 @@ services:
     ports:
       - "${FRONTEND_PORT_NUMBER:-5173}:80"
     environment:
-      - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+      VITE_API_URL: ${VITE_API_URL}
     restart: always
     healthcheck:
       test:
