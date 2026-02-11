@@ -2,22 +2,19 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, User } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 
 import { useCurrentUser } from "@/hooks/useAuth";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { CountdownTimer } from "@/components/countdown";
+import { AwrasChatButton } from "@/components/awras-chat-button";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { data: user, isLoading, isError, error } = useCurrentUser();
+
+  // Target date: February 15, 2026
+  const launchDate = new Date("2026-02-15T00:00:00");
 
   useEffect(() => {
     if (isError && error?.message === "Unauthorized") {
@@ -41,14 +38,11 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-xl text-center">Error</CardTitle>
-            <CardDescription className="text-center">
+          <CardContent className="pt-6 text-center">
+            <p className="text-lg font-medium">Error</p>
+            <p className="text-muted-foreground">
               {error?.message || "Failed to load user data"}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <Button onClick={() => window.location.reload()}>Retry</Button>
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -60,49 +54,53 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16">
-                <AvatarImage
-                  src={user.profile_image_url || ""}
-                  alt={`${user.first_name} ${user.last_name}`}
-                />
-                <AvatarFallback>
-                  <User className="h-8 w-8" />
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <CardTitle className="text-2xl">
-                  Welcome, {user.first_name} {user.last_name}!
-                </CardTitle>
-                <CardDescription>{user.email}</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Username</p>
-                <p className="font-medium">{user.identifier}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Email Verified</p>
-                <p className="font-medium">
-                  {user.is_verified ? "Yes" : "No"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Member Since</p>
-                <p className="font-medium">
-                  {new Date(user.created_at).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-8">
+      <div className="max-w-5xl w-full space-y-12">
+        {/* Welcome Section */}
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center gap-2 text-muted-foreground mb-4">
+            <Sparkles className="h-5 w-5" />
+            <span className="text-sm tracking-widest uppercase">
+              Welcome to Awras
+            </span>
+            <Sparkles className="h-5 w-5" />
+          </div>
+
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+            Welcome, {user.first_name} {user.last_name}!
+          </h1>
+
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Thank you for joining us. We&apos;re excited to have you on board!
+          </p>
+        </div>
+
+        {/* Countdown Section */}
+        <div className="space-y-6">
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl md:text-3xl font-semibold">
+              Awras-Chat Launch
+            </h2>
+            <p className="text-muted-foreground">
+              Our Algerian LLM platform is launching soon
+            </p>
+          </div>
+
+          <CountdownTimer targetDate={launchDate} />
+        </div>
+
+        {/* Awras-Chat Button Section */}
+        <div className="flex flex-col items-center space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Get ready to experience our Algerian LLM
+          </p>
+          <AwrasChatButton />
+        </div>
+
+        {/* Footer Info */}
+        <div className="text-center text-sm text-muted-foreground pt-8 border-t">
+          <p>Signed in as {user.email}</p>
+        </div>
       </div>
     </div>
   );
