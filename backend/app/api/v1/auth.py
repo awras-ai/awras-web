@@ -24,6 +24,7 @@ from app.schemas.auth import (
     AuthResponse,
     MessageResponse,
     ResendVerification,
+    UserCountResponse,
     UserLogin,
     UserRegister,
     UserResponse,
@@ -439,3 +440,18 @@ async def upload_profile_image(
         message="Profile image uploaded successfully",
         profile_image_url=signed_url,
     )
+
+
+@router.get(
+    "/count",
+    response_model=UserCountResponse,
+    summary="Get count of authenticated users",
+)
+def get_user_count(
+    db: Session = Depends(get_db),
+) -> UserCountResponse:
+    """
+    Get the current number of authenticated users.
+    """
+    count = AuthService.count_users(db)
+    return UserCountResponse(count=count)
