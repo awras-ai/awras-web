@@ -24,9 +24,13 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: list[str]
 
-    # DeepSeek AI
-    DEEPSEEK_API_KEY: str = ""
-    DEEPSEEK_BASE_URL: str = "https://api.deepseek.com"
+    # AI MODEL
+    MODEL_API_KEY: str = ""
+    MODEL_BASE_URL: str = "https://api.deepseek.com"
+    MODEL_NAME: str
+    MODEL_CUSTOM_HEADER_KEY: str = ""
+    MODEL_CUSTOM_HEADER_VALUE: str = ""
+    MODEL_TEMPERATURE: float = 0.7
 
     # API
     API_V1_PREFIX: str = "/api/v1"
