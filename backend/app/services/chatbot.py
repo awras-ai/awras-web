@@ -94,7 +94,9 @@ class ChatbotService:
             return response.choices[0].message.content or ""
         except Exception as e:
             logger.error(f"Error generating response: {str(e)}")
-            return f"Sorry, I encountered an error: {str(e)}"
+            return (
+                "Sorry, I encountered an error, please try creating a news conversation"
+            )
 
     async def generate_streaming_response(
         self, messages: list[Any], user_id: str = "anonymous", thread_id: str = ""
@@ -134,4 +136,4 @@ class ChatbotService:
                     yield chunk.choices[0].delta.content
         except Exception as e:
             logger.error(f"Error generating streaming response: {str(e)}")
-            yield f"Sorry, I encountered an error: {str(e)}"
+            yield "Sorry, I encountered an error, please try creating a news conversation"

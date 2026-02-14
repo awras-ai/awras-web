@@ -1,21 +1,22 @@
-import { memo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { memo } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { useAuth, useConfig } from '@chainlit/react-client';
+import { useAuth, useConfig } from "@chainlit/react-client";
 
 // DISABLED: Audio features not needed for text-only chat
 // import AudioPresence from '@/components/AudioPresence';
-import ButtonLink from '@/components/ButtonLink';
-import { useSidebar } from '@/components/ui/sidebar';
+import ButtonLink from "@/components/ButtonLink";
+import { useSidebar } from "@/components/ui/sidebar";
 
-import ApiKeys from './ApiKeys';
-import ChatProfiles from './ChatProfiles';
-import NewChatButton from './NewChat';
-import ReadmeButton from './Readme';
-import ShareButton from './Share';
-import SidebarTrigger from './SidebarTrigger';
-import { ThemeToggle } from './ThemeToggle';
-import UserNav from './UserNav';
+import ApiKeys from "./ApiKeys";
+import ChatProfiles from "./ChatProfiles";
+import FeedbackButton from "./FeedbackButton";
+import NewChatButton from "./NewChat";
+import ReadmeButton from "./Readme";
+import ShareButton from "./Share";
+import SidebarTrigger from "./SidebarTrigger";
+import { ThemeToggle } from "./ThemeToggle";
+import UserNav from "./UserNav";
 
 const Header = memo(() => {
   // DISABLED: Audio connection not needed for text-only chat
@@ -65,6 +66,7 @@ const Header = memo(() => {
       <div />
       <div className="flex items-center gap-1">
         <ShareButton />
+        <FeedbackButton />
         <ReadmeButton />
         <ApiKeys />
         {links &&
