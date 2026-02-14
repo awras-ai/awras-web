@@ -1,3 +1,5 @@
+import { HeroCTA } from "./hero-cta";
+
 export function Hero() {
   return (
     <section className="relative flex flex-col items-center justify-center px-4 pt-32 pb-24 md:pt-48 md:pb-40 text-center overflow-hidden">
@@ -23,6 +25,9 @@ export function Hero() {
             Algerian dialect (Darija) through advanced Artificial Intelligence.
           </p>
         </div>
+
+        {/* CTA Section */}
+        <HeroCTA />
       </div>
     </section>
   );

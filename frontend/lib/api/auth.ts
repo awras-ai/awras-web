@@ -260,3 +260,22 @@ export async function getCurrentUser(): Promise<User> {
 
   return res.json();
 }
+
+export interface UserCountResponse {
+  count: number;
+}
+
+export async function getUserCount(): Promise<number> {
+  const res = await fetch(`${BASE_URL}api/v1/auth/count`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || "Failed to fetch user count.");
+  }
+
+  const data: UserCountResponse = await res.json();
+  return data.count;
+}
