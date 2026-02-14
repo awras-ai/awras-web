@@ -49,6 +49,9 @@ RUN VITE_API_URL=__VITE_API_URL_PLACEHOLDER__ pnpm build
 # --- Stage 2: Production ---
 FROM nginx:alpine
 
+# Install wget for healthcheck
+RUN apk add --no-cache wget
+
 WORKDIR /usr/share/nginx/html
 
 # Copy built assets from builder stage

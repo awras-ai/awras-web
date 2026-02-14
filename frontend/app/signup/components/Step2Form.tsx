@@ -18,7 +18,6 @@ export function Step2Form({ onComplete }: Step2FormProps) {
     data.profilePicture || null,
   );
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [zoom, setZoom] = useState(1);
   const mutation = useUploadProfile();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,7 +66,6 @@ export function Step2Form({ onComplete }: Step2FormProps) {
         >
           <Avatar
             className="w-full h-full"
-            style={{ transform: `scale(${zoom})` }}
           >
             <AvatarImage
               src={preview || ""}
@@ -95,38 +93,36 @@ export function Step2Form({ onComplete }: Step2FormProps) {
           </Button>
         </label>
 
-        {preview && (
-          <div className="w-full space-y-2">
-            <label className="text-sm font-medium">Zoom</label>
-            <input
-              type="range"
-              min="1"
-              max="3"
-              step="0.1"
-              value={zoom}
-              onChange={(e) => setZoom(parseFloat(e.target.value))}
-              className="w-full"
-            />
-          </div>
-        )}
       </div>
 
-      <Button
-        onClick={handleSubmit}
-        className="w-full"
-        disabled={mutation.isPending}
-      >
-        {mutation.isPending ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Uploading...
-          </>
-        ) : preview ? (
-          "Confirm & Continue"
-        ) : (
-          "Skip for now"
+      <div className="space-y-3">
+        <Button
+          onClick={handleSubmit}
+          className="w-full"
+          disabled={mutation.isPending}
+        >
+          {mutation.isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Uploading...
+            </>
+          ) : preview ? (
+            "Confirm & Continue"
+          ) : (
+            "Continue"
+          )}
+        </Button>
+
+        {!preview && (
+          <Button
+            onClick={onComplete}
+            variant="outline"
+            className="w-full"
+          >
+            Skip
+          </Button>
         )}
-      </Button>
+      </div>
 
       {mutation.isError && (
         <p className="text-sm text-red-500 text-center">

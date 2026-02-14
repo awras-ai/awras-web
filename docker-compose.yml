@@ -7,13 +7,10 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      RESEND_API_KEY: ${RESEND_API_KEY}
-      EMAIL_FROM: ${EMAIL_FROM:-"onboarding@resend.dev"}
-      EMAIL_VERIFICATION_EXPIRE_HOURS: ${EMAIL_VERIFICATION_EXPIRE_HOURS:-24}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    # ports:
-    #   - "5432:5432"
+    ports:
+      - "127.0.0.1:${POSTGRES_OUTSIDE_PORT:-5432}:5432"
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
@@ -28,7 +25,12 @@ services:
     container_name: redis
     command: redis-server --save 60 1 --loglevel warning
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks:
       - awras_internal_network
 
@@ -38,15 +40,19 @@ services:
     build:
       context: ./backend/
       dockerfile: Dockerfile
-    #NOTE: in docker we should never use urls with the localhost (always use with the container name)
-    env_file:
-      - .env
     environment:
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT-5432}/${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       CORS_ORIGINS: ${CORS_ORIGINS}
       DEBUG: ${DEBUG:-False}
-      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
+      MODEL_API_KEY: ${MODEL_API_KEY}
+      MODEL_BASE_URL: ${MODEL_BASE_URL}
+      MODEL_NAME: ${MODEL_NAME}
+      MODEL_TEMPERATURE: ${MODEL_TEMPERATURE:-0.6}
+      MODEL_CUSTOM_HEADER_KEY: ${MODEL_CUSTOM_HEADER_KEY}
+      MODEL_CUSTOM_HEADER_VALUE: ${MODEL_CUSTOM_HEADER_VALUE}
       REQUIRE_EMAIL_VERIFICATION: ${REQUIRE_EMAIL_VERIFICATION:-False}
       SESSION_SECRET_KEY: ${SESSION_SECRET_KEY}
       SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-"session_id"}
@@ -66,11 +72,17 @@ services:
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     depends_on:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
     networks:
       - awras_internal_network
 
@@ -83,17 +95,21 @@ services:
       args:
         - NEXT_PUBLIC_BACKEND_BASE_URL=${NEXT_PUBLIC_BACKEND_BASE_URL}
     environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      - NEXT_PUBLIC_BACKEND_BASE_URL=${NEXT_PUBLIC_BACKEND_BASE_URL}
+      NODE_ENV: production
+      NEXT_PUBLIC_BACKEND_BASE_URL: ${NEXT_PUBLIC_BACKEND_BASE_URL}
+      NEXT_PUBLIC_CHAT_PLATFORM_URL: ${NEXT_PUBLIC_CHAT_PLATFORM_URL:-"https://chat.awras.site"}
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     depends_on:
-      postgres:
+      backend:
         condition: service_healthy
-      # backend:
-      #   condition: service_started
     networks:
       - awras_internal_network
   chat_app:
@@ -104,12 +120,29 @@ services:
     ports:
       - "${FRONTEND_PORT_NUMBER:-5173}:80"
     environment:
-      - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+      VITE_API_URL: ${VITE_API_URL}
     restart: always
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:80",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     depends_on:
-      - postgres
-      - frontend
-      - backend
+      postgres:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
     networks:
       - awras_internal_network
 

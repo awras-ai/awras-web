@@ -293,3 +293,13 @@ class AuthService:
         db.commit()
         logger.info(f"Cleaned up {count} expired sessions")
         return count
+
+    @staticmethod
+    def count_users(db: DBSession) -> int:
+        """
+        Count the number of authenticated users.
+
+        Returns:
+            Number of users
+        """
+        return db.query(User).count()

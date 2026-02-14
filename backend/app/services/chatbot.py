@@ -15,15 +15,24 @@ class ChatbotService:
 
     def __init__(self):
         """Initialize OpenAI client with DeepSeek configuration."""
-        self.client = AsyncOpenAI(
-            api_key=settings.DEEPSEEK_API_KEY,
-            base_url=settings.DEEPSEEK_BASE_URL,
-        )
-        self.model = "deepseek-chat"  # DeepSeek model name
+        if settings.MODEL_CUSTOM_HEADER_KEY and settings.MODEL_CUSTOM_HEADER_VALUE:
+            self.client = AsyncOpenAI(
+                api_key=settings.MODEL_API_KEY,
+                base_url=settings.MODEL_BASE_URL,
+                default_headers={
+                    settings.MODEL_CUSTOM_HEADER_KEY: settings.MODEL_CUSTOM_HEADER_VALUE
+                },
+            )
+        else:
+            self.client = AsyncOpenAI(
+                api_key=settings.MODEL_API_KEY,
+                base_url=settings.MODEL_BASE_URL,
+            )
+        self.model = settings.MODEL_NAME
 
     async def generate_response(self, message: str) -> str:
         """
-        Generate a response from the DeepSeek model.
+        Generate a response from the Openai compatible model.
 
         Args:
             message: User message
@@ -35,19 +44,9 @@ class ChatbotService:
             response = await self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {
-                        "role": "system",
-                        "content": """You are 'Awras-Chat', an AI assistant that communicates exclusively in Algerian Darija using Arabic script. Your goal is to be helpful and friendly while maintaining a natural Algerian tone. 
-    
-    Strict Rules:
-    1. NEVER use Modern Standard Arabic (Fusha), English, or French unless specifically quoting something.
-    2. Use common Algerian vocabulary (e.g., use 'wash raki' or 'wash rak' instead of 'kayfa haluka').
-    3. If the user speaks in another language, you must still respond in Algerian Darija.
-    4. Maintain the cultural nuances of Algeria in your helpfulness.""",
-                    },
                     {"role": "user", "content": message},
                 ],
-                temperature=0.7,
+                temperature=settings.MODEL_TEMPERATURE,
                 max_tokens=1024,
             )
             return response.choices[0].message.content or ""
@@ -57,7 +56,7 @@ class ChatbotService:
 
     async def generate_streaming_response(self, message: str):
         """
-        Generate a streaming response from the DeepSeek model.
+        Generate a streaming response from the Openai compatible model.
 
         Args:
             message: User message
@@ -69,10 +68,9 @@ class ChatbotService:
             stream = await self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": message},
                 ],
-                temperature=0.7,
+                temperature=settings.MODEL_TEMPERATURE,
                 max_tokens=1024,
                 stream=True,
             )

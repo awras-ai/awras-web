@@ -117,6 +117,12 @@ class ProfileImageResponse(BaseModel):
     )
 
 
+class UserCountResponse(BaseModel):
+    """Schema for user count response."""
+
+    count: int = Field(..., description="Total number of registered users")
+
+
 class MessageResponse(BaseModel):
     """Schema for simple message responses."""
 

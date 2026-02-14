@@ -61,15 +61,7 @@ async def start_chat():
     Note: User is already authenticated by header_auth_callback.
     Chainlit blocks access if auth returns None.
     """
-    settings = get_settings()
     user = cl.user_session.get("user")
-
-    # Check if API key is configured
-    if not settings.DEEPSEEK_API_KEY:
-        await cl.Message(
-            content="DeepSeek API key is not configured. Please set DEEPSEEK_API_KEY environment variable."
-        ).send()
-        return
 
     # Initialize chatbot service
     chatbot = ChatbotService()
@@ -78,8 +70,8 @@ async def start_chat():
     # Send personalized welcome message
     first_name = user.metadata.get("first_name") if user else None
     name = first_name or (user.identifier if user else "there")
-    welcome_msg = f"Hello {name}! I'm your AI assistant powered by DeepSeek. How can I help you today?"
-    await cl.Message(content=welcome_msg).send()
+    # welcome_msg = f"Hello {name}! I'm your AI assistant powered by DeepSeek. How can I help you today?"
+    # await cl.Message(content=welcome_msg).send()
 
 
 @cl.on_message
@@ -93,10 +85,7 @@ async def handle_message(message: cl.Message):
     # Get chatbot service from session
     chatbot = cl.user_session.get("chatbot")
     if not chatbot:
-        await cl.Message(
-            content="Chatbot service not initialized. Please refresh the page."
-        ).send()
-        return
+        chatbot = ChatbotService()
 
     # Create a message object for streaming response
     msg = cl.Message(content="")
@@ -128,9 +117,8 @@ async def on_chat_resume(thread: Any):
 
     # Re-initialize chatbot service for resumed session
     settings = get_settings()
-    if settings.DEEPSEEK_API_KEY:
-        chatbot = ChatbotService()
-        cl.user_session.set("chatbot", chatbot)
+    chatbot = ChatbotService()
+    cl.user_session.set("chatbot", chatbot)
 
     # Conversation history is automatically loaded by Chainlit
     # from the data layer based on the thread ID

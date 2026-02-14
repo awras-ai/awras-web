@@ -34,6 +34,7 @@ FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 RUN apt-get update && apt-get install -y \
   libpq5 \
   netcat-openbsd \
+  curl \
   ffmpeg \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -53,21 +54,9 @@ COPY .chainlit ./.chainlit
 ENV PYTHONPATH=/app
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Create entrypoint script for running migrations before starting app
-RUN echo '#!/bin/sh\n\
-  # Wait for database to be ready\n\
-  echo "Waiting for database on ${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}..."\n\
-  while ! nc -z ${POSTGRES_HOST:-postgres} ${POSTGRES_PORT:-5432}; do\n\
-  sleep 1\n\
-  done\n\
-  echo "Database is ready!"\n\
-  \n\
-  # Run migrations\n\
-  alembic upgrade head\n\
-  \n\
-  # Start the application\n\
-  exec uvicorn main:app --host 0.0.0.0 --port 8000\n\
-  ' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
+# Copy entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 # Use entrypoint script
 ENTRYPOINT ["/app/entrypoint.sh"]

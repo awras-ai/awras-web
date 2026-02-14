@@ -49,7 +49,8 @@ export default function RegistrationPage() {
                 {step === 2 && (
                   <Step2Form
                     onComplete={() => {
-                      router.push("/dashboard");
+                      const chatUrl = process.env.NEXT_PUBLIC_CHAT_PLATFORM_URL || "/dashboard";
+                      router.push(chatUrl);
                     }}
                   />
                 )}

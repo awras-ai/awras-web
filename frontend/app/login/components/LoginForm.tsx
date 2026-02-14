@@ -38,7 +38,8 @@ export function LoginForm() {
   function onSubmit(values: z.infer<typeof loginSchema>) {
     mutation.mutate(values, {
       onSuccess: () => {
-        router.push("/dashboard");
+        const chatUrl = process.env.NEXT_PUBLIC_CHAT_PLATFORM_URL || "/dashboard";
+        router.push(chatUrl);
       },
     });
   }
