@@ -10,6 +10,7 @@ import ChatSettingsModal from './components/ChatSettings';
 import { ThemeProvider } from './components/ThemeProvider';
 import { Loader } from '@/components/Loader';
 import { Toaster } from '@/components/ui/sonner';
+import { WelcomeDialog } from '@/components/WelcomeDialog';
 
 import { userEnvState } from 'state/user';
 
@@ -81,6 +82,7 @@ function App() {
       <Toaster richColors className="toast" position="top-right" />
 
       <ChatSettingsModal />
+      <WelcomeDialog />
       <RouterProvider router={router} />
 
       <div
