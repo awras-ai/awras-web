@@ -36,7 +36,7 @@ user_message_autoscroll = true
 auto_tag_thread = true
 
 # Allow users to edit their own messages
-edit_message = true
+edit_message = false
 
 # Allow users to share threads (backend + UI). Requires an app-defined on_shared_thread_view callback.
 allow_thread_sharing = false
@@ -47,7 +47,7 @@ reaction_on_message_received = false
 
 # Authorize users to spontaneously upload files with messages
 [features.spontaneous_file_upload]
-enabled = true
+enabled = false
 # Define accepted file types using MIME types
 # Examples:
 # 1. For specific file types:
@@ -98,6 +98,8 @@ language = "en-US"
 
 # default_sidebar_state = "open"
 
+confirm_new_chat = false
+
 # Description of the assistant. This is used for HTML tags.
 # description = ""
 
@@ -135,10 +137,10 @@ alert_style = "classic"
 # custom_meta_image_url = "https://chainlit-cloud.s3.eu-west-3.amazonaws.com/logo/chainlit_banner.png"
 
 # Load assistant logo directly from URL.
-logo_file_url = ""
+logo_file_url = "/awras.png"
 
 # Load assistant avatar image directly from URL.
-default_avatar_file_url = ""
+default_avatar_file_url = "/awras.png"
 
 # Specify a custom build directory for the frontend.
 # This can be used to customize the frontend code.
