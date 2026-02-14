@@ -41,15 +41,13 @@ export default function RegistrationPage() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
               >
-                {step === 1 && (
-                  <Step1Form
-                    onNext={() => setStep(2)}
-                  />
-                )}
+                {step === 1 && <Step1Form onNext={() => setStep(2)} />}
                 {step === 2 && (
                   <Step2Form
                     onComplete={() => {
-                      const chatUrl = process.env.NEXT_PUBLIC_CHAT_PLATFORM_URL || "/dashboard";
+                      const chatUrl =
+                        process.env.NEXT_PUBLIC_CHAT_PLATFORM_URL ||
+                        "https://chat.awras.site";
                       router.push(chatUrl);
                     }}
                   />
