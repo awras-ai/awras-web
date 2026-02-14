@@ -122,7 +122,9 @@ export async function registerUser(
         "Validation error";
       throw new Error(messages);
     }
-    throw new Error(err.message || "Registration failed. Please try again.");
+    throw new Error(
+      err.detail || err.error || "Registration failed. Please try again.",
+    );
   }
 
   return res.json();

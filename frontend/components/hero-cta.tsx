@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getUserCount } from "@/lib/api/auth";
 
@@ -31,14 +30,13 @@ export function HeroCTA() {
   return (
     <div className="space-y-8">
       {/* Main CTA Button */}
-      <Link href="/signup">
-        <Button
-          size="lg"
-          className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-8 py-6 text-base font-medium"
-        >
-          Get Started
-        </Button>
-      </Link>
+      <Button
+        asChild
+        size="lg"
+        className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-8 py-6 text-base font-medium"
+      >
+        <a href="/signup">Get Started</a>
+      </Button>
 
       {/* User Count with Gradient Avatars */}
       <div className="flex justify-center items-center gap-4 pt-4">
