@@ -35,7 +35,7 @@ export function AnnouncementBar() {
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
   // Feb 16, 2026 at 12:00 AM
-  const countdownEndDate = new Date("2026-02-16T00:00:00");
+  const countdownEndDate = new Date("2026-02-16T12:00:00");
 
   useEffect(() => {
     // Calculate initial time left
