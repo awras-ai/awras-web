@@ -126,16 +126,22 @@ export function WelcomeDialog() {
             variant="outline"
             onClick={handleBack}
             disabled={isFirstStep}
-            className="flex-1 sm:flex-none min-w-0"
+            className="flex-1 sm:flex-none min-w-0 no-touch-hover active:scale-95 transition-transform"
             size="sm"
+            onTouchEnd={(e) => {
+              e.currentTarget.blur();
+            }}
           >
             <ChevronLeft className="h-4 w-4 sm:mr-2" />
             <span className="hidden sm:inline">Back</span>
           </Button>
           <Button 
             onClick={handleNext} 
-            className="flex-1 sm:flex-none min-w-0"
+            className="flex-1 sm:flex-none min-w-0 no-touch-hover active:scale-95 transition-transform"
             size="sm"
+            onTouchEnd={(e) => {
+              e.currentTarget.blur();
+            }}
           >
             <span className="truncate">
               {isLastStep ? "Start Chatting" : "Next"}

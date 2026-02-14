@@ -186,3 +186,16 @@ code {
   }
 }
 
+/* Disable hover effects on touch devices */
+@media (hover: none) {
+  .no-touch-hover:hover {
+    background-color: revert !important;
+    color: revert !important;
+  }
+}
+
+/* Prevent tap highlight color on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
