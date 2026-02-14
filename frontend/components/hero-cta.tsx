@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { getUserCount } from "@/lib/api/auth";
+import { getUserCount, getCurrentUser } from "@/lib/api/auth";
 
 export function HeroCTA() {
   const [userCount, setUserCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [href, setHref] = useState("/signup");
 
   useEffect(() => {
     const fetchUserCount = async () => {
@@ -27,6 +28,22 @@ export function HeroCTA() {
     return () => clearInterval(userCountInterval);
   }, []);
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        await getCurrentUser();
+        const chatUrl =
+          process.env.NEXT_PUBLIC_CHAT_PLATFORM_URL ||
+          "https://chat.awras.site";
+        setHref(chatUrl);
+      } catch {
+        setHref("/signup");
+      }
+    };
+
+    checkAuth();
+  }, []);
+
   return (
     <div className="">
       {/* Main CTA Button */}
@@ -35,7 +52,7 @@ export function HeroCTA() {
         size="lg"
         className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-8 py-6 text-base font-medium"
       >
-        <a href="/signup">Get Started</a>
+        <a href={href}>Get Started</a>
       </Button>
 
       {/* User Count with Gradient Avatars */}
