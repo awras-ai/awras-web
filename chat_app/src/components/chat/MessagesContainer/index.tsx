@@ -13,7 +13,6 @@ import {
   sideViewState,
   updateMessageById,
   useChatData,
-  useChatInteract,
   useChatMessages,
   useConfig
 } from '@chainlit/react-client';
@@ -30,19 +29,21 @@ const MessagesContainer = ({ navigate }: Props) => {
   const { config } = useConfig();
   const { elements, askUser, loading, actions } = useChatData();
   const { messages } = useChatMessages();
-  const { uploadFile: _uploadFile } = useChatInteract();
+  // DISABLED: File upload not needed for text-only chat
+  // const { uploadFile: _uploadFile } = useChatInteract();
   const setMessages = useSetRecoilState(messagesState);
   const setSideView = useSetRecoilState(sideViewState);
   const sessionId = useRecoilValue(sessionIdState);
 
   const { t } = useTranslation();
 
-  const uploadFile = useCallback(
-    (file: File, onProgress: (progress: number) => void, parentId?: string) => {
-      return _uploadFile(file, onProgress, parentId);
-    },
-    [_uploadFile]
-  );
+  // DISABLED: File upload callback not needed for text-only chat
+  // const uploadFile = useCallback(
+  //   (file: File, onProgress: (progress: number) => void, parentId?: string) => {
+  //     return _uploadFile(file, onProgress, parentId);
+  //   },
+  //   [_uploadFile]
+  // );
 
   const onFeedbackUpdated = useCallback(
     async (message: IStep, onSuccess: () => void, feedback: IFeedback) => {
@@ -120,7 +121,8 @@ const MessagesContainer = ({ navigate }: Props) => {
   // This prevents unnecessary re-renders of children components when no props have changed.
   const memoizedContext = useMemo(() => {
     return {
-      uploadFile,
+      // DISABLED: File upload not supported in text-only chat
+      // uploadFile,
       askUser,
       allowHtml: config?.features?.unsafe_allow_html,
       latex: config?.features?.latex,

@@ -1,16 +1,17 @@
 import { cn, hasMessage } from '@/lib/utils';
 import { MutableRefObject } from 'react';
 
-import { FileSpec, useChatMessages } from '@chainlit/react-client';
+import { useChatMessages } from '@chainlit/react-client';
 
 import WaterMark from '@/components/WaterMark';
 
 import MessageComposer from './MessageComposer';
 
 interface Props {
-  fileSpec: FileSpec;
-  onFileUpload: (payload: File[]) => void;
-  onFileUploadError: (error: string) => void;
+  // DISABLED: File upload props removed for text-only chat
+  // fileSpec: FileSpec;
+  // onFileUpload: (payload: File[]) => void;
+  // onFileUploadError: (error: string) => void;
   autoScrollRef: MutableRefObject<boolean>;
   showIfEmptyThread?: boolean;
 }

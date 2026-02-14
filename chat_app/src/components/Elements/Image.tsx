@@ -1,3 +1,8 @@
+// DISABLED: Image display not needed for text-only chat
+// This component has been disabled as part of performance optimization
+// To re-enable: uncomment this file and update Elements/index.tsx
+
+/*
 import { cn } from '@/lib/utils';
 import { X } from 'lucide-react';
 import { useState } from 'react';
@@ -64,3 +69,7 @@ const ImageElement = ({ element }: { element: IImageElement }) => {
 };
 
 export { ImageElement };
+*/
+
+// Export a placeholder to maintain type compatibility
+export const ImageElement = () => null;

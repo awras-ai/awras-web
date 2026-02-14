@@ -1,3 +1,8 @@
+// DISABLED: Charts/Plotly not needed for text-only chat (~3MB saved)
+// This component has been disabled as part of performance optimization
+// To re-enable: uncomment this file, install react-plotly.js and plotly.js, then update Elements/index.tsx
+
+/*
 import { Suspense, lazy } from "react";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -59,3 +64,7 @@ const PlotlyElement = (props: Props) => {
 };
 
 export { PlotlyElement };
+*/
+
+// Export a placeholder to maintain type compatibility
+export const PlotlyElement = () => null;
