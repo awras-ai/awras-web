@@ -3,11 +3,25 @@ Service layer for chatbot business logic.
 """
 
 import logging
+from typing import Any
 from openai import AsyncOpenAI
 from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
+
+# Global system prompt - Edit this to customize the AI personality
+SYSTEM_PROMPT = """نتا هو "أوراس شات" (Awras Chat)، مساعد ذكي جزائري مخدوم باش يعاون الناس.
+
+القواعد اللي لازم تمشي عليها:
+1. **الهدرة:** جاوب ديما باللهجة الجزائرية (الدارجة) وتكتب بالحروف العربية، إلا إذا طلب منك المستخدم لغة خلاف.
+2. **الشخصية:** نتا خدوم، ظريف، ومحترم (كيما "وليد فاميليا"). هدرتك تكون طبيعية ومفهومة، ماشي "روبو".
+3. **الثقافة:** نتا تفهم العقلية الجزائرية مليح، تعرف الأمثال الشعبية، الماكلة (كيما الكسكسي، الرشتة، المحاجب)، وتعرف الولايات والعادات والتقاليد تاعنا.
+4. **السياق:** إذا كاين كلمة تقنية واعرة، بسطها واشرحها بالدارجة.
+5. **اللغات لخرين:** إذا هدر معاك واحد بالفرنسية ولا بلونجلي، فهمو وجاوبو بالدارجة، غير إذا قالك "جاوبني بلونجلي".
+6. **المصداقية:** إذا ما فهمتش السؤال ولا جاتك الحاجة مخلطة، ما تخرطش من راسك. قول بصراحة: "سمحلي، ما فهمتش مليح واش راك تقصد. تقدر تزيد توضحلي؟"
+
+مهمتك هي تفيد المستخدم وتعطيه معلومة صحيحة وسهلة."""
 
 
 class ChatbotService:
@@ -30,12 +44,12 @@ class ChatbotService:
             )
         self.model = settings.MODEL_NAME
 
-    async def generate_response(self, message: str) -> str:
+    async def generate_response(self, messages: list[Any]) -> str:
         """
         Generate a response from the Openai compatible model.
 
         Args:
-            message: User message
+            messages: List of message dicts with 'role' and 'content' keys
 
         Returns:
             Model response as string
@@ -43,9 +57,7 @@ class ChatbotService:
         try:
             response = await self.client.chat.completions.create(
                 model=self.model,
-                messages=[
-                    {"role": "user", "content": message},
-                ],
+                messages=messages,
                 temperature=settings.MODEL_TEMPERATURE,
                 max_tokens=settings.MODEL_MAX_TOKENS,
             )
@@ -54,12 +66,12 @@ class ChatbotService:
             logger.error(f"Error generating response: {str(e)}")
             return f"Sorry, I encountered an error: {str(e)}"
 
-    async def generate_streaming_response(self, message: str):
+    async def generate_streaming_response(self, messages: list[Any]):
         """
         Generate a streaming response from the Openai compatible model.
 
         Args:
-            message: User message
+            messages: List of message dicts with 'role' and 'content' keys
 
         Yields:
             Chunks of the response as they become available
@@ -67,9 +79,7 @@ class ChatbotService:
         try:
             stream = await self.client.chat.completions.create(
                 model=self.model,
-                messages=[
-                    {"role": "user", "content": message},
-                ],
+                messages=messages,
                 temperature=settings.MODEL_TEMPERATURE,
                 max_tokens=settings.MODEL_MAX_TOKENS,
                 stream=True,

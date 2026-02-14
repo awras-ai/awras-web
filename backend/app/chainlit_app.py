@@ -12,8 +12,12 @@ import chainlit as cl
 
 from app.chainlit.data_layer import get_data_layer
 from app.chainlit.auth import header_auth_callback
-from app.services.chatbot import ChatbotService
+from app.services.chatbot import ChatbotService, SYSTEM_PROMPT
 from app.core.config import get_settings
+
+
+# Maximum number of messages to keep in context window (excluding system prompt)
+MAX_CONTEXT_MESSAGES = 6
 
 
 # =============================================================================
@@ -103,6 +107,16 @@ async def start_chat():
     # Message: "Welcome [Name]! I am Awras Chat. I'm here to answer your questions in Darija. What do you want to ask today?"
     welcome_msg = f"مرحبا {name}! أنا أوراس شات (Awras Chat). راني هنا باش نعاونك ونجاوبك بالدارجة. واش راك حاب تسقسي ليوم؟"
 
+    # Initialize conversation history with proper role alternation:
+    # 1. System prompt (user role)
+    # 2. Welcome message (assistant role) - ensures proper user/assistant alternation
+    conversation_history = [
+        {"role": "user", "content": SYSTEM_PROMPT},
+        {"role": "assistant", "content": welcome_msg},
+    ]
+    cl.user_session.set("conversation_history", conversation_history)
+
+    # Display welcome message to user (UI only, already in conversation history)
     await cl.Message(content=welcome_msg).send()
 
 
@@ -114,21 +128,50 @@ async def handle_message(message: cl.Message):
     Args:
         message: The user's message object
     """
-    # Get chatbot service from session
+    # Get chatbot service and conversation history from session
     chatbot = cl.user_session.get("chatbot")
     if not chatbot:
         chatbot = ChatbotService()
+
+    conversation_history = cl.user_session.get("conversation_history", [])
+    if not conversation_history:
+        # Initialize with system prompt if not set
+        conversation_history = [{"role": "user", "content": SYSTEM_PROMPT}]
+
+    # Add current user message to conversation history
+    conversation_history.append({"role": "user", "content": message.content})
+
+    # Determine which messages to send to the model
+    # If total messages (including system) < 7 (6 exchanges), send all
+    # Otherwise, send system prompt (first message) + last 6 messages
+    if len(conversation_history) <= MAX_CONTEXT_MESSAGES + 1:
+        messages_to_send = conversation_history.copy()
+    else:
+        # Always include system prompt (first message) + last 6 messages
+        messages_to_send = [conversation_history[0]] + conversation_history[
+            -MAX_CONTEXT_MESSAGES:
+        ]
 
     # Create a message object for streaming response
     msg = cl.Message(content="")
     await msg.send()
 
+    # Collect the full response
+    full_response = ""
+
     # Generate streaming response
-    async for chunk in chatbot.generate_streaming_response(message.content):
+    async for chunk in chatbot.generate_streaming_response(messages_to_send):
         await msg.stream_token(chunk)
+        full_response += chunk
 
     # Finalize the message
     await msg.update()
+
+    # Add assistant response to conversation history
+    conversation_history.append({"role": "assistant", "content": full_response})
+
+    # Save updated conversation history
+    cl.user_session.set("conversation_history", conversation_history)
 
 
 @cl.on_chat_resume
@@ -152,8 +195,30 @@ async def on_chat_resume(thread: Any):
     chatbot = ChatbotService()
     cl.user_session.set("chatbot", chatbot)
 
-    # Conversation history is automatically loaded by Chainlit
-    # from the data layer based on the thread ID
+    # Get user info for welcome message
+    user = cl.user_session.get("user")
+    first_name = user.metadata.get("first_name") if user else None
+    last_name = user.metadata.get("last_name") if user else None
+    full_name = (
+        f"{first_name} {last_name}".strip() if first_name and last_name else None
+    )
+    name = full_name or (user.identifier if user else "khoya/khti")
+
+    # Welcome message
+    welcome_msg = f"مرحبا {name}! أنا أوراس شات (Awras Chat). راني هنا باش نعاونك ونجاوبك بالدارجة. واش راك حاب تسقسي ليوم؟"
+
+    # Reset conversation history with proper role alternation for resumed conversation
+    # 1. System prompt (user role)
+    # 2. Welcome message (assistant role) - ensures proper user/assistant alternation
+    conversation_history = [
+        {"role": "user", "content": SYSTEM_PROMPT},
+        {"role": "assistant", "content": welcome_msg},
+    ]
+    cl.user_session.set("conversation_history", conversation_history)
+
+    # Note: Conversation history is automatically loaded by Chainlit
+    # from the data layer based on the thread ID, but we start fresh
+    # with the system prompt and welcome message to provide context
 
 
 @cl.on_chat_end
