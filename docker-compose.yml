@@ -97,7 +97,7 @@ services:
     environment:
       NODE_ENV: production
       NEXT_PUBLIC_BACKEND_BASE_URL: ${NEXT_PUBLIC_BACKEND_BASE_URL}
-      NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:-your_secret_access_key}
+      NEXT_PUBLIC_CHAT_PLATFORM_URL: ${NEXT_PUBLIC_CHAT_PLATFORM_URL:-"https://chat.awras.site"}
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     restart: unless-stopped
