@@ -32,14 +32,14 @@ export default function LoginPage() {
             <LoginForm />
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <div className="text-center">
-              <a
-                href="/forgot-password"
-                className="text-sm text-primary hover:underline"
-              >
-                Forgot password?
-              </a>
-            </div>
+            {/* <div className="text-center"> */}
+            {/*   <a */}
+            {/*     href="/forgot-password" */}
+            {/*     className="text-sm text-primary hover:underline" */}
+            {/*   > */}
+            {/*     Forgot password? */}
+            {/*   </a> */}
+            {/* </div> */}
             <p className="text-xs text-muted-foreground text-center">
               Don&apos;t have an account?{" "}
               <a href="/signup" className="text-primary hover:underline">

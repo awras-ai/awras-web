@@ -28,7 +28,7 @@ export function HeroCTA() {
   }, []);
 
   return (
-    <div className="space-y-8">
+    <div className="">
       {/* Main CTA Button */}
       <Button
         asChild
