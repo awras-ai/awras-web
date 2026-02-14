@@ -34,10 +34,10 @@ const step1Schema = z
   });
 
 interface Step1FormProps {
-  onNext: () => void;
+  onComplete: () => void;
 }
 
-export function Step1Form({ onNext }: Step1FormProps) {
+export function Step1Form({ onComplete }: Step1FormProps) {
   const { data, setData } = useRegistration();
   const mutation = useRegister();
   const [showPassword, setShowPassword] = useState(false);
@@ -61,7 +61,7 @@ export function Step1Form({ onNext }: Step1FormProps) {
     mutation.mutate(registrationData, {
       onSuccess: () => {
         setData(registrationData);
-        onNext();
+        onComplete();
       },
     });
   }
@@ -199,7 +199,7 @@ export function Step1Form({ onNext }: Step1FormProps) {
               Creating account...
             </>
           ) : (
-            "Next"
+            "Create Account"
           )}
         </Button>
 

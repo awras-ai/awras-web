@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
 
 import {
   Card,
@@ -14,13 +12,18 @@ import {
 import {
   RegistrationProvider,
   Step1Form,
-  Step2Form,
   RegistrationProgress,
 } from "../signup/components";
 
 export default function RegistrationPage() {
-  const [step, setStep] = useState(1);
   const router = useRouter();
+
+  const handleSuccess = () => {
+    const chatUrl =
+      process.env.NEXT_PUBLIC_CHAT_PLATFORM_URL ||
+      "https://chat.awras.site";
+    router.push(chatUrl);
+  };
 
   return (
     <RegistrationProvider>
@@ -30,30 +33,10 @@ export default function RegistrationPage() {
             <CardTitle className="text-2xl text-center">
               Create Account
             </CardTitle>
-            <RegistrationProgress currentStep={step} />
+            <RegistrationProgress currentStep={1} />
           </CardHeader>
           <CardContent>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={step}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-              >
-                {step === 1 && <Step1Form onNext={() => setStep(2)} />}
-                {step === 2 && (
-                  <Step2Form
-                    onComplete={() => {
-                      const chatUrl =
-                        process.env.NEXT_PUBLIC_CHAT_PLATFORM_URL ||
-                        "https://chat.awras.site";
-                      router.push(chatUrl);
-                    }}
-                  />
-                )}
-              </motion.div>
-            </AnimatePresence>
+            <Step1Form onComplete={handleSuccess} />
           </CardContent>
           <CardFooter className="flex justify-center">
             <p className="text-xs text-muted-foreground">
