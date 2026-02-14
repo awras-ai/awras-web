@@ -97,6 +97,12 @@ async def start_chat():
     chatbot = ChatbotService()
     cl.user_session.set("chatbot", chatbot)
 
+    # Get thread_id and user_id for Langfuse tracing
+    thread_id = cl.context.session.thread_id
+    user_id = user.identifier if user else "anonymous"
+    cl.user_session.set("thread_id", thread_id)
+    cl.user_session.set("user_id", user_id)
+
     first_name = user.metadata.get("first_name") if user else None
     last_name = user.metadata.get("last_name") if user else None
     full_name = (
@@ -156,11 +162,17 @@ async def handle_message(message: cl.Message):
     msg = cl.Message(content="")
     await msg.send()
 
+    # Get user_id and thread_id for Langfuse tracing
+    user_id = cl.user_session.get("user_id", "anonymous")
+    thread_id = cl.user_session.get("thread_id", "")
+
     # Collect the full response
     full_response = ""
 
-    # Generate streaming response
-    async for chunk in chatbot.generate_streaming_response(messages_to_send):
+    # Generate streaming response with tracing
+    async for chunk in chatbot.generate_streaming_response(
+        messages_to_send, user_id=user_id, thread_id=thread_id
+    ):
         await msg.stream_token(chunk)
         full_response += chunk
 
@@ -195,8 +207,13 @@ async def on_chat_resume(thread: Any):
     chatbot = ChatbotService()
     cl.user_session.set("chatbot", chatbot)
 
+    # Get thread_id and user_id for Langfuse tracing
+    thread_id = cl.context.session.thread_id
+    user_id = user.identifier if user else "anonymous"
+    cl.user_session.set("thread_id", thread_id)
+    cl.user_session.set("user_id", user_id)
+
     # Get user info for welcome message
-    user = cl.user_session.get("user")
     first_name = user.metadata.get("first_name") if user else None
     last_name = user.metadata.get("last_name") if user else None
     full_name = (
