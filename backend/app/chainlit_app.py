@@ -17,7 +17,7 @@ from app.core.config import get_settings
 
 
 # Maximum number of messages to keep in context window (excluding system prompt)
-MAX_CONTEXT_MESSAGES = 6
+MAX_CONTEXT_MESSAGES = 4
 
 
 # =============================================================================
