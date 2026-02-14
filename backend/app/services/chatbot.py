@@ -47,7 +47,7 @@ class ChatbotService:
                     {"role": "user", "content": message},
                 ],
                 temperature=settings.MODEL_TEMPERATURE,
-                max_tokens=1024,
+                max_tokens=settings.MODEL_MAX_TOKENS,
             )
             return response.choices[0].message.content or ""
         except Exception as e:
@@ -71,7 +71,7 @@ class ChatbotService:
                     {"role": "user", "content": message},
                 ],
                 temperature=settings.MODEL_TEMPERATURE,
-                max_tokens=1024,
+                max_tokens=settings.MODEL_MAX_TOKENS,
                 stream=True,
             )
             async for chunk in stream:

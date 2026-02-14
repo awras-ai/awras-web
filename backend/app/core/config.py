@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     MODEL_CUSTOM_HEADER_KEY: str = ""
     MODEL_CUSTOM_HEADER_VALUE: str = ""
     MODEL_TEMPERATURE: float = 0.7
+    MODEL_MAX_TOKENS: int = 512
 
     # API
     API_V1_PREFIX: str = "/api/v1"

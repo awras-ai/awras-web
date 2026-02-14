@@ -19,6 +19,34 @@ from app.core.config import get_settings
 # =============================================================================
 # CHAINLIT CONFIGURATION
 # =============================================================================
+# @cl.set_starters
+# async def set_starters():
+#     return [
+#         cl.Starter(
+#             label="Translate to Darija",
+#             # "Translate this from English to Darija: 'Welcome to the team...'"
+#             message="ترجم هادي من لونجلي للدارجة: 'Welcome to the team, we are happy to have you.'",
+#             icon="/public/learn.svg",
+#         ),
+#         cl.Starter(
+#             label="Who are you?",
+#             # "Who are you? Tell me about yourself and what you can do."
+#             message="شكون نتا؟ حكيلي شوية على روحك واش تقدر دير.",
+#             icon="/public/user.svg",
+#         ),
+#         cl.Starter(
+#             label="Mhajeb Recipe",
+#             # "I'm craving Mhajeb, how do I make them? Give me the recipe."
+#             message="شهيت المحاجب، كيفاش نطيبهم؟ عطيني الوصفة والخطوات.",
+#             icon="/public/idea.svg",
+#         ),
+#         cl.Starter(
+#             label="Tell me a joke",
+#             # "Tell me a funny joke to make me laugh a bit."
+#             message="حكيلي كاش نكتة شابة باش نضحك شوية.",
+#             icon="/public/smiley.svg",
+#         ),
+#     ]
 
 
 @cl.data_layer
@@ -62,16 +90,20 @@ async def start_chat():
     Chainlit blocks access if auth returns None.
     """
     user = cl.user_session.get("user")
-
-    # Initialize chatbot service
     chatbot = ChatbotService()
     cl.user_session.set("chatbot", chatbot)
 
-    # Send personalized welcome message
     first_name = user.metadata.get("first_name") if user else None
-    name = first_name or (user.identifier if user else "there")
-    # welcome_msg = f"Hello {name}! I'm your AI assistant powered by DeepSeek. How can I help you today?"
-    # await cl.Message(content=welcome_msg).send()
+    last_name = user.metadata.get("last_name") if user else None
+    full_name = (
+        f"{first_name} {last_name}".strip() if first_name and last_name else None
+    )
+    name = full_name or (user.identifier if user else "khoya/khti")
+
+    # Message: "Welcome [Name]! I am Awras Chat. I'm here to answer your questions in Darija. What do you want to ask today?"
+    welcome_msg = f"مرحبا {name}! أنا أوراس شات (Awras Chat). راني هنا باش نعاونك ونجاوبك بالدارجة. واش راك حاب تسقسي ليوم؟"
+
+    await cl.Message(content=welcome_msg).send()
 
 
 @cl.on_message
