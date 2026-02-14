@@ -63,7 +63,7 @@ export function AnnouncementBar() {
   return (
     <div className="sticky top-0 z-50 w-full bg-[#235CF3] text-white py-2 px-4">
       <div className="max-w-7xl mx-auto flex items-center justify-center relative">
-        <div className="flex items-center gap-2 text-sm font-medium">
+        <div className="flex items-center gap-2 text-xs sm:text-sm md:text-base font-medium">
           <span>✨</span>
           <span>
             awras-chat is now available for{" "}
