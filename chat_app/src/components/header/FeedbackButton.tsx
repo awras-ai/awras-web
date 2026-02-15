@@ -17,7 +17,27 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import Translator from "@/components/i18n/Translator";
+
+const borderGlowAnimation = `
+@keyframes borderGlow {
+  0%, 90% { 
+    box-shadow: none;
+    border-color: transparent;
+  }
+  5% { 
+    box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.3), 0 0 16px 4px rgba(0, 0, 0, 0.15);
+    border-color: rgba(0, 0, 0, 0.4);
+  }
+  10% { 
+    box-shadow: none;
+    border-color: transparent;
+  }
+  100% { 
+    box-shadow: none;
+    border-color: transparent;
+  }
+}
+`;
 
 export default function FeedbackButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,7 +62,7 @@ export default function FeedbackButton() {
           },
           credentials: "include",
           body: JSON.stringify({ feedback }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -55,7 +75,7 @@ export default function FeedbackButton() {
       setIsOpen(false);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to submit feedback"
+        error instanceof Error ? error.message : "Failed to submit feedback",
       );
     } finally {
       setIsSubmitting(false);
@@ -69,6 +89,7 @@ export default function FeedbackButton() {
 
   return (
     <>
+      <style>{borderGlowAnimation}</style>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -76,7 +97,11 @@ export default function FeedbackButton() {
               id="feedback-button"
               size="icon"
               variant="ghost"
-              className="text-muted-foreground hover:text-muted-foreground"
+              className="text-muted-foreground hover:text-muted-foreground border-2 border-transparent"
+              style={{
+                animation: "borderGlow 15s infinite",
+                transition: "box-shadow 0.3s ease, border-color 0.3s ease",
+              }}
               onClick={() => setIsOpen(true)}
             >
               <MessageCircle className="!size-4" />
