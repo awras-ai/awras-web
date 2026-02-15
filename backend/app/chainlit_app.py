@@ -30,30 +30,59 @@ async def set_starters():
     translation_options = [
         # Engineering
         "ترجم هادي من لونجلي للدارجة: 'Engineering is a very broad field that is not just about building machines or bridges; it is actually about using science and creativity to find smart solutions for complex problems so that we can help people live better and more comfortable lives every single day.'",
-        
         # Life
         "ترجم هادي من لونجلي للدارجة: 'Life is like a very long and unpredictable road with many different turns and challenges; even when things get difficult, you should always try to enjoy the small moments of happiness and keep a positive mindset for a brighter future ahead of you.'",
-        
         # Student Life
         "ترجم هادي من لونجلي للدارجة: 'Being a university student is one of the most exciting experiences in a person's life because you have the chance to learn new things daily, discover your true passions, and meet many different people who might end up becoming your best friends for the rest of your life.'",
-        
         # Choice (Technology & Society)
-        "ترجم هادي من لونجلي للدارجة: 'Technology is changing the world at an incredible speed, and while it makes communication much easier than before, we must learn how to use these powerful tools responsibly to make sure we create a balanced and helpful environment for everyone in our community.'"
+        "ترجم هادي من لونجلي للدارجة: 'Technology is changing the world at an incredible speed, and while it makes communication much easier than before, we must learn how to use these powerful tools responsibly to make sure we create a balanced and helpful environment for everyone in our community.'",
     ]
     # --- Technical / AI Variations ---
     tech_options = [
-        {"label": "What is AI?", "msg": "واش هو الذكاء الاصطناعي، أشرحلي ببساطة.", "icon": "https://cdn-icons-png.flaticon.com/512/2103/2103633.png"},
-        {"label": "What is the Cloud?", "msg": "شنو هو الكلاود (Cloud) وعلاش الشركات كامل راهي تخدم بيه دروك؟", "icon": "https://cdn-icons-png.flaticon.com/512/4149/4149661.png"},
-        {"label": "How to learn Coding?", "msg": "حبيت نبدا نتعلم البرمجة، واش هي أحسن لغة نبدا بيها للمبتدئين؟", "icon": "https://cdn-icons-png.flaticon.com/512/2463/2463321.png"},
-        {"label": "What is Open Source?", "msg": "واش معناها 'أوبن سورس' (Open Source) وعلاش مهم للمطورين؟", "icon": "https://cdn-icons-png.flaticon.com/512/25/25231.png"}
+        {
+            "label": "What is AI?",
+            "msg": "واش هو الذكاء الاصطناعي، أشرحلي ببساطة.",
+            "icon": "https://cdn-icons-png.flaticon.com/512/2103/2103633.png",
+        },
+        {
+            "label": "What is the Cloud?",
+            "msg": "شنو هو الكلاود (Cloud) وعلاش الشركات كامل راهي تخدم بيه دروك؟",
+            "icon": "https://cdn-icons-png.flaticon.com/512/4149/4149661.png",
+        },
+        {
+            "label": "How to learn Coding?",
+            "msg": "حبيت نبدا نتعلم البرمجة، واش هي أحسن لغة نبدا بيها للمبتدئين؟",
+            "icon": "https://cdn-icons-png.flaticon.com/512/2463/2463321.png",
+        },
+        {
+            "label": "What is Open Source?",
+            "msg": "واش معناها 'أوبن سورس' (Open Source) وعلاش مهم للمطورين؟",
+            "icon": "https://cdn-icons-png.flaticon.com/512/25/25231.png",
+        },
     ]
 
     # --- Recipe Variations ---
     recipe_options = [
-        {"label": "Mhajeb Recipe", "msg": "شهيت المحاجب، كيفاش نطيبهم؟ عطيني الوصفة والخطوات.", "icon": "https://cdn-icons-png.flaticon.com/512/3448/3448099.png"},
-        {"label": "Harira Recipe", "msg": "كيفاش ندير حريرة وهرانية بنينة؟ عطيني المقادير وطريقة التحضير.", "icon": "https://cdn-icons-png.flaticon.com/512/3448/3448099.png"},
-        {"label": "Chorba Recipe", "msg": "حبيت نطيب شربة فريك عاصمية، واش هي الطريقة الصحيحة باش تجي خاثرة؟", "icon": "https://cdn-icons-png.flaticon.com/512/3448/3448099.png"},
-        {"label": "Couscous Recipe", "msg": "عطيني أسرار كسكس بالخضر والمرقة الحمراء، كيفاش نفور الطعام باش يجي طري؟", "icon": "https://cdn-icons-png.flaticon.com/512/3448/3448099.png"}
+        {
+            "label": "Mhajeb Recipe",
+            "msg": "شهيت المحاجب، كيفاش نطيبهم؟ عطيني الوصفة والخطوات.",
+            "icon": "https://cdn-icons-png.flaticon.com/512/3448/3448099.png",
+        },
+        {
+            "label": "Harira Recipe",
+            "msg": "كيفاش ندير حريرة وهرانية بنينة؟ عطيني المقادير وطريقة التحضير.",
+            "icon": "https://cdn-icons-png.flaticon.com/512/3448/3448099.png",
+        },
+        {
+            "label": "Chorba Recipe",
+            "msg": "حبيت نطيب شربة فريك عاصمية، واش هي الطريقة الصحيحة باش تجي خاثرة؟",
+            "icon": "https://cdn-icons-png.flaticon.com/512/3448/3448099.png",
+        },
+        {
+            "label": "Couscous Recipe",
+            "msg": "عطيني أسرار كسكس بالخضر والمرقة الحمراء، كيفاش نفور الطعام باش يجي طري؟",
+            "icon": "https://cdn-icons-png.flaticon.com/512/3448/3448099.png",
+        },
     ]
 
     selected_tech = random.choice(tech_options)
@@ -81,6 +110,8 @@ async def set_starters():
             icon="https://cdn-icons-png.flaticon.com/512/4712/4712035.png",
         ),
     ]
+
+
 @cl.data_layer
 def data_layer():
     """
@@ -151,7 +182,7 @@ async def start_chat():
     cl.user_session.set("conversation_history", conversation_history)
 
     # Display welcome message to user (UI only, already in conversation history)
-    # await cl.Message(content=welcome_msg).send()
+    await cl.Message(content=welcome_msg).send()
 
 
 @cl.on_message
