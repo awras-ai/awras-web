@@ -182,7 +182,7 @@ async def start_chat():
     cl.user_session.set("conversation_history", conversation_history)
 
     # Display welcome message to user (UI only, already in conversation history)
-    await cl.Message(content=welcome_msg).send()
+    # await cl.Message(content=welcome_msg).send()
 
 
 @cl.on_message
