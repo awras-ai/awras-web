@@ -19,10 +19,7 @@ export default function RegistrationPage() {
   const router = useRouter();
 
   const handleSuccess = () => {
-    const chatUrl =
-      process.env.NEXT_PUBLIC_CHAT_PLATFORM_URL ||
-      "https://chat.awras.site";
-    router.push(chatUrl);
+    router.push("/goodbye");
   };
 
   return (

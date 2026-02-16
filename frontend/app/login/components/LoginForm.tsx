@@ -38,10 +38,7 @@ export function LoginForm() {
   function onSubmit(values: z.infer<typeof loginSchema>) {
     mutation.mutate(values, {
       onSuccess: () => {
-        const chatUrl =
-          process.env.NEXT_PUBLIC_CHAT_PLATFORM_URL ||
-          "https://chat.awras.site";
-        router.push(chatUrl);
+        router.push("/goodbye");
       },
     });
   }
