@@ -1,50 +1,33 @@
-"use client";
+import type { Metadata } from "next";
+import { SignupContent } from "./SignupContent";
 
-import { useRouter } from "next/navigation";
+export const metadata: Metadata = {
+  title: "Create Account",
+  description:
+    "Join the Awras community and contribute to the preservation of Algerian Darija. Create your free account to access AI tools and participate in language research.",
+  openGraph: {
+    title: "Create Account | Awras - Algerian AI Platform",
+    description:
+      "Join Awras and help preserve Algerian Darija through AI. Create your account to contribute to language preservation.",
+    url: "https://awras.site/signup",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Awras - Algerian AI Ecosystem",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Create Account | Awras - Algerian AI Platform",
+    description:
+      "Join Awras and help preserve Algerian Darija through AI research and community contribution.",
+    images: ["/og-image.jpg"],
+  },
+};
 
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  RegistrationProvider,
-  Step1Form,
-  RegistrationProgress,
-} from "../signup/components";
-
-export default function RegistrationPage() {
-  const router = useRouter();
-
-  const handleSuccess = () => {
-    router.push("/goodbye");
-  };
-
-  return (
-    <RegistrationProvider>
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">
-              Create Account
-            </CardTitle>
-            <RegistrationProgress currentStep={1} />
-          </CardHeader>
-          <CardContent>
-            <Step1Form onComplete={handleSuccess} />
-          </CardContent>
-          <CardFooter className="flex justify-center">
-            <p className="text-xs text-muted-foreground">
-              Already have an account?{" "}
-              <a href="/login" className="text-primary hover:underline">
-                Sign in
-              </a>
-            </p>
-          </CardFooter>
-        </Card>
-      </div>
-    </RegistrationProvider>
-  );
+export default function SignupPage() {
+  return <SignupContent />;
 }
