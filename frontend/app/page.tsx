@@ -8,7 +8,7 @@ import { AnnouncementBar } from "@/components/announcement-bar";
 export default function Home() {
   return (
     <main className="min-h-screen bg-white text-black selection:bg-black selection:text-white relative">
-      <AnnouncementBar />
+      {/* <AnnouncementBar /> */}
       {/* <Navbar /> */}
       <div className="squares-background" />
       <div className="relative z-10">
