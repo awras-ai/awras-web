@@ -117,39 +117,39 @@ services:
         condition: service_healthy
     networks:
       - awras_internal_network
-  chat_app:
-    build:
-      context: ./chat_app
-      dockerfile: Dockerfile
-    container_name: chat_app
-    ports:
-      - "${FRONTEND_PORT_NUMBER:-5173}:80"
-    environment:
-      VITE_API_URL: ${VITE_API_URL}
-    restart: always
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--quiet",
-          "--tries=1",
-          "--spider",
-          "http://localhost:80",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    depends_on:
-      postgres:
-        condition: service_healthy
-      frontend:
-        condition: service_healthy
-      backend:
-        condition: service_healthy
-    networks:
-      - awras_internal_network
+  # chat_app:
+  #   build:
+  #     context: ./chat_app
+  #     dockerfile: Dockerfile
+  #   container_name: chat_app
+  #   ports:
+  #     - "${FRONTEND_PORT_NUMBER:-5173}:80"
+  #   environment:
+  #     VITE_API_URL: ${VITE_API_URL}
+  #   restart: always
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD",
+  #         "wget",
+  #         "--quiet",
+  #         "--tries=1",
+  #         "--spider",
+  #         "http://localhost:80",
+  #       ]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 40s
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     frontend:
+  #       condition: service_healthy
+  #     backend:
+  #       condition: service_healthy
+  #   networks:
+  #     - awras_internal_network
 
 volumes:
   postgres_data:
