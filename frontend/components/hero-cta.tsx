@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { getUserCount, getCurrentUser } from "@/lib/api/auth";
+import posthog from "posthog-js";
 
 export function HeroCTA() {
   const [userCount, setUserCount] = useState<number | null>(null);
@@ -52,7 +53,9 @@ export function HeroCTA() {
         size="lg"
         className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-8 py-6 text-base font-medium"
       >
-        <a href={href}>Get Started</a>
+        <a href={href} onClick={() => posthog.capture("cta_clicked", { location: "hero" })}>
+          Get Started
+        </a>
       </Button>
 
       {/* User Count with Gradient Avatars */}
