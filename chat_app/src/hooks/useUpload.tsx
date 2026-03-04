@@ -1,3 +1,8 @@
+// DISABLED: File upload functionality not needed for text-only chat
+// This hook has been disabled as part of performance optimization
+// To re-enable: uncomment this file and install react-dropzone
+
+/*
 import { useCallback } from "react";
 import {
   DropzoneOptions,
@@ -55,5 +60,24 @@ const useUpload = ({ onError, onResolved, options, spec }: useUploadProps) => {
 
   return { getInputProps, getRootProps, isDragActive };
 };
+
+export { useUpload };
+*/
+
+// Export stub for compatibility
+import type { FileSpec } from "@chainlit/react-client";
+
+interface useUploadProps {
+  onError?: (error: string) => void;
+  onResolved?: (payloads: any[]) => void;
+  options?: any;
+  spec?: FileSpec;
+}
+
+const useUpload = (_props: useUploadProps) => ({
+  getInputProps: () => ({}),
+  getRootProps: () => ({}),
+  isDragActive: false,
+});
 
 export { useUpload };

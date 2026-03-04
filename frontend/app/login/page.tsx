@@ -1,54 +1,33 @@
-"use client";
+import type { Metadata } from "next";
+import { LoginContent } from "./LoginContent";
 
-import { motion } from "framer-motion";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { LoginForm } from "./components";
+export const metadata: Metadata = {
+  title: "Sign In",
+  description:
+    "Sign in to your Awras account to access the Algerian AI ecosystem and contribute to Darija language preservation.",
+  openGraph: {
+    title: "Sign In | Awras - Algerian AI Platform",
+    description:
+      "Access your Awras account to contribute to Algerian Darija AI research and language preservation.",
+    url: "https://awras.site/login",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Awras - Algerian AI Ecosystem",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sign In | Awras - Algerian AI Platform",
+    description:
+      "Access your Awras account to contribute to Algerian Darija AI research.",
+    images: ["/og-image.jpg"],
+  },
+};
 
 export default function LoginPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="w-full max-w-md"
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">Welcome Back</CardTitle>
-            <CardDescription className="text-center">
-              Sign in to your account
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <LoginForm />
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <div className="text-center">
-              <a
-                href="/forgot-password"
-                className="text-sm text-primary hover:underline"
-              >
-                Forgot password?
-              </a>
-            </div>
-            <p className="text-xs text-muted-foreground text-center">
-              Don&apos;t have an account?{" "}
-              <a href="/signup" className="text-primary hover:underline">
-                Sign up
-              </a>
-            </p>
-          </CardFooter>
-        </Card>
-      </motion.div>
-    </div>
-  );
+  return <LoginContent />;
 }

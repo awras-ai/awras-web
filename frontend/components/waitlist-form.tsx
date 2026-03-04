@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useWaitlist } from "@/hooks/useWaitlist";
 import { toast } from "sonner";
+import posthog from "posthog-js";
 
 export function WaitlistForm() {
   const {
@@ -20,6 +21,7 @@ export function WaitlistForm() {
   // Trigger confetti on successful subscription
   useEffect(() => {
     if (subscription.isSuccess) {
+      posthog.capture("waitlist_joined", { email: email });
       const duration = 1500;
       const animationEnd = Date.now() + duration;
       const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };

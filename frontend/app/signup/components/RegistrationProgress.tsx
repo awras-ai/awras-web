@@ -7,7 +7,7 @@ interface RegistrationProgressProps {
 
 export function RegistrationProgress({
   currentStep,
-  totalSteps = 2,
+  totalSteps = 1,
 }: RegistrationProgressProps) {
   const progress = (currentStep / totalSteps) * 100;
 

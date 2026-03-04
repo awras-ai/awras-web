@@ -128,3 +128,18 @@ class MessageResponse(BaseModel):
 
     success: bool = Field(..., description="Whether the operation was successful")
     message: str = Field(..., description="Response message")
+
+
+class FeedbackSubmit(BaseModel):
+    """Schema for submitting user feedback."""
+
+    feedback: str = Field(
+        ..., min_length=1, max_length=1000, description="User feedback text"
+    )
+
+
+class FeedbackResponse(BaseModel):
+    """Schema for feedback submission response."""
+
+    success: bool = Field(..., description="Whether the operation was successful")
+    message: str = Field(..., description="Response message")

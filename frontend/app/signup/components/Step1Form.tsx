@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Loader2, Eye, EyeOff } from "lucide-react";
+import posthog from "posthog-js";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -34,10 +35,10 @@ const step1Schema = z
   });
 
 interface Step1FormProps {
-  onNext: () => void;
+  onComplete: () => void;
 }
 
-export function Step1Form({ onNext }: Step1FormProps) {
+export function Step1Form({ onComplete }: Step1FormProps) {
   const { data, setData } = useRegistration();
   const mutation = useRegister();
   const [showPassword, setShowPassword] = useState(false);
@@ -60,8 +61,9 @@ export function Step1Form({ onNext }: Step1FormProps) {
     const { confirmPassword, ...registrationData } = values;
     mutation.mutate(registrationData, {
       onSuccess: () => {
+        posthog.capture("user_signed_up", { email: registrationData.email });
         setData(registrationData);
-        onNext();
+        onComplete();
       },
     });
   }
@@ -199,7 +201,7 @@ export function Step1Form({ onNext }: Step1FormProps) {
               Creating account...
             </>
           ) : (
-            "Next"
+            "Create Account"
           )}
         </Button>
 

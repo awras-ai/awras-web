@@ -1,3 +1,9 @@
+// DISABLED: Custom element imports not needed for text-only chat
+// This file has been disabled as part of performance optimization
+// It imported all Lucide icons (~1MB) and many UI components
+// To re-enable: uncomment this file and update CustomElement component
+
+/*
 import * as LucideIcons from 'lucide-react';
 import React from 'react';
 import * as ReactHookForm from 'react-hook-form';
@@ -76,4 +82,9 @@ const Imports = {
   '@/components/ui/tooltip': TooltipComponents
 };
 
+export default Imports;
+*/
+
+// Export empty object to maintain compatibility
+const Imports = {};
 export default Imports;

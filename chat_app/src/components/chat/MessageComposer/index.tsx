@@ -9,7 +9,6 @@ import { useRecoilState, useSetRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 
 import {
-  FileSpec,
   IStep,
   useAuth,
   useChatData,
@@ -24,32 +23,26 @@ import { useQuery } from '@/hooks/query';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 import { chatSettingsOpenState } from '@/state/project';
-import {
-  IAttachment,
-  attachmentsState,
-  persistentCommandState
-} from 'state/chat';
+import { persistentCommandState } from 'state/chat';
 
-import { Attachments } from './Attachments';
 import CommandButtons from './CommandButtons';
 import CommandButton from './CommandPopoverButton';
 import Input, { InputMethods } from './Input';
 import McpButton from './Mcp';
 import SubmitButton from './SubmitButton';
-import UploadButton from './UploadButton';
-import VoiceButton from './VoiceButton';
+// DISABLED: Voice and upload buttons not needed for text-only chat
+// import VoiceButton from './VoiceButton';
+// import UploadButton from './UploadButton';
 
 interface Props {
-  fileSpec: FileSpec;
-  onFileUpload: (payload: File[]) => void;
-  onFileUploadError: (error: string) => void;
+  // DISABLED: File upload props removed for text-only chat
+  // fileSpec: FileSpec;
+  // onFileUpload: (payload: File[]) => void;
+  // onFileUploadError: (error: string) => void;
   autoScrollRef: MutableRefObject<boolean>;
 }
 
 export default function MessageComposer({
-  fileSpec,
-  onFileUpload,
-  onFileUploadError,
   autoScrollRef
 }: Props) {
   const inputRef = useRef<InputMethods>(null);
@@ -58,14 +51,17 @@ export default function MessageComposer({
     persistentCommandState
   );
   const setChatSettingsOpen = useSetRecoilState(chatSettingsOpenState);
-  const [attachments, setAttachments] = useRecoilState(attachmentsState);
+  // DISABLED: Attachments not supported in text-only chat
+  // const [attachments, setAttachments] = useRecoilState(attachmentsState);
   const { t } = useTranslation();
 
   const { user } = useAuth();
   const { sendMessage, replyMessage } = useChatInteract();
   const { askUser, chatSettingsInputs, disabled: _disabled } = useChatData();
 
-  const disabled = _disabled || !!attachments.find((a) => !a.uploaded);
+  // DISABLED: No attachments to check
+  const disabled = _disabled;
+  // const disabled = _disabled || !!attachments.find((a) => !a.uploaded);
 
   const isMobile = useIsMobile();
 
@@ -79,29 +75,31 @@ export default function MessageComposer({
 
   const [promptUsed, setPromptUsed] = useState(false);
 
-  const onPaste = useCallback(
-    (event: ClipboardEvent) => {
-      if (event.clipboardData && event.clipboardData.items) {
-        const items = Array.from(event.clipboardData.items);
+  // DISABLED: File paste handling not needed for text-only chat
+  // const onPaste = useCallback(
+  //   (event: ClipboardEvent) => {
+  //     if (event.clipboardData && event.clipboardData.items) {
+  //       const items = Array.from(event.clipboardData.items);
 
-        // If no text data, check for files (e.g., images)
-        items.forEach((item) => {
-          if (item.kind === 'file') {
-            const file = item.getAsFile();
-            if (file) {
-              onFileUpload([file]);
-            }
-          }
-        });
-      }
-    },
-    [onFileUpload]
-  );
+  //       // If no text data, check for files (e.g., images)
+  //       items.forEach((item) => {
+  //         if (item.kind === 'file') {
+  //           const file = item.getAsFile();
+  //           if (file) {
+  //             onFileUpload([file]);
+  //           }
+  //         }
+  //       });
+  //     }
+  //   },
+  //   [onFileUpload]
+  // );
 
   const onSubmit = useCallback(
     async (
       msg: string,
-      attachments?: IAttachment[],
+      // DISABLED: Attachments not supported in text-only chat
+      // attachments?: IAttachment[],
       selectedCommand?: string
     ) => {
       const message: IStep = {
@@ -115,14 +113,16 @@ export default function MessageComposer({
         metadata: { location: window.location.href }
       };
 
-      const fileReferences = attachments
-        ?.filter((a) => !!a.serverId)
-        .map((a) => ({ id: a.serverId! }));
+      // DISABLED: File references not needed for text-only chat
+      // const fileReferences = attachments
+      //   ?.filter((a) => !!a.serverId)
+      //   .map((a) => ({ id: a.serverId! }));
 
       if (autoScrollRef) {
         autoScrollRef.current = true;
       }
-      sendMessage(message, fileReferences);
+      sendMessage(message, undefined);
+      // sendMessage(message, fileReferences);
     },
     [user, sendMessage, autoScrollRef]
   );
@@ -148,9 +148,11 @@ export default function MessageComposer({
   );
 
   const submit = useCallback(() => {
+    // DISABLED: No attachments to check
     if (
       disabled ||
-      (value.trim() === '' && attachments.length === 0 && !selectedCommand)
+      (value.trim() === '' && !selectedCommand)
+      // (value.trim() === '' && attachments.length === 0 && !selectedCommand)
     ) {
       return;
     }
@@ -158,19 +160,22 @@ export default function MessageComposer({
     if (askUser) {
       onReply(value);
     } else {
-      onSubmit(value, attachments, selectedCommand?.id);
+      onSubmit(value, selectedCommand?.id);
+      // onSubmit(value, attachments, selectedCommand?.id);
     }
 
-    setAttachments([]);
+    // DISABLED: No attachments to clear
+    // setAttachments([]);
     setValue(''); // Clear the value state
     inputRef.current?.reset();
   }, [
     value,
     disabled,
     askUser,
-    attachments,
+    // DISABLED: No attachments
+    // attachments,
     selectedCommand,
-    setAttachments,
+    // setAttachments,
     onSubmit,
     onReply
   ]);
@@ -194,11 +199,12 @@ export default function MessageComposer({
       id="message-composer"
       className="bg-accent dark:bg-card rounded-3xl p-3 px-4 w-full min-h-24 flex flex-col"
     >
-      {attachments.length > 0 ? (
+      {/* DISABLED: Attachments UI not needed for text-only chat */}
+      {/* {attachments.length > 0 ? (
         <div className="mb-1">
           <Attachments />
         </div>
-      ) : null}
+      ) : null} */}
       <Input
         ref={inputRef}
         id="chat-input"
@@ -206,19 +212,21 @@ export default function MessageComposer({
         selectedCommand={selectedCommand}
         setSelectedCommand={setSelectedCommand}
         onChange={setValue}
-        onPaste={onPaste}
+        // DISABLED: File paste not needed
+        // onPaste={onPaste}
         onEnter={submit}
         placeholder={t('chat.input.placeholder')}
       />
       <div className="flex items-center justify-between">
         <div className="flex items-center -ml-1.5">
-          <VoiceButton disabled={disabled} />
-          <UploadButton
+          {/* DISABLED: Voice and upload buttons not needed for text-only chat */}
+          {/* <VoiceButton disabled={disabled} /> */}
+          {/* <UploadButton
             disabled={disabled}
             fileSpec={fileSpec}
             onFileUploadError={onFileUploadError}
             onFileUpload={onFileUpload}
-          />
+          /> */}
           {chatSettingsInputs.length > 0 && (
             <Button
               id="chat-settings-open-modal"
@@ -248,7 +256,9 @@ export default function MessageComposer({
             onSubmit={submit}
             disabled={
               disabled ||
-              (!value.trim() && !selectedCommand && attachments.length === 0)
+              (!value.trim() && !selectedCommand)
+              // DISABLED: No attachments to check
+              // (!value.trim() && !selectedCommand && attachments.length === 0)
             }
           />
         </div>

@@ -1,3 +1,8 @@
+// DISABLED: PDF viewing not needed for text-only chat
+// This component has been disabled as part of performance optimization
+// To re-enable: uncomment this file and update Elements/index.tsx
+
+/*
 import { type IPdfElement } from "@chainlit/react-client";
 
 interface Props {
@@ -20,3 +25,7 @@ const PDFElement = ({ element }: Props) => {
 };
 
 export { PDFElement };
+*/
+
+// Export a placeholder to maintain type compatibility
+export const PDFElement = () => null;

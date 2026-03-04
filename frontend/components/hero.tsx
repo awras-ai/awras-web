@@ -1,4 +1,4 @@
-import { HeroCTA } from "./hero-cta";
+// import { HeroCTA } from "./hero-cta";
 
 export function Hero() {
   return (
@@ -27,7 +27,7 @@ export function Hero() {
         </div>
 
         {/* CTA Section */}
-        <HeroCTA />
+        {/* <HeroCTA /> */}
       </div>
     </section>
   );

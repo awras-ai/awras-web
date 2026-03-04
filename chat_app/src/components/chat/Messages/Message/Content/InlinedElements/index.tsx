@@ -3,14 +3,15 @@ import { cn } from '@/lib/utils';
 import type { ElementType, IMessageElement } from '@chainlit/react-client';
 
 import { InlinedCustomElementList } from './InlineCustomElementList';
-import { InlinedAudioList } from './InlinedAudioList';
-import { InlinedDataframeList } from './InlinedDataframeList';
-import { InlinedFileList } from './InlinedFileList';
-import { InlinedImageList } from './InlinedImageList';
-import { InlinedPDFList } from './InlinedPDFList';
-import { InlinedPlotlyList } from './InlinedPlotlyList';
+// DISABLED: Media components not needed for text-only chat
+// import { InlinedAudioList } from './InlinedAudioList';
+// import { InlinedDataframeList } from './InlinedDataframeList';
+// import { InlinedFileList } from './InlinedFileList';
+// import { InlinedImageList } from './InlinedImageList';
+// import { InlinedPDFList } from './InlinedPDFList';
+// import { InlinedPlotlyList } from './InlinedPlotlyList';
 import { InlinedTextList } from './InlinedTextList';
-import { InlinedVideoList } from './InlinedVideoList';
+// import { InlinedVideoList } from './InlinedVideoList';
 
 interface Props {
   elements: IMessageElement[];
@@ -49,30 +50,37 @@ const InlinedElements = ({ elements, className }: Props) => {
       {elementsByType.custom?.length ? (
         <InlinedCustomElementList items={elementsByType.custom} />
       ) : null}
-      {elementsByType.image?.length ? (
+      {/* DISABLED: Media elements not supported in text-only chat */}
+      {/* {elementsByType.image?.length ? (
         <InlinedImageList items={elementsByType.image} />
-      ) : null}
+      ) : null} */}
       {elementsByType.text?.length ? (
         <InlinedTextList items={elementsByType.text} />
       ) : null}
-      {elementsByType.pdf?.length ? (
+      {/* DISABLED: Media elements not supported in text-only chat */}
+      {/* {elementsByType.pdf?.length ? (
         <InlinedPDFList items={elementsByType.pdf} />
-      ) : null}
-      {elementsByType.audio?.length ? (
+      ) : null} */}
+      {/* DISABLED: Media elements not supported in text-only chat */}
+      {/* {elementsByType.audio?.length ? (
         <InlinedAudioList items={elementsByType.audio} />
-      ) : null}
-      {elementsByType.video?.length ? (
+      ) : null} */}
+      {/* DISABLED: Media elements not supported in text-only chat */}
+      {/* {elementsByType.video?.length ? (
         <InlinedVideoList items={elementsByType.video} />
-      ) : null}
-      {elementsByType.file?.length ? (
+      ) : null} */}
+      {/* DISABLED: Media elements not supported in text-only chat */}
+      {/* {elementsByType.file?.length ? (
         <InlinedFileList items={elementsByType.file} />
-      ) : null}
-      {elementsByType.plotly?.length ? (
+      ) : null} */}
+      {/* DISABLED: Media elements not supported in text-only chat */}
+      {/* {elementsByType.plotly?.length ? (
         <InlinedPlotlyList items={elementsByType.plotly} />
-      ) : null}
-      {elementsByType.dataframe?.length ? (
+      ) : null} */}
+      {/* DISABLED: Media elements not supported in text-only chat */}
+      {/* {elementsByType.dataframe?.length ? (
         <InlinedDataframeList items={elementsByType.dataframe} />
-      ) : null}
+      ) : null} */}
     </div>
   );
 };

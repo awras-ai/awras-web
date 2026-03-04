@@ -1,72 +1,33 @@
-"use client";
+import type { Metadata } from "next";
+import { SignupContent } from "./SignupContent";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+export const metadata: Metadata = {
+  title: "Create Account",
+  description:
+    "Join the Awras community and contribute to the preservation of Algerian Darija. Create your free account to access AI tools and participate in language research.",
+  openGraph: {
+    title: "Create Account | Awras - Algerian AI Platform",
+    description:
+      "Join Awras and help preserve Algerian Darija through AI. Create your account to contribute to language preservation.",
+    url: "https://awras.site/signup",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Awras - Algerian AI Ecosystem",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Create Account | Awras - Algerian AI Platform",
+    description:
+      "Join Awras and help preserve Algerian Darija through AI research and community contribution.",
+    images: ["/og-image.jpg"],
+  },
+};
 
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  RegistrationProvider,
-  Step1Form,
-  Step2Form,
-  RegistrationProgress,
-} from "../signup/components";
-
-export default function RegistrationPage() {
-  const [step, setStep] = useState(1);
-  const router = useRouter();
-
-  return (
-    <RegistrationProvider>
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">
-              Create Account
-            </CardTitle>
-            <RegistrationProgress currentStep={step} />
-          </CardHeader>
-          <CardContent>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={step}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-              >
-                {step === 1 && (
-                  <Step1Form
-                    onNext={() => setStep(2)}
-                  />
-                )}
-                {step === 2 && (
-                  <Step2Form
-                    onComplete={() => {
-                      const chatUrl = process.env.NEXT_PUBLIC_CHAT_PLATFORM_URL || "/dashboard";
-                      router.push(chatUrl);
-                    }}
-                  />
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </CardContent>
-          <CardFooter className="flex justify-center">
-            <p className="text-xs text-muted-foreground">
-              Already have an account?{" "}
-              <a href="/login" className="text-primary hover:underline">
-                Sign in
-              </a>
-            </p>
-          </CardFooter>
-        </Card>
-      </div>
-    </RegistrationProvider>
-  );
+export default function SignupPage() {
+  return <SignupContent />;
 }

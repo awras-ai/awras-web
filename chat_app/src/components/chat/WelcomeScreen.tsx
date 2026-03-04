@@ -9,7 +9,6 @@ import {
 
 import {
   ChainlitContext,
-  FileSpec,
   useChatMessages,
   useChatSession,
   useConfig
@@ -22,9 +21,10 @@ import MessageComposer from './MessageComposer';
 import Starters from './Starters';
 
 interface Props {
-  fileSpec: FileSpec;
-  onFileUpload: (payload: File[]) => void;
-  onFileUploadError: (error: string) => void;
+  // DISABLED: File upload props removed for text-only chat
+  // fileSpec: FileSpec;
+  // onFileUpload: (payload: File[]) => void;
+  // onFileUploadError: (error: string) => void;
   autoScrollRef: MutableRefObject<boolean>;
 }
 

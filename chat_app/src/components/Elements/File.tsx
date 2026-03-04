@@ -1,3 +1,8 @@
+// DISABLED: File display not needed for text-only chat
+// This component has been disabled as part of performance optimization
+// To re-enable: uncomment this file and update Elements/index.tsx
+
+/*
 import { type IFileElement } from '@chainlit/react-client';
 
 import { Attachment } from '@/components/chat/MessageComposer/Attachment';
@@ -20,3 +25,7 @@ const FileElement = ({ element }: { element: IFileElement }) => {
 };
 
 export { FileElement };
+*/
+
+// Export a placeholder to maintain type compatibility
+export const FileElement = () => null;

@@ -38,8 +38,7 @@ export function LoginForm() {
   function onSubmit(values: z.infer<typeof loginSchema>) {
     mutation.mutate(values, {
       onSuccess: () => {
-        const chatUrl = process.env.NEXT_PUBLIC_CHAT_PLATFORM_URL || "/dashboard";
-        router.push(chatUrl);
+        router.push("/goodbye");
       },
     });
   }
@@ -54,11 +53,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input
-                  type="email"
-                  placeholder="john@example.com"
-                  {...field}
-                />
+                <Input type="email" placeholder="john@example.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -79,11 +74,7 @@ export function LoginForm() {
           )}
         />
 
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={mutation.isPending}
-        >
+        <Button type="submit" className="w-full" disabled={mutation.isPending}>
           {mutation.isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

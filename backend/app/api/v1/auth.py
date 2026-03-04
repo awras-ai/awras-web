@@ -20,6 +20,7 @@ from app.core.config import get_settings
 from app.core.limiter import limiter
 from app.db.database import get_db
 from app.models.user import User
+from app.models.users_feedback import UsersFeedback
 from app.schemas.auth import (
     AuthResponse,
     MessageResponse,
@@ -29,6 +30,8 @@ from app.schemas.auth import (
     UserRegister,
     UserResponse,
     ProfileImageResponse,
+    FeedbackSubmit,
+    FeedbackResponse,
 )
 from app.services.auth import AuthService
 from app.services.email import EmailService
@@ -455,3 +458,33 @@ def get_user_count(
     """
     count = AuthService.count_users(db)
     return UserCountResponse(count=count)
+
+
+@router.post(
+    "/submit-feedback",
+    response_model=FeedbackResponse,
+    summary="Submit user feedback",
+)
+async def submit_feedback(
+    request: Request,
+    data: FeedbackSubmit,
+    user: User = Depends(require_auth),
+    db: Session = Depends(get_db),
+) -> FeedbackResponse:
+    """
+    Submit feedback from the authenticated user.
+
+    Saves the feedback text with the user ID and current timestamp.
+    Requires authentication.
+    """
+    feedback = UsersFeedback(
+        feedback=data.feedback,
+        user_id=user.id,
+    )
+    db.add(feedback)
+    db.commit()
+
+    return FeedbackResponse(
+        success=True,
+        message="Feedback submitted successfully",
+    )

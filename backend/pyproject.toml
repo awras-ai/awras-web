@@ -48,6 +48,7 @@ dependencies = [
   "boto3>=1.42.42",
   "asyncpg>=0.31.0",
   "psycopg>=3.3.2",
+  "langfuse>=2.0.0",
 ]
 
 [dependency-groups]

@@ -1,23 +1,26 @@
-import { memo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { memo } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { useAudio, useAuth, useConfig } from '@chainlit/react-client';
+import { useAuth, useConfig } from "@chainlit/react-client";
 
-import AudioPresence from '@/components/AudioPresence';
-import ButtonLink from '@/components/ButtonLink';
-import { useSidebar } from '@/components/ui/sidebar';
+// DISABLED: Audio features not needed for text-only chat
+// import AudioPresence from '@/components/AudioPresence';
+import ButtonLink from "@/components/ButtonLink";
+import { useSidebar } from "@/components/ui/sidebar";
 
-import ApiKeys from './ApiKeys';
-import ChatProfiles from './ChatProfiles';
-import NewChatButton from './NewChat';
-import ReadmeButton from './Readme';
-import ShareButton from './Share';
-import SidebarTrigger from './SidebarTrigger';
-import { ThemeToggle } from './ThemeToggle';
-import UserNav from './UserNav';
+import ApiKeys from "./ApiKeys";
+import ChatProfiles from "./ChatProfiles";
+import FeedbackButton from "./FeedbackButton";
+import NewChatButton from "./NewChat";
+import ReadmeButton from "./Readme";
+import ShareButton from "./Share";
+import SidebarTrigger from "./SidebarTrigger";
+import { ThemeToggle } from "./ThemeToggle";
+import UserNav from "./UserNav";
 
 const Header = memo(() => {
-  const { audioConnection } = useAudio();
+  // DISABLED: Audio connection not needed for text-only chat
+  // const { audioConnection } = useAudio();
   const navigate = useNavigate();
   const { data } = useAuth();
   const { config } = useConfig();
@@ -48,7 +51,8 @@ const Header = memo(() => {
       </div>
 
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        {audioConnection === 'on' ? (
+        {/* DISABLED: Audio presence indicator not needed for text-only chat */}
+        {/* {audioConnection === 'on' ? (
           <AudioPresence
             type="server"
             height={35}
@@ -56,12 +60,13 @@ const Header = memo(() => {
             barCount={4}
             barSpacing={2}
           />
-        ) : null}
+        ) : null} */}
       </div>
 
       <div />
       <div className="flex items-center gap-1">
         <ShareButton />
+        <FeedbackButton />
         <ReadmeButton />
         <ApiKeys />
         {links &&
