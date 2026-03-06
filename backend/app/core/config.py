@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     # AI MODEL
     MODEL_API_KEY: str = ""
     MODEL_BASE_URL: str = "https://api.deepseek.com"
-    MODEL_NAME: str
+    MODEL_NAME: str = ""
     MODEL_CUSTOM_HEADER_KEY: str = ""
     MODEL_CUSTOM_HEADER_VALUE: str = ""
     MODEL_TEMPERATURE: float = 0.7
@@ -53,7 +53,7 @@ class Settings(BaseSettings):
     EMAIL_VERIFICATION_EXPIRE_HOURS: int = 24
 
     # Frontend URL (for verification links and redirects)
-    FRONTEND_URL: str = "http://localhost:5173"
+    FRONTEND_URL: str = "http://localhost:3000"
 
     # Email Verification
     REQUIRE_EMAIL_VERIFICATION: bool = (
@@ -70,6 +70,12 @@ class Settings(BaseSettings):
     LANGFUSE_SECRET_KEY: str = ""
     LANGFUSE_PUBLIC_KEY: str = ""
     LANGFUSE_BASE_URL: str = "https://cloud.langfuse.com"
+
+    # Google OAuth
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+    GOOGLE_REDIRECT_URI: str = "http://localhost:8000/api/v1/auth/google/callback"
+    OAUTH_SUCCESS_REDIRECT: str = "http://localhost:3000/auth/success"
 
     class Config:
         env_file = ".env"

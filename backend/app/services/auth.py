@@ -3,6 +3,8 @@ Authentication service for user management and session handling.
 """
 
 import logging
+import re
+import secrets
 import uuid
 from datetime import datetime, timezone
 from typing import Optional
@@ -303,3 +305,108 @@ class AuthService:
             Number of users
         """
         return db.query(User).count()
+
+    @staticmethod
+    def get_or_create_google_user(
+        db: DBSession,
+        google_sub: str,
+        email: str,
+        first_name: Optional[str],
+        last_name: Optional[str],
+        profile_picture_url: Optional[str],
+    ) -> tuple[Optional[User], str]:
+        """
+        Get or create a user from Google OAuth.
+
+        Args:
+            db: Database session
+            google_sub: Google's unique user ID (sub claim)
+            email: User's email from Google
+            first_name: User's first name from Google
+            last_name: User's last name from Google
+            profile_picture_url: URL of the user's profile picture from Google
+
+        Returns:
+            Tuple of (User or None, error_message or "")
+        """
+        email = email.lower()
+
+        existing_by_oauth = (
+            db.query(User)
+            .filter(User.oauth_provider == "google", User.oauth_sub == google_sub)
+            .first()
+        )
+        if existing_by_oauth:
+            existing_by_oauth.first_name = first_name
+            existing_by_oauth.last_name = last_name
+            existing_by_oauth.oauth_profile_picture_url = profile_picture_url
+            db.commit()
+            db.refresh(existing_by_oauth)
+            logger.info(f"Google user logged in: {existing_by_oauth.identifier}")
+            return existing_by_oauth, ""
+
+        existing_by_email = db.query(User).filter(User.email == email).first()
+        if existing_by_email:
+            if (
+                existing_by_email.oauth_provider is None
+                and existing_by_email.oauth_sub is None
+            ):
+                existing_by_email.oauth_provider = "google"
+                existing_by_email.oauth_sub = google_sub
+                existing_by_email.oauth_profile_picture_url = profile_picture_url
+                if not existing_by_email.is_verified:
+                    existing_by_email.is_verified = True
+                db.commit()
+                db.refresh(existing_by_email)
+                logger.info(
+                    f"Linked existing account to Google: {existing_by_email.identifier}"
+                )
+                return existing_by_email, ""
+            else:
+                return None, "Email already associated with another account"
+
+        base_identifier = ""
+        if first_name and last_name:
+            base_identifier = (first_name + last_name).lower()
+        elif first_name:
+            base_identifier = first_name.lower()
+        elif last_name:
+            base_identifier = last_name.lower()
+
+        base_identifier = re.sub(r"[^a-z0-9_-]", "", base_identifier)
+
+        if not base_identifier:
+            base_identifier = email.split("@")[0].lower()
+            base_identifier = re.sub(r"[^a-z0-9_-]", "", base_identifier)
+
+        identifier = base_identifier
+        while db.query(User).filter(User.identifier == identifier).first():
+            identifier = f"{base_identifier}_{secrets.randbelow(9000) + 1000}"
+
+        user = User(
+            email=email,
+            identifier=identifier,
+            hashed_password=None,
+            first_name=first_name,
+            last_name=last_name,
+            is_verified=True,
+            is_active=True,
+            oauth_provider="google",
+            oauth_sub=google_sub,
+            oauth_profile_picture_url=profile_picture_url,
+        )
+
+        try:
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+            logger.info(f"Google user created: {user.identifier} ({user.email})")
+            return user, ""
+        except IntegrityError as e:
+            db.rollback()
+            logger.error(f"IntegrityError creating Google user: {str(e)}")
+            return None, "User creation failed due to duplicate data"
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error creating Google user: {str(e)}")
+            return None, f"User creation failed: {str(e)}"

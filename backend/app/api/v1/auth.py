@@ -2,8 +2,11 @@
 Authentication API endpoints.
 """
 
+import logging
+import secrets
 from typing import Optional
 
+import httpx
 from fastapi import (
     APIRouter,
     Depends,
@@ -14,6 +17,7 @@ from fastapi import (
     UploadFile,
     File,
 )
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -39,6 +43,8 @@ from app.services.object_storage import storage_service
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 settings = get_settings()
+
+GOOGLE_STATE_COOKIE_NAME = "google_oauth_state"
 
 
 # =============================================================================
@@ -104,6 +110,8 @@ def user_to_response(user: User) -> UserResponse:
     profile_image_url = None
     if user.profile_image_path:
         profile_image_url = storage_service.get_presigned_url(user.profile_image_path)
+    elif user.oauth_profile_picture_url:
+        profile_image_url = user.oauth_profile_picture_url
 
     return UserResponse(
         id=user.id,
@@ -488,3 +496,164 @@ async def submit_feedback(
         success=True,
         message="Feedback submitted successfully",
     )
+
+
+def set_google_state_cookie(response: Response, state: str) -> None:
+    """Set the Google OAuth state cookie on the response."""
+    response.set_cookie(
+        key=GOOGLE_STATE_COOKIE_NAME,
+        value=state,
+        httponly=True,
+        secure=settings.SESSION_COOKIE_SECURE,
+        samesite=settings.SESSION_COOKIE_SAMESITE,
+        domain=settings.SESSION_COOKIE_DOMAIN,
+        max_age=600,
+        path="/",
+    )
+
+
+def clear_google_state_cookie(response: Response) -> None:
+    """Clear the Google OAuth state cookie."""
+    response.delete_cookie(
+        key=GOOGLE_STATE_COOKIE_NAME,
+        httponly=True,
+        secure=settings.SESSION_COOKIE_SECURE,
+        samesite=settings.SESSION_COOKIE_SAMESITE,
+        domain=settings.SESSION_COOKIE_DOMAIN,
+        path="/",
+    )
+
+
+@router.get(
+    "/google/login",
+    summary="Initiate Google OAuth login",
+)
+async def google_login(request: Request):
+    """
+    Redirect the user to Google's consent screen.
+
+    Sets a state cookie for CSRF protection.
+    """
+    if not settings.GOOGLE_CLIENT_ID or not settings.GOOGLE_CLIENT_SECRET:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Google OAuth is not configured",
+        )
+
+    state = secrets.token_urlsafe(32)
+
+    google_auth_url = (
+        "https://accounts.google.com/o/oauth2/v2/auth?"
+        f"client_id={settings.GOOGLE_CLIENT_ID}&"
+        f"redirect_uri={settings.GOOGLE_REDIRECT_URI}&"
+        "response_type=code&"
+        "scope=openid email profile&"
+        "access_type=offline&"
+        f"state={state}"
+    )
+
+    redirect = RedirectResponse(url=google_auth_url)
+    set_google_state_cookie(redirect, state)
+    return redirect
+
+
+@router.get(
+    "/google/callback",
+    summary="Handle Google OAuth callback",
+)
+async def google_callback(
+    request: Request,
+    response: Response,
+    code: str,
+    state: str,
+    db: Session = Depends(get_db),
+):
+    """
+    Handle the OAuth callback from Google.
+
+    Exchanges the authorization code for tokens, fetches user info,
+    creates/links the user, and creates a session.
+    """
+    stored_state = request.cookies.get(GOOGLE_STATE_COOKIE_NAME)
+
+    if not stored_state or stored_state != state:
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/login?error=oauth_state_mismatch"
+        )
+
+    clear_google_state_cookie(response)
+
+    if not settings.GOOGLE_CLIENT_ID or not settings.GOOGLE_CLIENT_SECRET:
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/login?error=oauth_not_configured"
+        )
+
+    token_url = "https://oauth2.googleapis.com/token"
+    token_data = {
+        "client_id": settings.GOOGLE_CLIENT_ID,
+        "client_secret": settings.GOOGLE_CLIENT_SECRET,
+        "code": code,
+        "grant_type": "authorization_code",
+        "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+    }
+
+    try:
+        async with httpx.AsyncClient() as client:
+            token_response = await client.post(token_url, data=token_data)
+            token_response.raise_for_status()
+            tokens = token_response.json()
+
+            access_token = tokens.get("access_token")
+            if not access_token:
+                return RedirectResponse(
+                    url=f"{settings.FRONTEND_URL}/login?error=oauth_token_error"
+                )
+
+            userinfo_response = await client.get(
+                "https://www.googleapis.com/oauth2/v2/userinfo",
+                headers={"Authorization": f"Bearer {access_token}"},
+            )
+            userinfo_response.raise_for_status()
+            google_user = userinfo_response.json()
+
+    except httpx.HTTPError as e:
+        logger = logging.getLogger(__name__)
+        logger.error(f"Google OAuth HTTP error: {str(e)}")
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/login?error=oauth_http_error"
+        )
+
+    google_sub = google_user.get("id")
+    email = google_user.get("email")
+    first_name = google_user.get("given_name")
+    last_name = google_user.get("family_name")
+    profile_picture_url = google_user.get("picture")
+
+    if not google_sub or not email:
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/login?error=oauth_invalid_user"
+        )
+
+    user, error = AuthService.get_or_create_google_user(
+        db=db,
+        google_sub=google_sub,
+        email=email,
+        first_name=first_name,
+        last_name=last_name,
+        profile_picture_url=profile_picture_url,
+    )
+
+    if not user:
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/login?error={error or 'oauth_user_error'}"
+        )
+
+    session = AuthService.create_session(
+        db=db,
+        user_id=user.id,
+        user_agent=request.headers.get("User-Agent"),
+        ip_address=get_client_ip(request),
+    )
+    set_session_cookie(response, session.token)
+
+    return RedirectResponse(url=settings.OAUTH_SUCCESS_REDIRECT)
