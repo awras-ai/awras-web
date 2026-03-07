@@ -281,3 +281,18 @@ export async function getUserCount(): Promise<number> {
   const data: UserCountResponse = await res.json();
   return data.count;
 }
+
+export function initiateGoogleLogin() {
+  window.location.href = `${BASE_URL}api/v1/auth/google/login`;
+}
+
+export function getOAuthErrorFromUrl(): string | null {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("error");
+}
+
+export function clearOAuthError() {
+  const url = new URL(window.location.href);
+  url.searchParams.delete("error");
+  window.history.replaceState({}, "", url.toString());
+}

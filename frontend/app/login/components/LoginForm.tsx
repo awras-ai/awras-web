@@ -38,7 +38,7 @@ export function LoginForm() {
   function onSubmit(values: z.infer<typeof loginSchema>) {
     mutation.mutate(values, {
       onSuccess: () => {
-        router.push("/goodbye");
+        router.push("/dashboard");
       },
     });
   }
