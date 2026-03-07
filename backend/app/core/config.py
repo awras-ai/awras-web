@@ -75,7 +75,7 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
     GOOGLE_REDIRECT_URI: str = "http://localhost:8000/api/v1/auth/google/callback"
-    OAUTH_SUCCESS_REDIRECT: str = "http://localhost:3000/auth/success"
+    OAUTH_SUCCESS_REDIRECT: str = "http://localhost:3000/goodbye"
 
     class Config:
         env_file = ".env"
