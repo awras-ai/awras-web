@@ -71,4 +71,4 @@ async def health_check(request: Request):
     return {"status": "healthy"}
 
 
-mount_chainlit(app, target="./app/chainlit_app.py", path="/chat")
+# mount_chainlit(app, target="./app/chainlit_app.py", path="/chat")
