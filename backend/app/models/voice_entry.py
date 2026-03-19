@@ -2,8 +2,7 @@
 VoiceEntry model for voice recording datasets.
 
 Each entry holds the text that the user will read aloud.
-The admin provides the text (and optional reference translation);
-the user provides the audio recording via VoiceAnnotation.
+The admin provides the text; the user provides the audio recording via VoiceAnnotation.
 """
 
 import uuid
@@ -20,8 +19,7 @@ class VoiceEntry(Base):
     """
     A text prompt within a voice dataset that a user will read aloud.
 
-    source_text:            The text the user must read / record.
-    reference_translation:  Optional translation context shown to the user.
+    source_text: The text the user must read / record.
 
     status:
         "pending"   - not yet recorded
@@ -33,13 +31,12 @@ class VoiceEntry(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     dataset_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("datasets.id", ondelete="CASCADE"),
+        ForeignKey("voice_datasets.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
 
     source_text = Column(Text, nullable=False)  # Text the user reads aloud
-    reference_translation = Column(Text, nullable=True)  # Optional translation context
 
     status = Column(
         String(20), nullable=False, default="pending"
@@ -52,7 +49,7 @@ class VoiceEntry(Base):
     )
 
     # Relationships
-    dataset = relationship("Dataset", back_populates="voice_entries")
+    dataset = relationship("VoiceDataset", back_populates="entries")
     annotation = relationship(
         "VoiceAnnotation",
         back_populates="entry",

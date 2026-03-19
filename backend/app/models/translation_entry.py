@@ -29,7 +29,7 @@ class TranslationEntry(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     dataset_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("datasets.id", ondelete="CASCADE"),
+        ForeignKey("translation_datasets.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -48,7 +48,7 @@ class TranslationEntry(Base):
     )
 
     # Relationships
-    dataset = relationship("Dataset", back_populates="translation_entries")
+    dataset = relationship("TranslationDataset", back_populates="entries")
     annotation = relationship(
         "TranslationAnnotation",
         back_populates="entry",

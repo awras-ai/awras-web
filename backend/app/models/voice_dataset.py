@@ -1,8 +1,8 @@
 """
-Dataset model for managing annotation datasets.
+VoiceDataset model for managing voice recording datasets.
 
-A dataset groups translation/voice/dictionary entries under a common
-source/target language pair and optional domain category.
+A voice dataset groups voice entries with a single language
+and optional domain category.
 """
 
 import uuid
@@ -15,30 +15,25 @@ from sqlalchemy.orm import relationship
 from app.db.database import Base
 
 
-class Dataset(Base):
+class VoiceDataset(Base):
     """
-    Represents a collection of entries to be annotated.
+    Represents a collection of voice recording entries.
 
-    entry_type: "translation" for translation correction datasets,
-                "voice" for voice recording datasets,
-                "dictionary" for word/translation pairs.
+    Each dataset has a single language (the language being recorded)
+    and can be categorized by domain (e.g., "conversational", "formal", "medical").
     """
 
-    __tablename__ = "datasets"
+    __tablename__ = "voice_datasets"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
 
-    # Language pair
-    source_language = Column(String(50), nullable=False)  # e.g. "en", "fr"
-    target_language = Column(String(50), nullable=False)  # e.g. "ar"
+    # Single language for voice recording
+    language = Column(String(50), nullable=False)  # e.g. "ar", "en"
 
-    # Optional domain/category (e.g. "medical", "news", "legal")
+    # Optional domain/category (e.g. "conversational", "formal", "medical")
     category = Column(String(100), nullable=True)
-
-    # "translation", "voice", or "dictionary"
-    entry_type = Column(String(20), nullable=False)
 
     # Who created this dataset (must be superuser)
     created_by_id = Column(
@@ -61,15 +56,9 @@ class Dataset(Base):
 
     # Relationships
     created_by = relationship("User", foreign_keys=[created_by_id])
-    translation_entries = relationship(
-        "TranslationEntry", back_populates="dataset", cascade="all, delete-orphan"
-    )
-    voice_entries = relationship(
+    entries = relationship(
         "VoiceEntry", back_populates="dataset", cascade="all, delete-orphan"
-    )
-    dictionary_entries = relationship(
-        "DictionaryEntry", back_populates="dataset", cascade="all, delete-orphan"
     )
 
     def __repr__(self) -> str:
-        return f"<Dataset {self.name} ({self.source_language}->{self.target_language})>"
+        return f"<VoiceDataset {self.name} ({self.language})>"

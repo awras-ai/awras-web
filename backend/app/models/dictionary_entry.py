@@ -38,7 +38,7 @@ class DictionaryEntry(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     dataset_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("datasets.id", ondelete="CASCADE"),
+        ForeignKey("dictionary_datasets.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -72,7 +72,7 @@ class DictionaryEntry(Base):
     )
 
     # Relationships
-    dataset = relationship("Dataset", back_populates="dictionary_entries")
+    dataset = relationship("DictionaryDataset", back_populates="entries")
     created_by = relationship("User", foreign_keys=[created_by_id])
     annotation = relationship(
         "DictionaryAnnotation",
