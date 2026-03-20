@@ -471,8 +471,6 @@ async def google_callback(
         ip_address=get_client_ip(request),
     )
 
-    SessionCookieManager.set(response, session.token)
-
     redirect = RedirectResponse(url=settings.OAUTH_SUCCESS_REDIRECT)
-    set_session_cookie(redirect, session.token)
+    SessionCookieManager.set(redirect, session.token)
     return redirect
