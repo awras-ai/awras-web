@@ -157,7 +157,13 @@ async def upload_csv(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
-
+    # check that dataset exist
+    dataset = TranslationService.get_dataset(db, dataset_id)
+    if not dataset:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"there is no dataset with an id {dataset_id}",
+        )
     # Upload entries
     result = TranslationService.upload_entries(db, dataset_id, entries)
 
