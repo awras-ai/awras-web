@@ -43,9 +43,8 @@ class DictionaryEntry(Base):
         index=True,
     )
 
-    word = Column(Text, nullable=False)  # Source word
-    translation = Column(Text, nullable=False)  # Translation/definition
-    pronunciation = Column(Text, nullable=True)  # Optional pronunciation
+    word = Column(Text, nullable=False, index=True)  # Source word
+    meaning = Column(Text, nullable=False)  # Translation/definition
     examples = Column(Text, nullable=True)  # Single string example usage
     tags = Column(
         JSONB, nullable=True, default=list

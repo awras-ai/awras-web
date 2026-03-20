@@ -42,8 +42,7 @@ class DictionaryAnnotation(Base):
     )
 
     # Correction fields (all nullable - only correct what's needed)
-    corrected_translation = Column(Text, nullable=True)
-    corrected_pronunciation = Column(Text, nullable=True)
+    corrected_meaning = Column(Text, nullable=True)
     corrected_examples = Column(Text, nullable=True)
     corrected_tags = Column(JSONB, nullable=True)
 
