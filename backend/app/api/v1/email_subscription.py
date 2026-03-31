@@ -20,6 +20,7 @@ router = APIRouter(prefix="/waitlist", tags=["Waitlist"])
     "/subscribe",
     response_model=EmailSubscriptionResponse,
     summary="Add email to waitlist",
+    deprecated=True,
 )
 @limiter.limit("10/minute")
 async def subscribe_email(
@@ -55,6 +56,7 @@ async def subscribe_email(
     "/count",
     response_model=SubscriptionCountResponse,
     summary="Get waitlist count",
+    deprecated=True,
 )
 @limiter.limit("30/minute")
 async def get_waitlist_count(
