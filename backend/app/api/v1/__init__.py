@@ -3,7 +3,7 @@ API v1 router aggregation.
 """
 
 from fastapi import APIRouter
-from app.api.v1 import auth, email_subscription, translation
+from app.api.v1 import auth, email_subscription, translation, dictionary
 
 api_router = APIRouter()
 
@@ -11,3 +11,4 @@ api_router = APIRouter()
 api_router.include_router(auth.router)
 api_router.include_router(email_subscription.router)
 api_router.include_router(translation.router)
+api_router.include_router(dictionary.router)

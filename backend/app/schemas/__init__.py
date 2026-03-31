@@ -13,6 +13,22 @@ from app.schemas.email_subscription import (
     EmailSubscriptionResponse,
     SubscriptionCountResponse,
 )
+from app.schemas.dictionary import (
+    AnnotationResponse,
+    CreateDatasetRequest,
+    CreateEntryRequest,
+    DatasetListResponse,
+    DatasetResponse,
+    DatasetStatsDetailResponse,
+    DatasetStatsResponse,
+    EntryResponse,
+    SearchEntriesResponse,
+    SubmitAnnotationRequest,
+    UploadErrorItem,
+    UploadResponse,
+    UserDatasetStatsResponse,
+    UserEntriesResponse,
+)
 
 __all__ = [
     # Auth schemas
@@ -26,4 +42,19 @@ __all__ = [
     "EmailSubscriptionCreate",
     "EmailSubscriptionResponse",
     "SubscriptionCountResponse",
+    # Dictionary schemas
+    "AnnotationResponse",
+    "CreateDatasetRequest",
+    "CreateEntryRequest",
+    "DatasetListResponse",
+    "DatasetResponse",
+    "DatasetStatsDetailResponse",
+    "DatasetStatsResponse",
+    "EntryResponse",
+    "SearchEntriesResponse",
+    "SubmitAnnotationRequest",
+    "UploadErrorItem",
+    "UploadResponse",
+    "UserDatasetStatsResponse",
+    "UserEntriesResponse",
 ]
