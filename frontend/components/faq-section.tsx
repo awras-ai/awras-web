@@ -49,31 +49,36 @@ export function FAQSection() {
   };
 
   return (
-    <section id="faq" className="py-24 md:py-32 bg-background">
+    <section id="faq" className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-white">
       <Script
         id="faq-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <div className="container mx-auto px-4 max-w-4xl">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-muted-foreground text-lg">
-            No one asked really, but here are the answers.
+      <div className="max-w-6xl mx-auto w-full">
+        {/* Header Section */}
+        <div className="mb-12">
+          <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-3">
+            03 — FAQ
           </p>
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
+            Frequently Asked{" "}
+            <span style={{ color: "#14b8a6" }}>Questions.</span>
+          </h2>
         </div>
 
         {/* FAQ Accordion */}
         <Accordion type="single" collapsible className="w-full">
           {faqData.map((faq, index) => (
-            <AccordionItem key={index} value={`item-${index}`}>
-              <AccordionTrigger className="text-left text-base font-medium hover:no-underline py-5">
+            <AccordionItem
+              key={index}
+              value={`item-${index}`}
+              className="border-b border-black/10"
+            >
+              <AccordionTrigger className="text-left text-base font-medium hover:no-underline py-6 text-black hover:text-black/80 transition-colors">
                 {faq.question}
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground leading-relaxed">
+              <AccordionContent className="text-black/60 leading-relaxed pb-6">
                 {faq.answer}
               </AccordionContent>
             </AccordionItem>
@@ -81,12 +86,12 @@ export function FAQSection() {
         </Accordion>
 
         {/* Contact CTA */}
-        <div className="mt-12 text-center">
-          <p className="text-muted-foreground">
+        <div className="mt-12">
+          <p className="text-black/60">
             Still have questions?{" "}
             <a
               href="mailto:awras.ai.dz@gmail.com"
-              className="text-foreground font-medium hover:underline"
+              className="text-black font-medium hover:underline"
             >
               Contact us
             </a>
