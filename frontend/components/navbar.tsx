@@ -10,10 +10,10 @@ export function Navbar() {
 
   const navLinks = [
     { href: "#mission", label: "Mission" },
-    { href: "#faq", label: "FAQ" },
     { href: "#process", label: "Process" },
+    { href: "#faq", label: "FAQ" },
     // { href: "#about", label: "About" },
-    { href: "/contact", label: "Contact" },
+    // { href: "/contact", label: "Contact" },
   ];
 
   return (
