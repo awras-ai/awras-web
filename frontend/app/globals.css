@@ -157,6 +157,21 @@
   animation: accordion-up 0.2s ease-out;
 }
 
+/* Marquee animation */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
 /* Squares background pattern */
 .squares-background {
   position: fixed;

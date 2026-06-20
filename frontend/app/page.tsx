@@ -1,4 +1,5 @@
 import { Hero } from "@/components/hero";
+import { Marquee } from "@/components/marquee";
 import { Footer } from "@/components/footer";
 import { FAQSection } from "@/components/faq-section";
 import { Mission } from "@/components/mission";
@@ -13,6 +14,7 @@ export default function Home() {
       <div className="squares-background" />
       <div className="relative z-10">
         <Hero />
+        <Marquee />
         <Mission />
         {/* <ModelComparisonSection /> */}
         {/* <VisionSection /> */}
