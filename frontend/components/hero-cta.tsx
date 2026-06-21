@@ -2,19 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { getUserCount, getCurrentUser } from "@/lib/api/auth";
+import { authClient } from "@/lib/auth-client";
 import posthog from "posthog-js";
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
 export function HeroCTA() {
   const [userCount, setUserCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [href, setHref] = useState("/signup");
+  const { data: session } = authClient.useSession();
 
   useEffect(() => {
     const fetchUserCount = async () => {
       try {
-        const count = await getUserCount();
-        setUserCount(count);
+        const res = await fetch(`${BACKEND_URL}api/v1/auth/count`);
+        if (res.ok) {
+          const data = await res.json();
+          setUserCount(data.count);
+        }
       } catch (error) {
         console.error("Failed to fetch user count:", error);
       } finally {
@@ -30,24 +36,18 @@ export function HeroCTA() {
   }, []);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        await getCurrentUser();
-        const chatUrl =
-          process.env.NEXT_PUBLIC_CHAT_PLATFORM_URL ||
-          "https://chat.awras.site";
-        setHref(chatUrl);
-      } catch {
-        setHref("/signup");
-      }
-    };
-
-    checkAuth();
-  }, []);
+    if (session) {
+      const chatUrl =
+        process.env.NEXT_PUBLIC_CHAT_PLATFORM_URL ||
+        "https://chat.awras.site";
+      setHref(chatUrl);
+    } else {
+      setHref("/signup");
+    }
+  }, [session]);
 
   return (
     <div className="">
-      {/* Main CTA Button */}
       <Button
         asChild
         size="lg"
@@ -58,7 +58,6 @@ export function HeroCTA() {
         </a>
       </Button>
 
-      {/* User Count with Gradient Avatars */}
       <div className="flex justify-center items-center gap-4 pt-4">
         <div className="flex flex-col items-start">
           <div className="flex items-center gap-2">

@@ -10,20 +10,25 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useCurrentUser } from "@/hooks/useAuth";
 import { Loader2, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 export function DashboardContent() {
   const router = useRouter();
-  const { data: user, isLoading, error } = useCurrentUser();
+  const { data: session, isPending, error } = authClient.useSession();
 
-  const handleLogout = async () => {
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    router.push("/");
+  const handleLogout = () => {
+    authClient.signOut()
+    const issuer = process.env.NEXT_PUBLIC_KEYCLOAK_ISSUER;
+    const clientId = process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID;
+    window.location.href =
+      `${issuer}/protocol/openid-connect/logout` +
+      `?post_logout_redirect_uri=${encodeURIComponent(window.location.origin + "/")}` +
+      `&client_id=${clientId}`;
   };
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -31,7 +36,7 @@ export function DashboardContent() {
     );
   }
 
-  if (error || !user) {
+  if (error || !session) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <Card className="w-full max-w-md">
@@ -49,7 +54,13 @@ export function DashboardContent() {
     );
   }
 
-  const initials = `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`.toUpperCase();
+  const user = session.user;
+  const nameParts = (user.name || user.email || "?").split(" ");
+  const initials = nameParts
+    .map((p: string) => p.charAt(0))
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <div className="min-h-screen bg-background">
@@ -73,12 +84,12 @@ export function DashboardContent() {
           <Card>
             <CardHeader className="flex flex-row items-center gap-4">
               <Avatar className="h-16 w-16">
-                <AvatarImage src={user.profile_image_url || undefined} />
+                <AvatarImage src={user.image || undefined} />
                 <AvatarFallback className="text-lg">{initials}</AvatarFallback>
               </Avatar>
               <div>
                 <CardTitle className="text-2xl">
-                  Welcome, {user.first_name}!
+                  Welcome, {user.name || "User"}!
                 </CardTitle>
                 <CardDescription>
                   Welcome to Awras - Your Algerian AI Platform
@@ -99,20 +110,24 @@ export function DashboardContent() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Username</CardTitle>
+                <CardTitle className="text-lg">Account Status</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">@{user.identifier}</p>
+                <p className="text-muted-foreground">
+                  {user.emailVerified ? "Verified" : "Pending Verification"}
+                </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Account Status</CardTitle>
+                <CardTitle className="text-lg">Joined</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  {user.is_verified ? "Verified" : "Pending Verification"}
+                  {user.createdAt
+                    ? new Date(user.createdAt).toLocaleDateString()
+                    : "N/A"}
                 </p>
               </CardContent>
             </Card>
