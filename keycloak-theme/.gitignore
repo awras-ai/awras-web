@@ -22,3 +22,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+keycloak-theme/.pnpm-store/
+keycloak-theme/pnpm-workspace.yaml

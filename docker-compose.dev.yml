@@ -114,27 +114,41 @@ services:
       - awras_internal_network
 
   # Next.js application
-  frontend:
-    container_name: frontend
-    build:
-      context: ./frontend/
-      dockerfile: Dockerfile
-      args:
-        - NEXT_PUBLIC_BACKEND_BASE_URL=${NEXT_PUBLIC_BACKEND_BASE_URL}
-    environment:
-      NODE_ENV: production
-      NEXT_PUBLIC_BACKEND_BASE_URL: ${NEXT_PUBLIC_BACKEND_BASE_URL}
-      NEXT_PUBLIC_CHAT_PLATFORM_URL: ${NEXT_PUBLIC_CHAT_PLATFORM_URL:-"https://chat.awras.site"}
-    ports:
-      - "${FRONTEND_PORT:-3000}:3000"
-    restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-      # backend:
-      #   condition: service_started
-    networks:
-      - awras_internal_network
+  # frontend:
+  #   container_name: frontend
+  #   build:
+  #     context: ./frontend/
+  #     dockerfile: Dockerfile
+  #     args:
+  #       - NEXT_PUBLIC_BACKEND_BASE_URL=${NEXT_PUBLIC_BACKEND_BASE_URL}
+  #       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+  #       - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
+  #       - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
+  #       - KEYCLOAK_ISSUER=${KEYCLOAK_ISSUER}
+  #       - NEXT_PUBLIC_KEYCLOAK_ISSUER=${NEXT_PUBLIC_KEYCLOAK_ISSUER}
+  #       - NEXT_PUBLIC_KEYCLOAK_CLIENT_ID=${NEXT_PUBLIC_KEYCLOAK_CLIENT_ID}
+  #       - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
+  #   environment:
+  #     NODE_ENV: production
+  #     NEXT_PUBLIC_BACKEND_BASE_URL: ${NEXT_PUBLIC_BACKEND_BASE_URL}
+  #     NEXT_PUBLIC_CHAT_PLATFORM_URL: ${NEXT_PUBLIC_CHAT_PLATFORM_URL:-"https://chat.awras.site"}
+  #     BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
+  #     BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+  #     KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
+  #     KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+  #     KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER}
+  #     NEXT_PUBLIC_KEYCLOAK_ISSUER: ${NEXT_PUBLIC_KEYCLOAK_ISSUER}
+  #     NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: ${NEXT_PUBLIC_KEYCLOAK_CLIENT_ID}
+  #   ports:
+  #     - "${FRONTEND_PORT:-3000}:3000"
+  #   restart: unless-stopped
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     # backend:
+  #     #   condition: service_started
+  #   networks:
+  #     - awras_internal_network
 
 volumes:
   postgres_data:
