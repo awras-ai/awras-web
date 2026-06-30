@@ -18,8 +18,8 @@ Models are organized into:
 """
 
 from app.models.email_subscription import EmailSubscription
+
 from app.models.user import User, Session
-from app.models.chainlit import Thread, Step, Element, Feedback
 from app.models.translation_dataset import TranslationDataset
 from app.models.voice_dataset import VoiceDataset
 from app.models.dictionary_dataset import DictionaryDataset
@@ -32,13 +32,13 @@ from app.models.dictionary_annotation import DictionaryAnnotation
 
 __all__ = [
     # Auth models
-    "User",
-    "Session",
+    # "User",
+    # "Session",
     # Chainlit data layer models
-    "Thread",
-    "Step",
-    "Element",
-    "Feedback",
+    # "Thread",
+    # "Step",
+    # "Element",
+    # "Feedback",
     # Other models
     "EmailSubscription",
     # Annotation models
