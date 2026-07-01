@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
+import { useKeycloak } from "@/context/KeycloakContext";
 import posthog from "posthog-js";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
@@ -10,8 +10,11 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 export function HeroCTA() {
   const [userCount, setUserCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const [href, setHref] = useState("/signup");
-  const { data: session } = authClient.useSession();
+  const { authenticated } = useKeycloak();
+
+  const href = authenticated
+    ? process.env.NEXT_PUBLIC_CHAT_PLATFORM_URL || "https://chat.awras.site"
+    : "/signup";
 
   useEffect(() => {
     const fetchUserCount = async () => {
@@ -35,17 +38,6 @@ export function HeroCTA() {
     return () => clearInterval(userCountInterval);
   }, []);
 
-  useEffect(() => {
-    if (session) {
-      const chatUrl =
-        process.env.NEXT_PUBLIC_CHAT_PLATFORM_URL ||
-        "https://chat.awras.site";
-      setHref(chatUrl);
-    } else {
-      setHref("/signup");
-    }
-  }, [session]);
-
   return (
     <div className="">
       <Button
@@ -53,7 +45,10 @@ export function HeroCTA() {
         size="lg"
         className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-8 py-6 text-base font-medium"
       >
-        <a href={href} onClick={() => posthog.capture("cta_clicked", { location: "hero" })}>
+        <a
+          href={href}
+          onClick={() => posthog.capture("cta_clicked", { location: "hero" })}
+        >
           Get Started
         </a>
       </Button>

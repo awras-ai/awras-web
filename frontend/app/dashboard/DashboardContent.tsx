@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Card,
@@ -11,24 +12,29 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
+import { useKeycloak } from "@/context/KeycloakContext";
 
 export function DashboardContent() {
-  const router = useRouter();
-  const { data: session, isPending, error } = authClient.useSession();
+  const { keycloak, initialized, authenticated, user } = useKeycloak();
+
+  // Redirect unauthenticated users to Keycloak login
+  useEffect(() => {
+    if (!initialized) return;
+    if (!authenticated) {
+      keycloak?.login({
+        redirectUri: `${window.location.origin}/dashboard`,
+      });
+    }
+  }, [initialized, authenticated, keycloak]);
 
   const handleLogout = () => {
-    authClient.signOut()
-    const issuer = process.env.NEXT_PUBLIC_KEYCLOAK_ISSUER;
-    const clientId = process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID;
-    window.location.href =
-      `${issuer}/protocol/openid-connect/logout` +
-      `?post_logout_redirect_uri=${encodeURIComponent(window.location.origin + "/")}` +
-      `&client_id=${clientId}`;
+    keycloak?.logout({
+      redirectUri: `${window.location.origin}/`,
+    });
   };
 
-  if (isPending) {
+  // Show spinner while keycloak initializes or while redirecting unauthenticated users
+  if (!initialized || !authenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -36,26 +42,8 @@ export function DashboardContent() {
     );
   }
 
-  if (error || !session) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-center text-red-500">Error</CardTitle>
-            <CardDescription className="text-center">
-              Unable to load user information. Please try logging in again.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <Button onClick={() => router.push("/login")}>Go to Login</Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  const user = session.user;
-  const nameParts = (user.name || user.email || "?").split(" ");
+  const displayName = user?.name || user?.email || "User";
+  const nameParts = displayName.split(" ");
   const initials = nameParts
     .map((p: string) => p.charAt(0))
     .join("")
@@ -84,12 +72,12 @@ export function DashboardContent() {
           <Card>
             <CardHeader className="flex flex-row items-center gap-4">
               <Avatar className="h-16 w-16">
-                <AvatarImage src={user.image || undefined} />
+                <AvatarImage src={user?.picture || undefined} />
                 <AvatarFallback className="text-lg">{initials}</AvatarFallback>
               </Avatar>
               <div>
                 <CardTitle className="text-2xl">
-                  Welcome, {user.name || "User"}!
+                  Welcome, {user?.name || "User"}!
                 </CardTitle>
                 <CardDescription>
                   Welcome to Awras - Your Algerian AI Platform
@@ -104,7 +92,7 @@ export function DashboardContent() {
                 <CardTitle className="text-lg">Email</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">{user.email}</p>
+                <p className="text-muted-foreground">{user?.email ?? "N/A"}</p>
               </CardContent>
             </Card>
 
@@ -114,20 +102,7 @@ export function DashboardContent() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  {user.emailVerified ? "Verified" : "Pending Verification"}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Joined</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  {user.createdAt
-                    ? new Date(user.createdAt).toLocaleDateString()
-                    : "N/A"}
+                  {user?.emailVerified ? "Verified" : "Pending Verification"}
                 </p>
               </CardContent>
             </Card>

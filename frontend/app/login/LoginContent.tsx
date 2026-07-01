@@ -1,19 +1,18 @@
 "use client";
 
 import { useEffect } from "react";
-import { authClient } from "@/lib/auth-client";
+import { useKeycloak } from "@/context/KeycloakContext";
 import { Loader2 } from "lucide-react";
 
 export function LoginContent() {
+  const { keycloak, initialized } = useKeycloak();
+
   useEffect(() => {
-    authClient.signOut().then(() => {
-      authClient.signIn.oauth2({
-        providerId: "keycloak",
-        callbackURL: "/dashboard",
-        errorCallbackURL: "/",
-      });
+    if (!initialized) return;
+    keycloak?.login({
+      redirectUri: `${window.location.origin}/dashboard`,
     });
-  }, []);
+  }, [initialized, keycloak]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
