@@ -9,6 +9,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres-init:/docker-entrypoint-initdb.d:ro
     ports:
       - "127.0.0.1:${POSTGRES_OUTSIDE_PORT:-5432}:5432"
     restart: unless-stopped
@@ -55,29 +56,18 @@ services:
       MODEL_CUSTOM_HEADER_VALUE: ${MODEL_CUSTOM_HEADER_VALUE}
       MODEL_MAX_TOKENS: ${MODEL_MAX_TOKENS:-512}
       REQUIRE_EMAIL_VERIFICATION: ${REQUIRE_EMAIL_VERIFICATION:-False}
-      SESSION_SECRET_KEY: ${SESSION_SECRET_KEY}
-      SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-"session_id"}
-      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-true} # Set to true in production (HTTPS)
-      SESSION_COOKIE_HTTPONLY: ${SESSION_COOKIE_HTTPONLY:-true}
-      SESSION_COOKIE_SAMESITE: ${SESSION_COOKIE_SAMESITE:-"lax"}
-      SESSION_COOKIE_DOMAIN: ${SESSION_COOKIE_DOMAIN} # Leave empty for localhost
-      SESSION_EXPIRE_DAYS: ${SESSION_EXPIRE_DAYS:-15}
-      RESEND_API_KEY: ${RESEND_API_KEY}
-      EMAIL_FROM: ${EMAIL_FROM:-"onboarding@resend.dev"}
-      EMAIL_VERIFICATION_EXPIRE_HOURS: ${EMAIL_VERIFICATION_EXPIRE_HOURS:-24}
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-http://keycloak:8080/realms/awras}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_BACKEND_CLIENT_ID:-awras-backend}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_BACKEND_CLIENT_SECRET}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
       R2_ENDPOINT_URL: ${R2_ENDPOINT_URL:-"https://<accountid>.r2.cloudflarestorage.com"}
       R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-"<your_access_key_id>"}
       R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-"<your_secret_access_key>"}
       R2_BUCKET_NAME: ${R2_BUCKET_NAME:-"awras-profiles"}
-      CHAINLIT_AUTH_SECRET: ${CHAINLIT_AUTH_SECRET:-secret_ta3k}
       LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY}
       LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY}
       LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL-"https://cloud.langfuse.com"}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-"http://localhost:8000/api/v1/auth/google/callback"}
       FRONTEND_URL: ${FRONTEND_URL:-"https://awras.site"}
-      OAUTH_SUCCESS_REDIRECT: ${OAUTH_SUCCESS_REDIRECT:-"https://awras.site/dashbord}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     restart: unless-stopped
@@ -119,6 +109,7 @@ services:
       - "127.0.0.1:${KEYCLOAK_PORT:-8080}:8080"
     volumes:
       - keycloak_data:/opt/keycloak/data
+      - ./keycloak-theme/dist_keycloak/keycloak-theme-for-kc-22-to-25.jar:/opt/keycloak/providers/keycloak-theme-for-kc-22-to-25.jar:ro
     restart: unless-stopped
     healthcheck:
       test:

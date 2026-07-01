@@ -8,7 +8,7 @@ Users can correct the translation, pronunciation, examples, and tags.
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, DateTime, ForeignKey, Text, UniqueConstraint, func
+from sqlalchemy import Column, DateTime, ForeignKey, String, Text, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 
@@ -34,12 +34,7 @@ class DictionaryAnnotation(Base):
         nullable=False,
         index=True,
     )
-    user_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("users.id", ondelete="SET NULL"),
-        nullable=True,
-        index=True,
-    )
+    keycloak_sub = Column(String(255), nullable=True, index=True)
 
     # Correction fields (all nullable - only correct what's needed)
     corrected_meaning = Column(Text, nullable=True)
@@ -62,7 +57,6 @@ class DictionaryAnnotation(Base):
 
     # Relationships
     entry = relationship("DictionaryEntry", back_populates="annotation")
-    user = relationship("User", foreign_keys=[user_id])
 
     def __repr__(self) -> str:
-        return f"<DictionaryAnnotation entry={self.entry_id} user={self.user_id}>"
+        return f"<DictionaryAnnotation entry={self.entry_id} sub={self.keycloak_sub}>"

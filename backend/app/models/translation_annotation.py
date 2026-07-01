@@ -8,7 +8,7 @@ The annotator provides a corrected translation and optional notes.
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, DateTime, ForeignKey, Text, UniqueConstraint, func
+from sqlalchemy import Column, DateTime, ForeignKey, String, Text, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -34,12 +34,7 @@ class TranslationAnnotation(Base):
         nullable=False,
         index=True,
     )
-    user_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("users.id", ondelete="SET NULL"),
-        nullable=True,
-        index=True,
-    )
+    keycloak_sub = Column(String(255), nullable=True, index=True)
 
     corrected_translation = Column(Text, nullable=False)
     notes = Column(Text, nullable=True)
@@ -58,7 +53,6 @@ class TranslationAnnotation(Base):
 
     # Relationships
     entry = relationship("TranslationEntry", back_populates="annotation")
-    user = relationship("User", foreign_keys=[user_id])
 
     def __repr__(self) -> str:
-        return f"<TranslationAnnotation entry={self.entry_id} user={self.user_id}>"
+        return f"<TranslationAnnotation entry={self.entry_id} sub={self.keycloak_sub}>"

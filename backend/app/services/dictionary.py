@@ -30,7 +30,7 @@ class DictionaryService:
         language: str,
         description: Optional[str] = None,
         category: Optional[str] = None,
-        created_by_id: Optional[uuid.UUID] = None,
+        created_by_sub: Optional[uuid.UUID] = None,
     ) -> DictionaryDataset:
         """
         Create a new dictionary dataset.
@@ -41,7 +41,7 @@ class DictionaryService:
             language: Language code (e.g., "ar", "en")
             description: Optional description
             category: Optional category (e.g., "medical", "technical", "colloquial")
-            created_by_id: ID of user creating the dataset
+            created_by_sub: ID of user creating the dataset
 
         Returns:
             DictionaryDataset object
@@ -51,7 +51,7 @@ class DictionaryService:
             description=description,
             language=language,
             category=category,
-            created_by_id=created_by_id,
+            created_by_sub=created_by_sub,
         )
         db.add(dataset)
         db.commit()
@@ -242,7 +242,7 @@ class DictionaryService:
         meaning: str,
         examples: Optional[str] = None,
         tags: Optional[list[str]] = None,
-        user_id: Optional[uuid.UUID] = None,
+        keycloak_sub: Optional[uuid.UUID] = None,
         is_user_submitted: bool = False,
     ) -> DictionaryEntry:
         """
@@ -255,7 +255,7 @@ class DictionaryService:
             meaning: Definition/meaning
             examples: Optional example usage
             tags: Optional list of tags
-            user_id: User who created the entry (if user-submitted)
+            keycloak_sub: User who created the entry (if user-submitted)
             is_user_submitted: Whether this is a user submission
 
         Returns:
@@ -268,7 +268,7 @@ class DictionaryService:
             examples=examples.strip() if examples else None,
             tags=tags,
             is_user_submitted=is_user_submitted,
-            created_by_id=user_id if is_user_submitted else None,
+            created_by_sub=user_id if is_user_submitted else None,
             status="pending",
         )
         db.add(entry)
@@ -343,14 +343,14 @@ class DictionaryService:
 
     @staticmethod
     def get_user_submitted_entries(
-        db: DBSession, user_id: uuid.UUID, skip: int = 0, limit: int = 50
+        db: DBSession, keycloak_sub: str, skip: int = 0, limit: int = 50
     ) -> list[DictionaryEntry]:
         """
         Get entries submitted by a specific user.
 
         Args:
             db: Database session
-            user_id: User UUID
+            keycloak_sub: Keycloak sub
             skip: Number of records to skip
             limit: Maximum number of records to return
 
@@ -360,7 +360,7 @@ class DictionaryService:
         return (
             db.query(DictionaryEntry)
             .filter(
-                DictionaryEntry.created_by_id == user_id,
+                DictionaryEntry.created_by_sub == user_id,
                 DictionaryEntry.is_user_submitted,
             )
             .order_by(DictionaryEntry.created_at.desc())
@@ -377,7 +377,7 @@ class DictionaryService:
     def get_next_entry(
         db: DBSession,
         dataset_id: Optional[uuid.UUID],
-        user_id: uuid.UUID,
+        keycloak_sub: str,
     ) -> Optional[DictionaryEntry]:
         """
         Get one random pending entry for user to annotate.
@@ -389,7 +389,7 @@ class DictionaryService:
         Args:
             db: Database session
             dataset_id: Optional dataset UUID (if None, get from any dataset)
-            user_id: User UUID
+            keycloak_sub: Keycloak sub
 
         Returns:
             DictionaryEntry or None (if no pending entries)
@@ -408,8 +408,8 @@ class DictionaryService:
             ~DictionaryEntry.id.in_(db.query(annotated_ids.c.entry_id)),
             # Exclude user's own submissions
             or_(
-                DictionaryEntry.created_by_id != user_id,
-                DictionaryEntry.created_by_id.is_(None),
+                DictionaryEntry.created_by_sub != user_id,
+                DictionaryEntry.created_by_sub.is_(None),
             ),
         )
 
@@ -426,7 +426,7 @@ class DictionaryService:
     def submit_annotation(
         db: DBSession,
         entry_id: uuid.UUID,
-        user_id: uuid.UUID,
+        keycloak_sub: str,
         corrected_meaning: Optional[str] = None,
         corrected_examples: Optional[str] = None,
         corrected_tags: Optional[list[str]] = None,
@@ -440,7 +440,7 @@ class DictionaryService:
         Args:
             db: Database session
             entry_id: Entry UUID
-            user_id: User UUID
+            keycloak_sub: Keycloak sub
             corrected_meaning: Corrected meaning/definition
             corrected_examples: Corrected examples
             corrected_tags: Corrected tags list
@@ -470,7 +470,7 @@ class DictionaryService:
             return None, "You have already annotated this entry"
 
         # Prevent users from annotating their own submissions
-        if entry.is_user_submitted and entry.created_by_id == user_id:
+        if entry.is_user_submitted and entry.created_by_sub == keycloak_sub:
             return None, "You cannot annotate your own entry"
 
         # Validate at least one correction field is provided
@@ -569,7 +569,7 @@ class DictionaryService:
 
     @staticmethod
     def get_user_dataset_stats(
-        db: DBSession, dataset_id: uuid.UUID, user_id: uuid.UUID
+        db: DBSession, dataset_id: uuid.UUID, keycloak_sub: str
     ) -> dict[str, Any]:
         """
         Get statistics for a dataset including user-specific metrics.
@@ -577,7 +577,7 @@ class DictionaryService:
         Args:
             db: Database session
             dataset_id: Dataset UUID
-            user_id: User UUID
+            keycloak_sub: Keycloak sub
 
         Returns:
             Dictionary with overall stats plus user_annotated_count,
@@ -602,7 +602,7 @@ class DictionaryService:
             db.query(DictionaryEntry)
             .filter(
                 DictionaryEntry.dataset_id == dataset_id,
-                DictionaryEntry.created_by_id == user_id,
+                DictionaryEntry.created_by_sub == user_id,
                 DictionaryEntry.is_user_submitted,
             )
             .count()
@@ -623,8 +623,8 @@ class DictionaryService:
                 DictionaryEntry.status == "pending",
                 ~DictionaryEntry.id.in_(db.query(annotated_ids.c.entry_id)),
                 or_(
-                    DictionaryEntry.created_by_id != user_id,
-                    DictionaryEntry.created_by_id.is_(None),
+                    DictionaryEntry.created_by_sub != user_id,
+                    DictionaryEntry.created_by_sub.is_(None),
                 ),
             )
             .count()
