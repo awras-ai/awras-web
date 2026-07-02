@@ -17,8 +17,7 @@ from sqlalchemy.orm import Session
 
 from app.core.limiter import limiter
 from app.db.database import get_db
-from app.deps.auth import require_auth, require_admin_auth
-from app.models import User
+from app.deps.keycloak import require_auth, require_admin_auth, KeycloakUser
 from app.schemas.translation import (
     AnnotationResponse,
     CreateDatasetRequest,
@@ -53,7 +52,7 @@ async def create_dataset(
     request: Request,
     data: CreateDatasetRequest,
     db: Session = Depends(get_db),
-    user: User = Depends(require_admin_auth),
+    user: KeycloakUser = Depends(require_admin_auth),
 ) -> DatasetResponse:
     """
     Create a new translation dataset.
@@ -79,7 +78,7 @@ async def create_dataset(
     - 403: Not authorized (not admin)
     """
     # Convert Column[UUID] to UUID if needed
-    created_by_id = user.id if isinstance(user.id, UUID) else user.id
+    created_by_id = user.sub if isinstance(user.sub, UUID) else user.sub
     dataset = TranslationService.create_dataset(
         db=db,
         name=data.name,
@@ -104,7 +103,7 @@ async def upload_csv(
     dataset_id: str,
     file: UploadFile,
     db: Session = Depends(get_db),
-    user: User = Depends(require_admin_auth),
+    user: KeycloakUser = Depends(require_admin_auth),
 ) -> UploadResponse:
     """
     Upload a CSV file with translation entries.
@@ -192,7 +191,7 @@ async def list_datasets(
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(50, ge=1, le=100, description="Maximum records to return"),
     db: Session = Depends(get_db),
-    user: User = Depends(require_auth),
+    user: KeycloakUser = Depends(require_auth),
 ) -> DatasetListResponse:
     """
     List all available translation datasets.
@@ -227,7 +226,7 @@ async def get_dataset(
     request: Request,
     dataset_id: str,
     db: Session = Depends(get_db),
-    user: User = Depends(require_auth),
+    user: KeycloakUser = Depends(require_auth),
 ) -> DatasetResponse:
     """
     Get a specific translation dataset by its ID.
@@ -264,7 +263,7 @@ async def get_dataset_stats(
     request: Request,
     dataset_id: str,
     db: Session = Depends(get_db),
-    user: User = Depends(require_auth),
+    user: KeycloakUser = Depends(require_auth),
 ) -> DatasetStatsDetailResponse:
     """
     Get comprehensive statistics for a dataset.
@@ -305,7 +304,7 @@ async def get_dataset_stats(
         db.query(TranslationAnnotation)
         .join(TranslationEntry, TranslationAnnotation.entry_id == TranslationEntry.id)
         .filter(TranslationEntry.dataset_id == dataset_id)
-        .filter(TranslationAnnotation.user_id == user.id)
+        .filter(TranslationAnnotation.user_id == user.sub)
         .count()
     )
 
@@ -320,7 +319,7 @@ async def get_dataset_stats(
         db.query(TranslationAnnotation)
         .join(TranslationEntry, TranslationAnnotation.entry_id == TranslationEntry.id)
         .filter(TranslationEntry.dataset_id == dataset_id)
-        .filter(TranslationAnnotation.user_id == user.id)
+        .filter(TranslationAnnotation.user_id == user.sub)
         .count()
     )
 
@@ -355,7 +354,7 @@ async def get_next_entry(
     request: Request,
     dataset_id: str,
     db: Session = Depends(get_db),
-    user: User = Depends(require_auth),
+    user: KeycloakUser = Depends(require_auth),
 ) -> EntryResponse:
     """
     Get a random pending entry for the user to annotate.
@@ -379,7 +378,7 @@ async def get_next_entry(
     - 401: Not authenticated
     - 404: No pending entries available
     """
-    entry = TranslationService.get_next_entry(db, dataset_id, user.id)
+    entry = TranslationService.get_next_entry(db, dataset_id, user.sub)
     if not entry:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -398,7 +397,7 @@ async def get_entry(
     request: Request,
     entry_id: str,
     db: Session = Depends(get_db),
-    user: User = Depends(require_auth),
+    user: KeycloakUser = Depends(require_auth),
 ) -> EntryResponse:
     """
     Get a specific translation entry by its ID.
@@ -440,7 +439,7 @@ async def submit_annotation(
     entry_id: str,
     data: SubmitAnnotationRequest,
     db: Session = Depends(get_db),
-    user: User = Depends(require_auth),
+    user: KeycloakUser = Depends(require_auth),
 ) -> AnnotationResponse:
     """
     Submit an annotation for a translation entry.
@@ -472,7 +471,7 @@ async def submit_annotation(
     annotation, error = TranslationService.submit_annotation(
         db=db,
         entry_id=entry_id,
-        user_id=user.id,
+        user_id=user.sub,
         corrected_translation=data.corrected_translation,
         notes=data.notes,
     )

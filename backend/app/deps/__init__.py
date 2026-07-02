@@ -1,37 +1,21 @@
 """
 Dependency injection utilities.
 
-Imports:
-    from app.deps.auth import (
-        get_current_user,
-        require_auth,
-        require_superuser,
-        require_admin_auth,
-        user_to_response,
-        get_client_ip,
-        SessionCookieManager,
-        OAuthStateCookieManager,
-    )
+Imports from app.deps.keycloak for authentication.
 """
 
-from app.deps.auth import (
-    get_client_ip,
+from app.deps.keycloak import (
+    KeycloakUser,
     get_current_user,
-    OAuthStateCookieManager,
-    require_admin_auth,
     require_auth,
     require_superuser,
-    SessionCookieManager,
-    user_to_response,
+    require_admin_auth,
 )
 
 __all__ = [
-    "get_client_ip",
+    "KeycloakUser",
     "get_current_user",
     "require_auth",
     "require_superuser",
     "require_admin_auth",
-    "user_to_response",
-    "SessionCookieManager",
-    "OAuthStateCookieManager",
 ]

@@ -8,7 +8,7 @@ source->target language pair and optional domain category.
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, DateTime, ForeignKey, String, Text, func
+from sqlalchemy import Column, DateTime, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -36,12 +36,8 @@ class TranslationDataset(Base):
     # Optional domain/category (e.g. "medical", "news", "legal")
     category = Column(String(100), nullable=True)
 
-    # Who created this dataset (must be superuser)
-    created_by_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("users.id", ondelete="SET NULL"),
-        nullable=True,
-    )
+    # Who created this dataset (must be superuser) - Keycloak sub
+    created_by_sub = Column(String(255), nullable=True)
 
     created_at = Column(
         DateTime(timezone=True),
@@ -56,7 +52,6 @@ class TranslationDataset(Base):
     )
 
     # Relationships
-    created_by = relationship("User", foreign_keys=[created_by_id])
     entries = relationship(
         "TranslationEntry", back_populates="dataset", cascade="all, delete-orphan"
     )

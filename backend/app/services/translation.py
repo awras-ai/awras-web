@@ -35,7 +35,7 @@ class TranslationService:
         target_language: str,
         description: Optional[str] = None,
         category: Optional[str] = None,
-        created_by_id: Optional[uuid.UUID] = None,
+        created_by_sub: Optional[str] = None,
     ) -> TranslationDataset:
         """
         Create a new translation dataset.
@@ -47,7 +47,7 @@ class TranslationService:
             target_language: Target language code (e.g., "ar")
             description: Optional description
             category: Optional category (e.g., "medical", "legal")
-            created_by_id: ID of user creating the dataset
+            created_by_sub: Keycloak sub of user creating the dataset
 
         Returns:
             TranslationDataset object
@@ -58,7 +58,7 @@ class TranslationService:
             source_language=source_language,
             target_language=target_language,
             category=category,
-            created_by_id=created_by_id,
+            created_by_sub=created_by_sub,
         )
         db.add(dataset)
         db.commit()
@@ -237,7 +237,7 @@ class TranslationService:
 
     @staticmethod
     def get_next_entry(
-        db: DBSession, dataset_id: uuid.UUID, user_id: uuid.UUID
+        db: DBSession, dataset_id: uuid.UUID, keycloak_sub: str
     ) -> Optional[TranslationEntry]:
         """
         Get one random pending entry for user to annotate.
@@ -247,7 +247,7 @@ class TranslationService:
         Args:
             db: Database session
             dataset_id: Dataset UUID
-            user_id: User UUID
+            keycloak_sub: Keycloak sub
 
         Returns:
             TranslationEntry or None (if no pending entries)
@@ -275,7 +275,7 @@ class TranslationService:
     def submit_annotation(
         db: DBSession,
         entry_id: uuid.UUID,
-        user_id: uuid.UUID,
+        keycloak_sub: str,
         corrected_translation: str,
         notes: Optional[str] = None,
     ) -> tuple[Optional[TranslationAnnotation], Optional[str]]:
@@ -289,7 +289,7 @@ class TranslationService:
         Args:
             db: Database session
             entry_id: Entry UUID
-            user_id: User UUID
+            keycloak_sub: Keycloak sub
             corrected_translation: The user's corrected translation
             notes: Optional notes
 

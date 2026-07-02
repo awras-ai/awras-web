@@ -48,15 +48,17 @@ export function Hero() {
 
             {/* Description */}
             <p className="text-lg md:text-xl text-black/60 font-light leading-relaxed">
-              An ecosystem dedicated to preserving and understanding the Algerian
-              dialect. Small language models, curated datasets, and tools built
-              for the future.
+              An ecosystem dedicated to preserving and understanding the
+              Algerian dialect. Small language models, curated datasets, and
+              tools built for the future.
             </p>
           </div>
 
           {/* CTA Button */}
           <div className="flex-shrink-0">
-            <Button size="lg">Explore More</Button>
+            <Button size="lg">
+              <a href="/login">Explore More</a>
+            </Button>
           </div>
         </div>
       </div>

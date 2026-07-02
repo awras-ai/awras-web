@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import { ReactQueryProvider } from "./providers";
+import { Providers } from "./providers";
 import Script from "next/script";
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -133,7 +133,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${interDisplay.variable} antialiased`}
       >
-        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <Providers>{children}</Providers>
         <Toaster />
         <Script
           data-goatcounter="https://awras.goatcounter.com/count"

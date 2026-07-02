@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Card,
@@ -10,20 +11,43 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useCurrentUser } from "@/hooks/useAuth";
 import { Loader2, LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useKeycloak } from "@/context/KeycloakContext";
 
 export function DashboardContent() {
-  const router = useRouter();
-  const { data: user, isLoading, error } = useCurrentUser();
+  const { keycloak, initialized, authenticated, user } = useKeycloak();
+  console.log(keycloak?.token);
+  // Redirect unauthenticated users to Keycloak login
+  useEffect(() => {
+    if (!initialized) return;
+    if (!authenticated) {
+      keycloak?.login({
+        redirectUri: `${window.location.origin}/dashboard`,
+      });
+    }
+  }, [initialized, authenticated, keycloak]);
 
-  const handleLogout = async () => {
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    router.push("/");
+  const handleLogout = () => {
+    keycloak?.logout({
+      redirectUri: `${window.location.origin}/`,
+    });
   };
+  useEffect(() => {
+    if (!authenticated || !keycloak) return;
+    keycloak
+      .updateToken(30) // refresh if < 30s left
+      .then(() =>
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}api/v1/count/`, {
+          headers: { Authorization: `Bearer ${keycloak.token}` },
+        }),
+      )
+      .then((r) => r.json())
+      .then((data) => console.log(data))
+      .catch(console.error);
+  }, [authenticated, keycloak]);
 
-  if (isLoading) {
+  // Show spinner while keycloak initializes or while redirecting unauthenticated users
+  if (!initialized || !authenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -31,25 +55,13 @@ export function DashboardContent() {
     );
   }
 
-  if (error || !user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-center text-red-500">Error</CardTitle>
-            <CardDescription className="text-center">
-              Unable to load user information. Please try logging in again.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <Button onClick={() => router.push("/login")}>Go to Login</Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  const initials = `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`.toUpperCase();
+  const displayName = user?.name || user?.email || "User";
+  const nameParts = displayName.split(" ");
+  const initials = nameParts
+    .map((p: string) => p.charAt(0))
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <div className="min-h-screen bg-background">
@@ -73,12 +85,12 @@ export function DashboardContent() {
           <Card>
             <CardHeader className="flex flex-row items-center gap-4">
               <Avatar className="h-16 w-16">
-                <AvatarImage src={user.profile_image_url || undefined} />
+                <AvatarImage src={user?.picture || undefined} />
                 <AvatarFallback className="text-lg">{initials}</AvatarFallback>
               </Avatar>
               <div>
                 <CardTitle className="text-2xl">
-                  Welcome, {user.first_name}!
+                  Welcome, {user?.name || "User"}!
                 </CardTitle>
                 <CardDescription>
                   Welcome to Awras - Your Algerian AI Platform
@@ -93,16 +105,7 @@ export function DashboardContent() {
                 <CardTitle className="text-lg">Email</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">{user.email}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Username</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">@{user.identifier}</p>
+                <p className="text-muted-foreground">{user?.email ?? "N/A"}</p>
               </CardContent>
             </Card>
 
@@ -112,7 +115,7 @@ export function DashboardContent() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  {user.is_verified ? "Verified" : "Pending Verification"}
+                  {user?.emailVerified ? "Verified" : "Pending Verification"}
                 </p>
               </CardContent>
             </Card>

@@ -11,10 +11,9 @@ import pytest_asyncio
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from httpx import ASGITransport, AsyncClient
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from unittest.mock import patch
 
 os.environ["CORS_ORIGINS"] = '["http://localhost:3000"]'
 os.environ["SESSION_COOKIE_SECURE"] = "false"
@@ -113,15 +112,12 @@ def test_app_fixture(postgres_container, redis_container):
 
     settings = get_settings()
 
-    # Replace the module-level limiter with a Redis-backed one pointing at
-    # the isolated test container so rate limits don't hit production Redis.
     test_limiter = Limiter(
         key_func=get_remote_address,
         storage_uri=os.environ.get("REDIS_URL"),
     )
     limiter_module.limiter = test_limiter
 
-    # Import router AFTER patching so the decorator references pick up the new limiter
     from app.api.v1 import api_router
 
     @asynccontextmanager
@@ -183,3 +179,68 @@ def test_user_data() -> dict:
         "email": f"test_{uuid.uuid4().hex[:8]}@example.com",
         "password": "TestPassword123!",
     }
+
+
+def _make_auth_override(user):
+    """Create a get_current_user override that returns the given user."""
+
+    def override_get_current_user(request: Request, db):
+        return user
+
+    return override_get_current_user
+
+
+@pytest_asyncio.fixture
+async def auth_client(client, db_session, test_app_fixture):
+    """
+    Return an (AsyncClient, User) tuple with auth dependency overridden.
+
+    The returned user has is_superuser=False. Use auth_admin_client for admin.
+    """
+    from app.deps.auth import get_current_user
+    from app.models.user import User
+
+    user = User(
+        email=f"test_auth_{uuid.uuid4().hex[:8]}@example.com",
+        identifier=f"testauth_{uuid.uuid4().hex[:8]}",
+        is_active=True,
+        is_verified=True,
+        is_superuser=False,
+    )
+    db_session.add(user)
+    db_session.commit()
+    db_session.refresh(user)
+
+    test_app_fixture.dependency_overrides[get_current_user] = _make_auth_override(user)
+
+    yield client, user
+
+    test_app_fixture.dependency_overrides.pop(get_current_user, None)
+
+
+@pytest_asyncio.fixture
+async def auth_admin_client(client, db_session, test_app_fixture):
+    """
+    Return an (AsyncClient, User) tuple with auth dependency overridden.
+
+    The returned user has is_superuser=True. For admin-only endpoints.
+    """
+    from app.deps.auth import get_current_user
+    from app.models.user import User
+
+    user = User(
+        email=f"test_admin_{uuid.uuid4().hex[:8]}@example.com",
+        identifier=f"testadmin_{uuid.uuid4().hex[:8]}",
+        is_active=True,
+        is_verified=True,
+        is_superuser=True,
+    )
+    db_session.add(user)
+    db_session.commit()
+    db_session.refresh(user)
+
+    test_app_fixture.dependency_overrides[get_current_user] = _make_auth_override(user)
+
+    yield client, user
+
+    test_app_fixture.dependency_overrides.pop(get_current_user, None)

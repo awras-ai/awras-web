@@ -8,7 +8,7 @@ One annotation per entry (enforced by unique constraint on entry_id).
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, DateTime, ForeignKey, Text, UniqueConstraint, func
+from sqlalchemy import Column, DateTime, ForeignKey, String, Text, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -35,12 +35,7 @@ class VoiceAnnotation(Base):
         nullable=False,
         index=True,
     )
-    user_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("users.id", ondelete="SET NULL"),
-        nullable=True,
-        index=True,
-    )
+    keycloak_sub = Column(String(255), nullable=True, index=True)
 
     audio_path = Column(Text, nullable=False)  # Object storage key
     notes = Column(Text, nullable=True)
@@ -59,7 +54,6 @@ class VoiceAnnotation(Base):
 
     # Relationships
     entry = relationship("VoiceEntry", back_populates="annotation")
-    user = relationship("User", foreign_keys=[user_id])
 
     def __repr__(self) -> str:
-        return f"<VoiceAnnotation entry={self.entry_id} user={self.user_id}>"
+        return f"<VoiceAnnotation entry={self.entry_id} sub={self.keycloak_sub}>"

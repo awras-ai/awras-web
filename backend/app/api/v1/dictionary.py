@@ -17,8 +17,8 @@ from sqlalchemy.orm import Session
 
 from app.core.limiter import limiter
 from app.db.database import get_db
-from app.deps.auth import require_auth, require_admin_auth
-from app.models import User, DictionaryEntry
+from app.deps.keycloak import require_auth, require_admin_auth, KeycloakUser
+from app.models import DictionaryEntry
 from app.schemas.dictionary import (
     AnnotationResponse,
     CreateDatasetRequest,
@@ -56,7 +56,7 @@ async def create_dataset(
     request: Request,
     data: CreateDatasetRequest,
     db: Session = Depends(get_db),
-    user: User = Depends(require_admin_auth),
+    user: KeycloakUser = Depends(require_admin_auth),
 ) -> DatasetResponse:
     """
     Create a new dictionary dataset.
@@ -77,7 +77,7 @@ async def create_dataset(
     - 401: Not authenticated
     - 403: Not authorized (not admin)
     """
-    created_by_id = user.id if isinstance(user.id, UUID) else user.id
+    created_by_id = user.sub if isinstance(user.sub, UUID) else user.sub
     dataset = DictionaryService.create_dataset(
         db=db,
         name=data.name,
@@ -101,7 +101,7 @@ async def upload_csv(
     dataset_id: UUID,
     file: UploadFile,
     db: Session = Depends(get_db),
-    user: User = Depends(require_admin_auth),
+    user: KeycloakUser = Depends(require_admin_auth),
 ) -> UploadResponse:
     """
     Upload a CSV file with dictionary entries.
@@ -188,7 +188,7 @@ async def list_datasets(
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(50, ge=1, le=100, description="Maximum records to return"),
     db: Session = Depends(get_db),
-    user: User = Depends(require_auth),
+    user: KeycloakUser = Depends(require_auth),
 ) -> DatasetListResponse:
     """
     List all available dictionary datasets.
@@ -224,7 +224,7 @@ async def get_dataset(
     request: Request,
     dataset_id: UUID,
     db: Session = Depends(get_db),
-    user: User = Depends(require_auth),
+    user: KeycloakUser = Depends(require_auth),
 ) -> DatasetResponse:
     """
     Get a specific dictionary dataset by its ID.
@@ -261,7 +261,7 @@ async def get_dataset_stats(
     request: Request,
     dataset_id: UUID,
     db: Session = Depends(get_db),
-    user: User = Depends(require_auth),
+    user: KeycloakUser = Depends(require_auth),
 ) -> DatasetStatsDetailResponse:
     """
     Get comprehensive statistics for a dataset.
@@ -292,7 +292,7 @@ async def get_dataset_stats(
             detail="Dataset not found",
         )
 
-    user_id = user.id if isinstance(user.id, UUID) else user.id
+    user_id = user.sub if isinstance(user.sub, UUID) else user.sub
     overall_stats = DictionaryService.get_dataset_stats(db, dataset_id)
     user_stats = DictionaryService.get_user_dataset_stats(db, dataset_id, user_id)
 
@@ -337,7 +337,7 @@ async def create_entry(
     request: Request,
     data: CreateEntryRequest,
     db: Session = Depends(get_db),
-    user: User = Depends(require_auth),
+    user: KeycloakUser = Depends(require_auth),
 ) -> EntryResponse:
     """
     Create a new dictionary entry.
@@ -374,7 +374,7 @@ async def create_entry(
             detail="Dataset not found",
         )
 
-    user_id = user.id if isinstance(user.id, UUID) else user.id
+    user_id = user.sub if isinstance(user.sub, UUID) else user.sub
     is_admin = getattr(user, "is_superuser", False)
 
     entry = DictionaryService.create_entry(
@@ -408,7 +408,7 @@ async def search_entries(
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(50, ge=1, le=100, description="Maximum records to return"),
     db: Session = Depends(get_db),
-    user: User = Depends(require_auth),
+    user: KeycloakUser = Depends(require_auth),
 ) -> SearchEntriesResponse:
     """
     Search dictionary entries by word or meaning.
@@ -457,7 +457,7 @@ async def search_entries(
 async def get_user_entries(
     request: Request,
     db: Session = Depends(get_db),
-    user: User = Depends(require_auth),
+    user: KeycloakUser = Depends(require_auth),
 ) -> UserEntriesResponse:
     """
     Get entries submitted and annotated by the current user.
@@ -479,7 +479,7 @@ async def get_user_entries(
     - 200: Entries retrieved successfully
     - 401: Not authenticated
     """
-    user_id = user.id if isinstance(user.id, UUID) else user.id
+    user_id = user.sub if isinstance(user.sub, UUID) else user.sub
 
     submitted_entries = DictionaryService.get_user_submitted_entries(
         db=db,
@@ -529,7 +529,7 @@ async def get_next_entry(
     request: Request,
     dataset_id: UUID = None,
     db: Session = Depends(get_db),
-    user: User = Depends(require_auth),
+    user: KeycloakUser = Depends(require_auth),
 ) -> EntryResponse:
     """
     Get a random pending entry for the user to annotate.
@@ -555,7 +555,7 @@ async def get_next_entry(
     - 401: Not authenticated
     - 404: No pending entries available
     """
-    user_id = user.id if isinstance(user.id, UUID) else user.id
+    user_id = user.sub if isinstance(user.sub, UUID) else user.sub
     entry = DictionaryService.get_next_entry(db, dataset_id, user_id)
     if not entry:
         raise HTTPException(
@@ -575,7 +575,7 @@ async def get_entry(
     request: Request,
     entry_id: UUID,
     db: Session = Depends(get_db),
-    user: User = Depends(require_auth),
+    user: KeycloakUser = Depends(require_auth),
 ) -> EntryResponse:
     """
     Get a specific dictionary entry by its ID.
@@ -617,7 +617,7 @@ async def submit_annotation(
     entry_id: UUID,
     data: SubmitAnnotationRequest,
     db: Session = Depends(get_db),
-    user: User = Depends(require_auth),
+    user: KeycloakUser = Depends(require_auth),
 ) -> AnnotationResponse:
     """
     Submit an annotation for a dictionary entry.
@@ -650,7 +650,7 @@ async def submit_annotation(
     - 401: Not authenticated
     - 404: Entry not found
     """
-    user_id = user.id if isinstance(user.id, UUID) else user.id
+    user_id = user.sub if isinstance(user.sub, UUID) else user.sub
 
     annotation, error = DictionaryService.submit_annotation(
         db=db,

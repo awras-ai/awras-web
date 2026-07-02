@@ -26,7 +26,7 @@ class DictionaryEntry(Base):
         examples:          Optional example usage (single string)
         tags:              Free-form JSON array of tags
         is_user_submitted: False = admin imported, True = added by user
-        created_by_id:     Who added it (if user-submitted)
+        submitted_by_sub: Who added it (if user-submitted) - Keycloak sub
 
     status:
         "pending"   - not yet annotated
@@ -53,12 +53,7 @@ class DictionaryEntry(Base):
     is_user_submitted = Column(
         Boolean, default=False, nullable=False
     )  # Distinguishes user-added from admin-imported
-    created_by_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("users.id", ondelete="SET NULL"),
-        nullable=True,
-        index=True,
-    )
+    submitted_by_sub = Column(String(255), nullable=True, index=True)
 
     status = Column(
         String(20), nullable=False, default="pending"
@@ -72,7 +67,6 @@ class DictionaryEntry(Base):
 
     # Relationships
     dataset = relationship("DictionaryDataset", back_populates="entries")
-    created_by = relationship("User", foreign_keys=[created_by_id])
     annotation = relationship(
         "DictionaryAnnotation",
         back_populates="entry",
