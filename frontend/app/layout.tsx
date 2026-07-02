@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import { ReactQueryProvider } from "./providers";
+import { Providers } from "./providers";
 import Script from "next/script";
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,6 +12,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const interDisplay = Inter({
+  variable: "--font-inter-display",
+  subsets: ["latin"],
+  weight: ["700"],
 });
 
 export const metadata: Metadata = {
@@ -125,9 +131,9 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${interDisplay.variable} antialiased`}
       >
-        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <Providers>{children}</Providers>
         <Toaster />
         <Script
           data-goatcounter="https://awras.goatcounter.com/count"

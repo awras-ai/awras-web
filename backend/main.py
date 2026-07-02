@@ -7,11 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from chainlit.utils import mount_chainlit
 
 from app.core.config import get_settings
 from app.core.limiter import limiter
-from app.db.database import init_db
 from app.api.v1 import api_router
 
 settings = get_settings()
@@ -20,11 +18,9 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan events."""
-    # Startup
     print("✓ Application started")
     print("⚠ Run migrations with: uv run alembic upgrade head")
     yield
-    # Shutdown: cleanup if needed
     print("✓ Application shutdown")
 
 
@@ -32,7 +28,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="AWRAS API for managing email subscriptions and waitlist",
+    description="AWRAS API for annotation platforms",
     lifespan=lifespan,
     docs_url="/docs" if settings.DEBUG else None,
     redoc_url="/redoc" if settings.DEBUG else None,
@@ -69,6 +65,3 @@ async def root(request: Request):
 async def health_check(request: Request):
     """Health check endpoint."""
     return {"status": "healthy"}
-
-
-mount_chainlit(app, target="./app/chainlit_app.py", path="/chat")

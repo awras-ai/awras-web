@@ -1,50 +1,26 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  RegistrationProvider,
-  Step1Form,
-  RegistrationProgress,
-} from "./components";
+import { useEffect } from "react";
+import { useKeycloak } from "@/context/KeycloakContext";
+import { Loader2 } from "lucide-react";
 
 export function SignupContent() {
-  const router = useRouter();
+  const { keycloak, initialized } = useKeycloak();
 
-  const handleSuccess = () => {
-    router.push("/goodbye");
-  };
+  useEffect(() => {
+    if (!initialized) return;
+    keycloak?.login({
+      action: "register",
+      redirectUri: `${window.location.origin}/dashboard`,
+    });
+  }, [initialized, keycloak]);
 
   return (
-    <RegistrationProvider>
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">
-              Create Account
-            </CardTitle>
-            <RegistrationProgress currentStep={1} />
-          </CardHeader>
-          <CardContent>
-            <Step1Form onComplete={handleSuccess} />
-          </CardContent>
-          <CardFooter className="flex justify-center">
-            <p className="text-xs text-muted-foreground">
-              Already have an account?{" "}
-              <a href="/login" className="text-primary hover:underline">
-                Sign in
-              </a>
-            </p>
-          </CardFooter>
-        </Card>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="flex flex-col items-center gap-4">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="text-muted-foreground">Redirecting to sign up...</p>
       </div>
-    </RegistrationProvider>
+    </div>
   );
 }

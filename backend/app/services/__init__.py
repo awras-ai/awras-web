@@ -1,7 +1,13 @@
 """Services module."""
 
-from app.services.auth import AuthService
-from app.services.email import EmailService
-from app.services.email_subscription import EmailSubscriptionService
+from app.services.keycloak import KeycloakAuthService
+from app.services.dictionary import DictionaryService
+from app.services.translation import TranslationService
+from app.services.object_storage import storage_service
 
-__all__ = ["AuthService", "EmailService", "EmailSubscriptionService"]
+__all__ = [
+    "KeycloakAuthService",
+    "DictionaryService",
+    "TranslationService",
+    "storage_service",
+]

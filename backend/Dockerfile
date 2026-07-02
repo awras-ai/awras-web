@@ -30,10 +30,9 @@ RUN rm -rf /tmp/uv-cache && \
 # Stage 2: Runtime stage
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
-# Install runtime dependencies: libpq for PostgreSQL and netcat for health check
+# Install runtime dependencies: libpq for PostgreSQL and curl for health check
 RUN apt-get update && apt-get install -y \
   libpq5 \
-  netcat-openbsd \
   curl \
   ffmpeg \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -46,9 +45,6 @@ COPY --from=builder /app/.venv ./.venv
 
 # Copy application code (respects .dockerignore)
 COPY . .
-
-# Ensure .chainlit folder exists with its configs
-COPY .chainlit ./.chainlit
 
 # Set environment variables
 ENV PYTHONPATH=/app
