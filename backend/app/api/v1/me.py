@@ -4,13 +4,13 @@ from fastapi import (
     Request,
 )
 from app.core.limiter import limiter
-from app.deps.keycloak import require_auth, require_admin_auth, KeycloakUser
+from app.deps.keycloak import require_auth, KeycloakUser
 
 router = APIRouter(prefix="/me", tags=["User"])
 
 
 @router.get(
-    "/",
+    "",
     summary="return the user object",
 )
 @limiter.limit("60/minute")
