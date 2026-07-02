@@ -5,20 +5,18 @@ from fastapi import (
 )
 from app.core.limiter import limiter
 from app.deps.keycloak import require_auth, require_admin_auth, KeycloakUser
-from app.schemas.count import CountResponse
 
-router = APIRouter(prefix="/count", tags=["Count"])
+router = APIRouter(prefix="/me", tags=["User"])
 
 
 @router.get(
     "/",
-    summary="count how many users there are in the platform",
-    response_model=CountResponse,
+    summary="return the user object",
 )
 @limiter.limit("60/minute")
 async def list_datasets(
     request: Request,
     user: KeycloakUser = Depends(require_auth),
-) -> CountResponse:
+):
 
     return user

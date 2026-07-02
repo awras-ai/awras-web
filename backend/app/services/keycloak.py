@@ -7,7 +7,9 @@ No local user storage - Keycloak is the single source of truth.
 
 from functools import lru_cache
 
+from jwcrypto.jwt import JWTExpired
 from keycloak import KeycloakOpenID
+from keycloak.exceptions import KeycloakInvalidTokenError
 
 from app.core.config import get_settings
 
@@ -45,4 +47,7 @@ class KeycloakAuthService:
             KeycloakError: If validation fails for other reasons
         """
         oid = KeycloakAuthService._get_openid()
-        return oid.decode_token(token, validate=True)
+        try:
+            return oid.decode_token(token, validate=True)
+        except JWTExpired:
+            raise KeycloakInvalidTokenError("Token expired")

@@ -7,7 +7,8 @@ All user data comes from Keycloak JWT claims. No local user storage.
 import logging
 from typing import Optional
 
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import HTTPException, Request, status
+from jwcrypto.jwt import JWTExpired
 from keycloak.exceptions import KeycloakInvalidTokenError
 
 from app.services.keycloak import KeycloakAuthService
@@ -55,11 +56,29 @@ def get_current_user(request: Request) -> Optional[KeycloakUser]:
         claims = KeycloakAuthService.validate_token(token)
         return KeycloakUser(claims)
     except KeycloakInvalidTokenError:
-        logger.debug("Invalid Keycloak token")
+        logger.warning("Invalid or expired Keycloak token")
+        request.state.auth_failure = "invalid_or_expired_token"
+        return None
+    except JWTExpired:
+        logger.warning("Expired Keycloak token")
+        request.state.auth_failure = "token_expired"
         return None
     except Exception:
-        logger.exception("Unexpected error validating Keycloak token")
+        logger.warning("Unexpected error validating Keycloak token", exc_info=True)
+        request.state.auth_failure = "unexpected_error"
         return None
+
+
+_AUTH_FAILURE_MESSAGES = {
+    "invalid_or_expired_token": "Not authenticated: invalid or expired token",
+    "token_expired": "Not authenticated: token expired",
+    "unexpected_error": "Not authenticated",
+}
+
+
+def _get_auth_failure_detail(request: Request) -> str:
+    reason = getattr(request.state, "auth_failure", None)
+    return _AUTH_FAILURE_MESSAGES.get(reason, "Not authenticated")
 
 
 def require_auth(request: Request) -> KeycloakUser:
@@ -72,7 +91,7 @@ def require_auth(request: Request) -> KeycloakUser:
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
+            detail=_get_auth_failure_detail(request),
         )
     return user
 
@@ -87,7 +106,7 @@ def require_superuser(request: Request) -> KeycloakUser:
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
+            detail=_get_auth_failure_detail(request),
         )
     if not user.is_superuser:
         raise HTTPException(

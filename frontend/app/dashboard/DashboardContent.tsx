@@ -16,7 +16,7 @@ import { useKeycloak } from "@/context/KeycloakContext";
 
 export function DashboardContent() {
   const { keycloak, initialized, authenticated, user } = useKeycloak();
-
+  console.log(keycloak?.token);
   // Redirect unauthenticated users to Keycloak login
   useEffect(() => {
     if (!initialized) return;
@@ -32,6 +32,19 @@ export function DashboardContent() {
       redirectUri: `${window.location.origin}/`,
     });
   };
+  useEffect(() => {
+    if (!authenticated || !keycloak) return;
+    keycloak
+      .updateToken(30) // refresh if < 30s left
+      .then(() =>
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}api/v1/count/`, {
+          headers: { Authorization: `Bearer ${keycloak.token}` },
+        }),
+      )
+      .then((r) => r.json())
+      .then((data) => console.log(data))
+      .catch(console.error);
+  }, [authenticated, keycloak]);
 
   // Show spinner while keycloak initializes or while redirecting unauthenticated users
   if (!initialized || !authenticated) {
