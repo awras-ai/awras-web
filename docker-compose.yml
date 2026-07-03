@@ -123,6 +123,14 @@ services:
         condition: service_healthy
     networks:
       - awras_internal_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=dokploy-network"
+      - "traefik.http.routers.keycloak-admin-block.rule=Host(`auth.awras.site`) && PathPrefix(`/admin`)"
+      - "traefik.http.routers.keycloak-admin-block.entrypoints=websecure"
+      - "traefik.http.routers.keycloak-admin-block.tls=true"
+      - "traefik.http.routers.keycloak-admin-block.middlewares=block-admin-ip"
+      - "traefik.http.middlewares.block-admin-ip.ipwhitelist.sourcerange=127.0.0.1/32"
 
   # Next.js application
   frontend:
