@@ -38,6 +38,7 @@ from app.schemas.dictionary import (
 from app.services.dictionary import DictionaryService
 
 router = APIRouter(prefix="/dictionary", tags=["Dictionary"])
+router_admin = APIRouter(prefix="/dictionary", tags=["Dictionary Admin"])
 
 
 # =============================================================================
@@ -45,7 +46,7 @@ router = APIRouter(prefix="/dictionary", tags=["Dictionary"])
 # =============================================================================
 
 
-@router.post(
+@router_admin.post(
     "/datasets",
     response_model=DatasetResponse,
     status_code=status.HTTP_201_CREATED,
@@ -77,19 +78,18 @@ async def create_dataset(
     - 401: Not authenticated
     - 403: Not authorized (not admin)
     """
-    created_by_id = user.sub if isinstance(user.sub, UUID) else user.sub
     dataset = DictionaryService.create_dataset(
         db=db,
         name=data.name,
         language=data.language,
         description=data.description,
         category=data.category,
-        created_by_id=created_by_id,
+        created_by_sub=user.sub,
     )
     return dataset
 
 
-@router.post(
+@router_admin.post(
     "/datasets/{dataset_id}/upload",
     response_model=UploadResponse,
     status_code=status.HTTP_201_CREATED,
@@ -185,8 +185,8 @@ async def upload_csv(
 @limiter.limit("60/minute")
 async def list_datasets(
     request: Request,
-    skip: int = Query(0, ge=0, description="Number of records to skip"),
-    limit: int = Query(50, ge=1, le=100, description="Maximum records to return"),
+    # skip: int = Query(0, ge=0, description="Number of records to skip"),
+    # limit: int = Query(50, ge=1, le=100, description="Maximum records to return"),
     db: Session = Depends(get_db),
     user: KeycloakUser = Depends(require_auth),
 ) -> DatasetListResponse:
@@ -197,10 +197,6 @@ async def list_datasets(
 
     Returns a paginated list of all datasets ordered by creation date (newest first).
 
-    Args:
-    - **skip**: Number of records to skip (pagination offset)
-    - **limit**: Maximum number of records to return (1-100)
-
     Returns:
     - **datasets**: List of dataset objects
     - **total**: Total number of datasets
@@ -209,7 +205,7 @@ async def list_datasets(
     - 200: Datasets retrieved successfully
     - 401: Not authenticated
     """
-    datasets = DictionaryService.get_datasets(db, skip=skip, limit=limit)
+    datasets = DictionaryService.get_datasets(db)
     total = DictionaryService.get_datasets_count(db)
     return DatasetListResponse(datasets=datasets, total=total)
 
@@ -384,7 +380,7 @@ async def create_entry(
         meaning=data.meaning,
         examples=data.examples,
         tags=data.tags,
-        user_id=user_id,
+        keycloak_sub=user_id,
         is_user_submitted=not is_admin,
     )
     return entry
@@ -395,123 +391,123 @@ async def create_entry(
 # =============================================================================
 
 
-@router.get(
-    "/entries/search",
-    response_model=SearchEntriesResponse,
-    summary="Search dictionary entries",
-)
-@limiter.limit("60/minute")
-async def search_entries(
-    request: Request,
-    q: str = Query(..., description="Search query"),
-    dataset_id: UUID = None,
-    skip: int = Query(0, ge=0, description="Number of records to skip"),
-    limit: int = Query(50, ge=1, le=100, description="Maximum records to return"),
-    db: Session = Depends(get_db),
-    user: KeycloakUser = Depends(require_auth),
-) -> SearchEntriesResponse:
-    """
-    Search dictionary entries by word or meaning.
+# @router.get(
+#     "/entries/search",
+#     response_model=SearchEntriesResponse,
+#     summary="Search dictionary entries",
+# )
+# @limiter.limit("60/minute")
+# async def search_entries(
+#     request: Request,
+#     q: str = Query(..., description="Search query"),
+#     dataset_id: UUID = None,
+#     skip: int = Query(0, ge=0, description="Number of records to skip"),
+#     limit: int = Query(50, ge=1, le=100, description="Maximum records to return"),
+#     db: Session = Depends(get_db),
+#     user: KeycloakUser = Depends(require_auth),
+# ) -> SearchEntriesResponse:
+#     """
+#     Search dictionary entries by word or meaning.
+#
+#     **Requires authentication.**
+#
+#     Search is case-insensitive and matches partial text.
+#     Can be filtered by dataset_id.
+#
+#     Args:
+#     - **q**: Search query (no minimum length)
+#     - **dataset_id**: Optional dataset UUID to filter by
+#     - **skip**: Number of records to skip (pagination offset)
+#     - **limit**: Maximum number of records to return (1-100)
+#
+#     Returns:
+#     - **entries**: List of matching entries
+#     - **total**: Total number of matches
+#     - **query**: Search query used
+#
+#     Status codes:
+#     - 200: Search completed
+#     - 401: Not authenticated
+#     """
+#     entries, total = DictionaryService.search_entries(
+#         db=db,
+#         query=q,
+#         dataset_id=dataset_id,
+#         skip=skip,
+#         limit=limit,
+#     )
+#
+#     return SearchEntriesResponse(
+#         entries=entries,
+#         total=total,
+#         query=q,
+#     )
 
-    **Requires authentication.**
 
-    Search is case-insensitive and matches partial text.
-    Can be filtered by dataset_id.
-
-    Args:
-    - **q**: Search query (no minimum length)
-    - **dataset_id**: Optional dataset UUID to filter by
-    - **skip**: Number of records to skip (pagination offset)
-    - **limit**: Maximum number of records to return (1-100)
-
-    Returns:
-    - **entries**: List of matching entries
-    - **total**: Total number of matches
-    - **query**: Search query used
-
-    Status codes:
-    - 200: Search completed
-    - 401: Not authenticated
-    """
-    entries, total = DictionaryService.search_entries(
-        db=db,
-        query=q,
-        dataset_id=dataset_id,
-        skip=skip,
-        limit=limit,
-    )
-
-    return SearchEntriesResponse(
-        entries=entries,
-        total=total,
-        query=q,
-    )
-
-
-@router.get(
-    "/entries/user",
-    response_model=UserEntriesResponse,
-    summary="Get user's submitted and annotated entries",
-)
-@limiter.limit("60/minute")
-async def get_user_entries(
-    request: Request,
-    db: Session = Depends(get_db),
-    user: KeycloakUser = Depends(require_auth),
-) -> UserEntriesResponse:
-    """
-    Get entries submitted and annotated by the current user.
-
-    **Requires authentication.**
-
-    Returns two lists:
-    - **submitted_entries**: Entries created by this user
-    - **annotated_entries**: Entries annotated by this user
-
-    Args:
-    - (no parameters)
-
-    Returns:
-    - **submitted_entries**: List of entries the user submitted
-    - **annotated_entries**: List of entries the user annotated
-
-    Status codes:
-    - 200: Entries retrieved successfully
-    - 401: Not authenticated
-    """
-    user_id = user.sub if isinstance(user.sub, UUID) else user.sub
-
-    submitted_entries = DictionaryService.get_user_submitted_entries(
-        db=db,
-        user_id=user_id,
-        skip=0,
-        limit=100,
-    )
-
-    from app.models import DictionaryAnnotation
-
-    annotated_ids = (
-        db.query(DictionaryAnnotation.entry_id)
-        .filter(DictionaryAnnotation.user_id == user_id)
-        .subquery()
-    )
-
-    from sqlalchemy import and_
-
-    annotated_entries = (
-        db.query(DictionaryEntry)
-        .filter(
-            and_(
-                DictionaryEntry.id.in_(db.query(annotated_ids.c.entry_id)),
-            )
-        )
-        .all()
-    )
-
-    return UserEntriesResponse(
-        submitted_entries=submitted_entries,
-        annotated_entries=annotated_entries,
-    )
+# @router.get(
+#     "/entries/user",
+#     response_model=UserEntriesResponse,
+#     summary="Get user's submitted and annotated entries",
+# )
+# @limiter.limit("60/minute")
+# async def get_user_entries(
+#     request: Request,
+#     db: Session = Depends(get_db),
+#     user: KeycloakUser = Depends(require_auth),
+# ) -> UserEntriesResponse:
+#     """
+#     Get entries submitted and annotated by the current user.
+#
+#     **Requires authentication.**
+#
+#     Returns two lists:
+#     - **submitted_entries**: Entries created by this user
+#     - **annotated_entries**: Entries annotated by this user
+#
+#     Args:
+#     - (no parameters)
+#
+#     Returns:
+#     - **submitted_entries**: List of entries the user submitted
+#     - **annotated_entries**: List of entries the user annotated
+#
+#     Status codes:
+#     - 200: Entries retrieved successfully
+#     - 401: Not authenticated
+#     """
+#     user_id = user.sub if isinstance(user.sub, UUID) else user.sub
+#
+#     submitted_entries = DictionaryService.get_user_submitted_entries(
+#         db=db,
+#         user_id=user_id,
+#         skip=0,
+#         limit=100,
+#     )
+#
+#     from app.models import DictionaryAnnotation
+#
+#     annotated_ids = (
+#         db.query(DictionaryAnnotation.entry_id)
+#         .filter(DictionaryAnnotation.user_id == user_id)
+#         .subquery()
+#     )
+#
+#     from sqlalchemy import and_
+#
+#     annotated_entries = (
+#         db.query(DictionaryEntry)
+#         .filter(
+#             and_(
+#                 DictionaryEntry.id.in_(db.query(annotated_ids.c.entry_id)),
+#             )
+#         )
+#         .all()
+#     )
+#
+#     return UserEntriesResponse(
+#         submitted_entries=submitted_entries,
+#         annotated_entries=annotated_entries,
+#     )
 
 
 # =============================================================================
@@ -527,7 +523,7 @@ async def get_user_entries(
 @limiter.limit("30/minute")
 async def get_next_entry(
     request: Request,
-    dataset_id: UUID = None,
+    dataset_id: UUID,
     db: Session = Depends(get_db),
     user: KeycloakUser = Depends(require_auth),
 ) -> EntryResponse:
@@ -624,10 +620,9 @@ async def submit_annotation(
 
     **Requires authentication.**
 
-    User must provide at least one correction field:
-    - corrected_meaning
-    - corrected_examples
-    - corrected_tags
+    User must either:
+    - Provide at least one correction field, or
+    - Set **confirmed** to true to confirm the entry as-is
 
     After submission:
     - Entry status changes to 'completed'
@@ -636,6 +631,7 @@ async def submit_annotation(
 
     Args:
     - **entry_id**: UUID of the entry to annotate
+    - **confirmed**: Set to true to confirm entry without corrections
     - **corrected_meaning**: User's corrected meaning (optional)
     - **corrected_examples**: User's corrected examples (optional)
     - **corrected_tags**: User's corrected tags (optional)
@@ -655,7 +651,8 @@ async def submit_annotation(
     annotation, error = DictionaryService.submit_annotation(
         db=db,
         entry_id=entry_id,
-        user_id=user_id,
+        keycloak_sub=user_id,
+        confirmed=data.confirmed,
         corrected_meaning=data.corrected_meaning,
         corrected_examples=data.corrected_examples,
         corrected_tags=data.corrected_tags,

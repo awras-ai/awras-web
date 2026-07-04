@@ -30,7 +30,7 @@ class DictionaryService:
         language: str,
         description: Optional[str] = None,
         category: Optional[str] = None,
-        created_by_sub: Optional[uuid.UUID] = None,
+        created_by_sub: Optional[str] = None,
     ) -> DictionaryDataset:
         """
         Create a new dictionary dataset.
@@ -41,7 +41,7 @@ class DictionaryService:
             language: Language code (e.g., "ar", "en")
             description: Optional description
             category: Optional category (e.g., "medical", "technical", "colloquial")
-            created_by_sub: ID of user creating the dataset
+            created_by_sub: Keycloak sub string of the user creating the dataset
 
         Returns:
             DictionaryDataset object
@@ -268,7 +268,7 @@ class DictionaryService:
             examples=examples.strip() if examples else None,
             tags=tags,
             is_user_submitted=is_user_submitted,
-            created_by_sub=user_id if is_user_submitted else None,
+            submitted_by_sub=keycloak_sub if is_user_submitted else None,
             status="pending",
         )
         db.add(entry)
@@ -360,7 +360,7 @@ class DictionaryService:
         return (
             db.query(DictionaryEntry)
             .filter(
-                DictionaryEntry.created_by_sub == user_id,
+                DictionaryEntry.submitted_by_sub == keycloak_sub,
                 DictionaryEntry.is_user_submitted,
             )
             .order_by(DictionaryEntry.created_at.desc())
@@ -397,7 +397,7 @@ class DictionaryService:
         # Get IDs of entries already annotated by this user
         annotated_ids = (
             db.query(DictionaryAnnotation.entry_id)
-            .filter(DictionaryAnnotation.user_id == user_id)
+            .filter(DictionaryAnnotation.keycloak_sub == keycloak_sub)
             .subquery()
         )
 
@@ -408,8 +408,8 @@ class DictionaryService:
             ~DictionaryEntry.id.in_(db.query(annotated_ids.c.entry_id)),
             # Exclude user's own submissions
             or_(
-                DictionaryEntry.created_by_sub != user_id,
-                DictionaryEntry.created_by_sub.is_(None),
+                DictionaryEntry.submitted_by_sub != keycloak_sub,
+                DictionaryEntry.submitted_by_sub.is_(None),
             ),
         )
 
@@ -427,6 +427,7 @@ class DictionaryService:
         db: DBSession,
         entry_id: uuid.UUID,
         keycloak_sub: str,
+        confirmed: bool = False,
         corrected_meaning: Optional[str] = None,
         corrected_examples: Optional[str] = None,
         corrected_tags: Optional[list[str]] = None,
@@ -435,12 +436,14 @@ class DictionaryService:
         """
         Submit annotation for an entry.
 
-        User must provide at least one correction field.
+        User must provide at least one correction field, or set confirmed=true
+        to confirm the entry as-is.
 
         Args:
             db: Database session
             entry_id: Entry UUID
             keycloak_sub: Keycloak sub
+            confirmed: If true, confirms entry without corrections
             corrected_meaning: Corrected meaning/definition
             corrected_examples: Corrected examples
             corrected_tags: Corrected tags list
@@ -462,7 +465,7 @@ class DictionaryService:
             db.query(DictionaryAnnotation)
             .filter(
                 DictionaryAnnotation.entry_id == entry_id,
-                DictionaryAnnotation.user_id == user_id,
+                DictionaryAnnotation.keycloak_sub == keycloak_sub,
             )
             .first()
         )
@@ -470,10 +473,10 @@ class DictionaryService:
             return None, "You have already annotated this entry"
 
         # Prevent users from annotating their own submissions
-        if entry.is_user_submitted and entry.created_by_sub == keycloak_sub:
+        if entry.is_user_submitted and entry.submitted_by_sub == keycloak_sub:
             return None, "You cannot annotate your own entry"
 
-        # Validate at least one correction field is provided
+        # Validate at least one correction field is provided (or confirmed)
         has_correction = False
         if corrected_meaning and corrected_meaning.strip():
             has_correction = True
@@ -482,13 +485,13 @@ class DictionaryService:
         if corrected_tags and len(corrected_tags) > 0:
             has_correction = True
 
-        if not has_correction:
-            return None, "At least one correction field must be provided"
+        if not confirmed and not has_correction:
+            return None, "At least one correction field must be provided, or set confirmed=true"
 
         # Create annotation
         annotation = DictionaryAnnotation(
             entry_id=entry_id,
-            user_id=user_id,
+            keycloak_sub=keycloak_sub,
             corrected_meaning=corrected_meaning.strip() if corrected_meaning else None,
             corrected_examples=(
                 corrected_examples.strip() if corrected_examples else None
@@ -592,7 +595,7 @@ class DictionaryService:
             .join(DictionaryEntry)
             .filter(
                 DictionaryEntry.dataset_id == dataset_id,
-                DictionaryAnnotation.user_id == user_id,
+                DictionaryAnnotation.keycloak_sub == keycloak_sub,
             )
             .count()
         )
@@ -602,7 +605,7 @@ class DictionaryService:
             db.query(DictionaryEntry)
             .filter(
                 DictionaryEntry.dataset_id == dataset_id,
-                DictionaryEntry.created_by_sub == user_id,
+                DictionaryEntry.submitted_by_sub == keycloak_sub,
                 DictionaryEntry.is_user_submitted,
             )
             .count()
@@ -611,7 +614,7 @@ class DictionaryService:
         # Get IDs of entries already annotated by this user
         annotated_ids = (
             db.query(DictionaryAnnotation.entry_id)
-            .filter(DictionaryAnnotation.user_id == user_id)
+            .filter(DictionaryAnnotation.keycloak_sub == keycloak_sub)
             .subquery()
         )
 
@@ -623,8 +626,8 @@ class DictionaryService:
                 DictionaryEntry.status == "pending",
                 ~DictionaryEntry.id.in_(db.query(annotated_ids.c.entry_id)),
                 or_(
-                    DictionaryEntry.created_by_sub != user_id,
-                    DictionaryEntry.created_by_sub.is_(None),
+                    DictionaryEntry.submitted_by_sub != keycloak_sub,
+                    DictionaryEntry.submitted_by_sub.is_(None),
                 ),
             )
             .count()

@@ -10,4 +10,5 @@ api_router = APIRouter()
 # Include all v1 routers
 api_router.include_router(translation.router)
 api_router.include_router(dictionary.router)
+api_router.include_router(dictionary.router_admin)
 api_router.include_router(me.router)

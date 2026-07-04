@@ -146,6 +146,10 @@ class UserEntriesResponse(BaseModel):
 class SubmitAnnotationRequest(BaseModel):
     """Request schema for submitting an annotation."""
 
+    confirmed: bool = Field(
+        False,
+        description="Set to true to confirm the entry as-is (no corrections needed)",
+    )
     corrected_meaning: Optional[str] = Field(
         None, max_length=10000, description="Corrected meaning/definition"
     )
