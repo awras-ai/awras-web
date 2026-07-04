@@ -33,10 +33,16 @@ class KeycloakUser:
         self.preferred_username = claims.get("preferred_username", "")
         self.email_verified = claims.get("email_verified", False)
 
-        # Check if user has realm role "admin" or "superuser"
+        # Aggregate roles from realm_access and all resource_access clients.
+        # Keycloak puts composite admin roles like "realm-admin" under
+        # resource_access["realm-management"].roles, not realm_access.roles.
         realm_access = claims.get("realm_access", {})
-        roles = realm_access.get("roles", [])
-        self.is_superuser = "admin" in roles or "superuser" in roles
+        roles = set(realm_access.get("roles", []))
+        resource_access = claims.get("resource_access", {})
+        for client, access in resource_access.items():
+            roles.update(access.get("roles", []))
+        self.roles = roles
+        self.is_superuser = "realm-admin" in roles or "superuser" in roles
 
 
 def get_current_user(request: Request) -> Optional[KeycloakUser]:
