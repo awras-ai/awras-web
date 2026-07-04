@@ -89,7 +89,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     container_name: keycloak
-    command: start --optimized
+    command: start
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/${KEYCLOAK_DB_NAME:-keycloak}
@@ -98,15 +98,16 @@ services:
       KC_DB_SCHEMA: public
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HOSTNAME_ADMIN: ${KC_HOSTNAME_ADMIN}
       KC_HOSTNAME: ${KEYCLOAK_HOSTNAME}
-      KC_HOSTNAME_STRICT: "true"
-      KC_HOSTNAME_STRICT_HTTPS: "true"
+      KC_HOSTNAME_STRICT: ${KC_HOSTNAME_STRICT:-true}
+      KC_HOSTNAME_STRICT_HTTPS: ${KC_HOSTNAME_STRICT_HTTPS:-true}
       KC_PROXY: ${KEYCLOAK_PROXY:-edge}
       KC_HTTP_ENABLED: "true"
       KC_HEALTH_ENABLED: "true"
       KC_LOG_LEVEL: ${KEYCLOAK_LOG_LEVEL:-info}
     ports:
-      - "127.0.0.1:${KEYCLOAK_PORT:-8080}:8080"
+      - "${KEYCLOAK_PORT:-8080}:8080"
     volumes:
       - keycloak_data:/opt/keycloak/data
       - ${KEYCLOAK_THEME_PATH:-./keycloak-theme/dist_keycloak}:/opt/keycloak/providers:ro
