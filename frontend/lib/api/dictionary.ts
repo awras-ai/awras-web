@@ -55,13 +55,18 @@ export const fetchDatasetStats = async (
   return res.json();
 };
 
+export class NoEntriesAvailableError extends Error {
+  constructor() {
+    super("NO_ENTRIES_AVAILABLE");
+    this.name = "NoEntriesAvailableError";
+  }
+}
+
 export const fetchNextEntry = async (
   token: string,
   datasetId: string,
 ): Promise<Entry> => {
-  const url = new URL(
-    `${BASE_URL}api/v1/dictionary/entries/next`,
-  );
+  const url = new URL(`${BASE_URL}api/v1/dictionary/entries/next`);
   url.searchParams.set("dataset_id", datasetId);
 
   const res = await fetch(url.toString(), {
@@ -71,6 +76,7 @@ export const fetchNextEntry = async (
     },
   });
 
+  if (res.status === 404) throw new NoEntriesAvailableError();
   if (!res.ok) throw new Error("Failed to fetch next entry");
   return res.json();
 };
