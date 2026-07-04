@@ -8,7 +8,15 @@ Users can correct the translation, pronunciation, examples, and tags.
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, DateTime, ForeignKey, String, Text, UniqueConstraint, func
+from sqlalchemy import (
+    Column,
+    DateTime,
+    ForeignKey,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 
@@ -40,6 +48,8 @@ class DictionaryAnnotation(Base):
     corrected_meaning = Column(Text, nullable=True)
     corrected_examples = Column(Text, nullable=True)
     corrected_tags = Column(JSONB, nullable=True)
+    corrected_word = Column(Text, nullable=True)
+    corrected_word_arabizi = Column(Text, nullable=True)
 
     notes = Column(Text, nullable=True)
 

@@ -156,6 +156,7 @@ class DictionaryService:
             entries.append(
                 {
                     "word": (row.get("word") or "").strip(),
+                    "word_arabizi": (row.get("word_arabizi") or "").strip() or None,
                     "meaning": (row.get("meaning") or "").strip(),
                     "examples": (row.get("examples") or "").strip() or None,
                     "tags": tags_list,
@@ -209,6 +210,7 @@ class DictionaryService:
                 entry = DictionaryEntry(
                     dataset_id=dataset_id,
                     word=entry_data["word"],
+                    word_arabizi=entry_data.get("word_arabizi"),
                     meaning=entry_data["meaning"],
                     examples=entry_data.get("examples"),
                     tags=entry_data.get("tags"),
@@ -240,6 +242,7 @@ class DictionaryService:
         dataset_id: uuid.UUID,
         word: str,
         meaning: str,
+        word_arabizi: Optional[str] = None,
         examples: Optional[str] = None,
         tags: Optional[list[str]] = None,
         keycloak_sub: Optional[uuid.UUID] = None,
@@ -253,6 +256,7 @@ class DictionaryService:
             dataset_id: Dataset UUID
             word: The word
             meaning: Definition/meaning
+            word_arabizi: Optional Arabizi/French transliteration
             examples: Optional example usage
             tags: Optional list of tags
             keycloak_sub: User who created the entry (if user-submitted)
@@ -264,6 +268,7 @@ class DictionaryService:
         entry = DictionaryEntry(
             dataset_id=dataset_id,
             word=word.strip(),
+            word_arabizi=word_arabizi.strip() if word_arabizi else None,
             meaning=meaning.strip(),
             examples=examples.strip() if examples else None,
             tags=tags,
@@ -431,6 +436,8 @@ class DictionaryService:
         corrected_meaning: Optional[str] = None,
         corrected_examples: Optional[str] = None,
         corrected_tags: Optional[list[str]] = None,
+        corrected_word: Optional[str] = None,
+        corrected_word_arabizi: Optional[str] = None,
         notes: Optional[str] = None,
     ) -> tuple[Optional[DictionaryAnnotation], Optional[str]]:
         """
@@ -447,6 +454,8 @@ class DictionaryService:
             corrected_meaning: Corrected meaning/definition
             corrected_examples: Corrected examples
             corrected_tags: Corrected tags list
+            corrected_word: Corrected word (original script)
+            corrected_word_arabizi: Corrected word in Arabizi/French transliteration
             notes: Optional notes
 
         Returns:
@@ -484,9 +493,16 @@ class DictionaryService:
             has_correction = True
         if corrected_tags and len(corrected_tags) > 0:
             has_correction = True
+        if corrected_word and corrected_word.strip():
+            has_correction = True
+        if corrected_word_arabizi and corrected_word_arabizi.strip():
+            has_correction = True
 
         if not confirmed and not has_correction:
-            return None, "At least one correction field must be provided, or set confirmed=true"
+            return (
+                None,
+                "At least one correction field must be provided, or set confirmed=true",
+            )
 
         # Create annotation
         annotation = DictionaryAnnotation(
@@ -497,6 +513,10 @@ class DictionaryService:
                 corrected_examples.strip() if corrected_examples else None
             ),
             corrected_tags=corrected_tags,
+            corrected_word=corrected_word.strip() if corrected_word else None,
+            corrected_word_arabizi=corrected_word_arabizi.strip()
+            if corrected_word_arabizi
+            else None,
             notes=notes.strip() if notes else None,
         )
         db.add(annotation)

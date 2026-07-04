@@ -110,15 +110,16 @@ async def upload_csv(
 
     The CSV file must have a header row with the following columns:
     - **word**: The word (required)
+    - **word_arabizi**: Word in Arabizi/French transliteration (optional)
     - **meaning**: Definition/meaning (required)
     - **examples**: Example usage (optional)
     - **tags**: Comma-separated tags (optional)
 
     Example CSV format:
     ```csv
-    word,meaning,examples,tags
-    كتاب,book,A writing instrument.,stationery,noun
-    قلم,pen,For writing.,stationery,noun
+    word,word_arabizi,meaning,examples,tags
+    كتاب,ktab,book,A writing instrument.,stationery,noun
+    قلم,9alam,pen,For writing.,stationery,noun
     ```
 
     Args:
@@ -346,6 +347,7 @@ async def create_entry(
     Args:
     - **dataset_id**: UUID of the target dataset
     - **word**: The word (required)
+    - **word_arabizi**: Word in Arabizi/French transliteration (optional)
     - **meaning**: Definition/meaning (required)
     - **examples**: Optional example usage
     - **tags**: Optional list of tags
@@ -377,6 +379,7 @@ async def create_entry(
         db=db,
         dataset_id=dataset_uuid,
         word=data.word,
+        word_arabizi=data.word_arabizi,
         meaning=data.meaning,
         examples=data.examples,
         tags=data.tags,
@@ -544,7 +547,7 @@ async def get_next_entry(
     - **dataset_id**: Optional UUID of the dataset
 
     Returns:
-    - **entry**: Entry object with word, meaning, examples, tags
+    - **entry**: Entry object with word, word_arabizi, meaning, examples, tags
 
     Status codes:
     - 200: Entry retrieved successfully
@@ -578,7 +581,7 @@ async def get_entry(
 
     **Requires authentication.**
 
-    Returns the entry details including the word, meaning, examples, and tags.
+    Returns the entry details including word, word_arabizi, meaning, examples, and tags.
     If the user has annotated this entry, the annotation will be included.
 
     Args:
@@ -635,6 +638,8 @@ async def submit_annotation(
     - **corrected_meaning**: User's corrected meaning (optional)
     - **corrected_examples**: User's corrected examples (optional)
     - **corrected_tags**: User's corrected tags (optional)
+    - **corrected_word**: User's corrected word in original script (optional)
+    - **corrected_word_arabizi**: User's corrected word in Arabizi/French transliteration (optional)
     - **notes**: Optional notes about the correction
 
     Returns:
@@ -656,6 +661,8 @@ async def submit_annotation(
         corrected_meaning=data.corrected_meaning,
         corrected_examples=data.corrected_examples,
         corrected_tags=data.corrected_tags,
+        corrected_word=data.corrected_word,
+        corrected_word_arabizi=data.corrected_word_arabizi,
         notes=data.notes,
     )
 
