@@ -11,7 +11,7 @@ export function SignupContent() {
     if (!initialized) return;
     keycloak?.login({
       action: "register",
-      redirectUri: `${window.location.origin}/dashboard`,
+      redirectUri: `${window.location.origin}/annotation`,
     });
   }, [initialized, keycloak]);
 

@@ -17,7 +17,7 @@ export function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-neutral-200/50">
+    <nav className="sticky top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-b border-neutral-200/50">
       <div className="flex justify-between items-center h-16 sm:h-20 max-w-6xl mx-auto px-4">
         {/* Logo */}
         <Link
@@ -42,17 +42,17 @@ export function Navbar() {
             </Link>
           ))}
 
-          <div className="mx-3 w-px h-5 bg-neutral-300" aria-hidden="true" />
+          {/* <div className="mx-3 w-px h-5 bg-neutral-300" aria-hidden="true" /> */}
 
-          <Button
-            className="ml-2 group rounded-full px-6 py-5 text-[14px] font-medium shadow-sm"
-          >
-            <span>Explore More</span>
-            <ArrowUpRight
-              className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-              aria-hidden="true"
-            />
-          </Button>
+          {/* <Button asChild className="ml-2 group rounded-full px-6 py-5 text-[14px] font-medium shadow-sm"> */}
+          {/*   <Link href="/annotation"> */}
+          {/*     Explore More */}
+          {/*     <ArrowUpRight */}
+          {/*       className="w-4 h-4 ml-1.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" */}
+          {/*       aria-hidden="true" */}
+          {/*     /> */}
+          {/*   </Link> */}
+          {/* </Button> */}
         </div>
 
         {/* Mobile Controls */}
@@ -94,12 +94,20 @@ export function Navbar() {
               </Link>
             ))}
             <div className="pt-6">
-              <Button className="w-full group rounded-full px-6 py-5 text-[14px] font-medium shadow-sm">
-                <span>Explore More</span>
-                <ArrowUpRight
-                  className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  aria-hidden="true"
-                />
+              <Button
+                asChild
+                className="w-full group rounded-full px-6 py-5 text-[14px] font-medium shadow-sm"
+              >
+                <Link
+                  href="/annotation"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Explore More
+                  <ArrowUpRight
+                    className="w-4 h-4 ml-1.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    aria-hidden="true"
+                  />
+                </Link>
               </Button>
             </div>
           </div>
