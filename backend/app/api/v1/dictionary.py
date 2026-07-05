@@ -28,8 +28,10 @@ from app.schemas.dictionary import (
     DatasetStatsDetailResponse,
     DatasetStatsResponse,
     EntryResponse,
+    ReportResponse,
     SearchEntriesResponse,
     SubmitAnnotationRequest,
+    SubmitReportRequest,
     UploadErrorItem,
     UploadResponse,
     UserDatasetStatsResponse,
@@ -673,3 +675,66 @@ async def submit_annotation(
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
 
     return annotation
+
+
+@router.post(
+    "/entries/{entry_id}/report",
+    response_model=ReportResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Submit a report for an entry",
+)
+@limiter.limit("20/minute")
+async def submit_report(
+    request: Request,
+    entry_id: UUID,
+    data: SubmitReportRequest,
+    db: Session = Depends(get_db),
+    user: KeycloakUser = Depends(require_auth),
+) -> ReportResponse:
+    """
+    Submit a report flagging a dictionary entry as problematic.
+
+    **Requires authentication.**
+
+    User must provide a reason. An optional `details` field can be used to
+    add a free-text explanation.
+
+    After submission:
+    - Entry status changes to 'completed'
+    - Entry will no longer be returned by `GET /entries/next`
+    - Entry counts toward dataset completion statistics
+    - User cannot report the same entry again, nor annotate it afterwards
+    - User cannot report an entry they themselves submitted
+
+    Args:
+    - **entry_id**: UUID of the entry to report
+    - **reason**: One of `duplicate`, `offensive`, `wrong_language`,
+      `more_than_a_word`, `other`
+    - **details**: Optional free-text explanation (max 2000 chars)
+
+    Returns:
+    - **report**: Created report object
+
+    Status codes:
+    - 201: Report submitted successfully
+    - 400: Validation error (e.g., already annotated/reported, own entry)
+    - 401: Not authenticated
+    - 404: Entry not found
+    """
+    user_id = user.sub if isinstance(user.sub, UUID) else user.sub
+
+    report, error = DictionaryService.submit_report(
+        db=db,
+        entry_id=entry_id,
+        keycloak_sub=user_id,
+        reason=data.reason.value,
+        details=data.details,
+    )
+
+    if error:
+        if "not found" in error.lower():
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=error)
+        else:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
+
+    return report
