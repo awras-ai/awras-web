@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Pencil, X, SkipForward, CheckCheck } from "lucide-react";
+import { Loader2, Pencil, X, SkipForward, CheckCheck, Flag } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAnnotateEntry } from "@/hooks/useDictionary";
 import { EntryFormFields } from "./EntryFormFields";
+import { ReportEntryDialog } from "./ReportEntryDialog";
 import type { Entry } from "@/lib/types/dictionary";
 
 interface EntryCardProps {
@@ -27,6 +28,7 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
   const annotate = useAnnotateEntry();
 
   const [editMode, setEditMode] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
   const [formWord, setFormWord] = useState("");
   const [formWordArabizi, setFormWordArabizi] = useState("");
   const [formMeaning, setFormMeaning] = useState("");
@@ -168,15 +170,28 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
               Cancel
             </Button>
           ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setEditMode(true)}
-              className="border-black/10 text-black/60"
-            >
-              <Pencil className="w-3.5 h-3.5 mr-1.5" />
-              Edit
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditMode(true)}
+                className="border-black/10 text-black/60"
+              >
+                <Pencil className="w-3.5 h-3.5 mr-1.5" />
+                Edit
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setReportOpen(true)}
+                disabled={annotate.isPending}
+                className="border-red-500/20 text-red-500/70 hover:bg-red-500/5 hover:text-red-500 hover:border-red-500/40"
+              >
+                <Flag className="w-3.5 h-3.5 mr-1.5" />
+                Report
+              </Button>
+            </>
           )}
 
           <div className="flex-1" />
@@ -217,6 +232,12 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
             Failed to submit. Please try again.
           </p>
         )}
+
+        <ReportEntryDialog
+          entryId={entry.id}
+          open={reportOpen}
+          onOpenChange={setReportOpen}
+        />
       </CardContent>
     </Card>
   );
