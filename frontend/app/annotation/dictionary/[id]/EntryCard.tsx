@@ -107,7 +107,7 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
               </p>
               <div className="flex items-baseline justify-between gap-4">
                 {formWordArabizi ? (
-                  <span className="text-sm text-black/40 italic">
+                  <span className="text-base font-semibold text-black/70">
                     {formWordArabizi}
                   </span>
                 ) : (
@@ -135,16 +135,20 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
             </div>
 
             {/* Examples */}
-            {entry.examples && (
-              <div>
-                <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-2">
-                  Examples
-                </p>
+            <div>
+              <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-2">
+                Examples
+              </p>
+              {entry.examples ? (
                 <div dir="rtl" className="space-y-1">
                   {renderMultiline(formExamples)}
                 </div>
-              </div>
-            )}
+              ) : (
+                <span className="text-sm text-black/20 italic">
+                  No examples yet…
+                </span>
+              )}
+            </div>
           </>
         )}
 
