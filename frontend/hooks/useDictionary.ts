@@ -48,6 +48,7 @@ export const useNextEntry = (datasetId: string) => {
     queryKey: ["nextEntry", datasetId],
     queryFn: () => fetchNextEntry(token!, datasetId),
     enabled: !!token && !!datasetId,
+    staleTime: Infinity,
   });
 };
 
