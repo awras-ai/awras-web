@@ -9,7 +9,10 @@ import {
   createEntry,
   annotateEntry,
 } from "@/lib/api/dictionary";
-import type { CreateEntryRequest, AnnotateRequest } from "@/lib/types/dictionary";
+import type {
+  CreateEntryRequest,
+  AnnotateRequest,
+} from "@/lib/types/dictionary";
 
 export const useDatasets = () => {
   const { token } = useKeycloak();
@@ -50,6 +53,25 @@ export const useNextEntry = (datasetId: string) => {
     enabled: !!token && !!datasetId,
     staleTime: Infinity,
   });
+};
+
+export const usePrimaryDataset = () => {
+  const { token } = useKeycloak();
+  const datasets = useDatasets();
+  const primary = datasets.data?.datasets?.[0];
+
+  const stats = useQuery({
+    queryKey: ["datasetStats", primary?.id],
+    queryFn: () => fetchDatasetStats(token!, primary!.id),
+    enabled: !!token && !!primary?.id,
+  });
+
+  return {
+    dataset: primary,
+    stats: stats.data,
+    isLoading: datasets.isLoading || stats.isLoading,
+    isError: datasets.isError || stats.isError,
+  };
 };
 
 export const useEntry = (id: string) => {

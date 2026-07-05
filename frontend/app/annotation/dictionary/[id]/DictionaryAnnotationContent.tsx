@@ -76,11 +76,11 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
         >
           {/* Back link */}
           <Link
-            href="/annotation/dictionary"
+            href="/annotation"
             className="inline-flex items-center gap-1.5 text-sm text-black/40 hover:text-black transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            Back to datasets
+            Back to tasks
           </Link>
 
           {/* Dataset name + progress */}
@@ -144,9 +144,9 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
                 <p className="text-sm text-black/60">
                   There are no more pending entries for you in this dataset.
                 </p>
-                <Link href="/annotation/dictionary" className="mt-2">
+                <Link href="/annotation" className="mt-2">
                   <Button variant="outline" size="sm" className="border-black/10">
-                    Back to datasets
+                    Back to tasks
                   </Button>
                 </Link>
               </CardContent>
