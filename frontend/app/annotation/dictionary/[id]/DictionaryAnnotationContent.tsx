@@ -6,13 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   Loader2,
-  Pencil,
-  X,
-  SkipForward,
-  CheckCheck,
   CheckCircle,
+  Plus,
 } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -21,9 +17,10 @@ import { AnnotationHeader } from "@/components/annotation/AnnotationHeader";
 import {
   useDatasetStats,
   useNextEntry,
-  useAnnotateEntry,
 } from "@/hooks/useDictionary";
 import { NoEntriesAvailableError } from "@/lib/api/dictionary";
+import { EntryCard } from "./EntryCard";
+import { AddWordDialog } from "./AddWordDialog";
 
 interface Props {
   datasetId: string;
@@ -31,24 +28,16 @@ interface Props {
 
 export function DictionaryAnnotationContent({ datasetId }: Props) {
   const { initialized, authenticated, keycloak } = useKeycloak();
-  const queryClient = useQueryClient();
 
   const { data: statsData } = useDatasetStats(datasetId);
   const nextEntry = useNextEntry(datasetId);
-  const annotate = useAnnotateEntry();
 
   const entry = nextEntry.data;
   const isNoEntries =
     nextEntry.isError && nextEntry.error instanceof NoEntriesAvailableError;
 
-  // Form state
-  const [editMode, setEditMode] = useState(false);
-  const [formWord, setFormWord] = useState("");
-  const [formWordArabizi, setFormWordArabizi] = useState("");
-  const [formMeaning, setFormMeaning] = useState("");
-  const [formExamples, setFormExamples] = useState("");
+  const [addWordOpen, setAddWordOpen] = useState(false);
 
-  // Auth guard
   useEffect(() => {
     if (!initialized) return;
     if (!authenticated) {
@@ -58,17 +47,6 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
     }
   }, [initialized, authenticated, keycloak, datasetId]);
 
-  // Reset form when a new entry loads
-  useEffect(() => {
-    if (entry) {
-      setFormWord(entry.word);
-      setFormWordArabizi(entry.word_arabizi ?? "");
-      setFormMeaning(entry.meaning);
-      setFormExamples(entry.examples ?? "");
-      setEditMode(false);
-    }
-  }, [entry?.id]); // eslint-disable-line react-hooks/exhaustive-deps
-
   if (!initialized || !authenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
@@ -77,55 +55,6 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
     );
   }
 
-  const handleSubmit = () => {
-    if (!entry) return;
-
-    const correctedWord =
-      formWord.trim() !== entry.word ? formWord.trim() : undefined;
-    const correctedArabizi =
-      formWordArabizi.trim() !== (entry.word_arabizi ?? "")
-        ? formWordArabizi.trim()
-        : undefined;
-    const correctedMeaning =
-      formMeaning.trim() !== entry.meaning ? formMeaning.trim() : undefined;
-    const correctedExamples =
-      formExamples.trim() !== (entry.examples ?? "")
-        ? formExamples.trim()
-        : undefined;
-    const hasChanges =
-      correctedWord !== undefined ||
-      correctedArabizi !== undefined ||
-      correctedMeaning !== undefined ||
-      correctedExamples !== undefined;
-
-    annotate.mutate({
-      entryId: entry.id,
-      data: hasChanges
-        ? {
-            corrected_word: correctedWord,
-            corrected_word_arabizi: correctedArabizi,
-            corrected_meaning: correctedMeaning,
-            corrected_examples: correctedExamples,
-          }
-        : { confirmed: true },
-    });
-  };
-
-  const handleSkip = () => {
-    queryClient.invalidateQueries({ queryKey: ["nextEntry", datasetId] });
-  };
-
-  const handleCancelEdit = () => {
-    if (entry) {
-      setFormWord(entry.word);
-      setFormWordArabizi(entry.word_arabizi ?? "");
-      setFormMeaning(entry.meaning);
-      setFormExamples(entry.examples ?? "");
-    }
-    setEditMode(false);
-  };
-
-  // Stats
   const userStats = statsData?.user_stats;
   const overallStats = statsData?.overall_stats;
   const datasetName = statsData?.dataset.name;
@@ -157,9 +86,20 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
           {/* Dataset name + progress */}
           <div className="space-y-3">
             <div className="flex items-baseline justify-between gap-4">
-              <h1 className="text-xl font-bold tracking-tight truncate">
-                {datasetName ?? "Dictionary"}
-              </h1>
+              <div className="flex items-center gap-2 min-w-0">
+                <h1 className="text-xl font-bold tracking-tight truncate">
+                  {datasetName ?? "Dictionary"}
+                </h1>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAddWordOpen(true)}
+                  className="border-black/10 text-black/60 flex-shrink-0 ml-1"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1" />
+                  Add word
+                </Button>
+              </div>
               <span className="text-xs text-black/40 flex-shrink-0">
                 {userAnnotated.toLocaleString()} annotated
               </span>
@@ -240,176 +180,18 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.2 }}
               >
-                <Card className="border-black/10 shadow-sm">
-                  <CardContent className="p-8 space-y-7">
-                    {/* Word */}
-                    <div>
-                      <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-2">
-                        Word
-                      </p>
-                      {editMode ? (
-                        <div className="flex gap-3">
-                          <input
-                            type="text"
-                            value={formWordArabizi}
-                            onChange={(e) => setFormWordArabizi(e.target.value)}
-                            placeholder="Arabizi…"
-                            className="flex-1 rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-base text-black/60 leading-relaxed outline-none transition-colors placeholder:text-black/25 focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
-                          />
-                          <input
-                            type="text"
-                            value={formWord}
-                            onChange={(e) => setFormWord(e.target.value)}
-                            dir="rtl"
-                            placeholder="الكلمة…"
-                            className="flex-[2] rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-lg text-black/80 leading-relaxed text-right outline-none transition-colors placeholder:text-black/25 focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex items-baseline justify-between gap-4">
-                          {formWordArabizi ? (
-                            <span className="text-sm text-black/40 italic">
-                              {formWordArabizi}
-                            </span>
-                          ) : (
-                            <span className="text-sm text-black/20 italic">
-                              No arabizi…
-                            </span>
-                          )}
-                          <h2
-                            dir="rtl"
-                            className="text-3xl font-bold tracking-tight text-right"
-                          >
-                            {formWord}
-                          </h2>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Meaning */}
-                    <div>
-                      <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-2">
-                        Meaning
-                      </p>
-                      {editMode ? (
-                        <textarea
-                          value={formMeaning}
-                          onChange={(e) => setFormMeaning(e.target.value)}
-                          dir="rtl"
-                          rows={3}
-                          className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-base text-black/80 leading-relaxed text-right resize-none outline-none transition-colors focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
-                        />
-                      ) : (
-                        <div dir="rtl" className="space-y-1">
-                          {formMeaning.split("\n").map((line, i) => (
-                            <p key={i} className="text-lg text-black/80 leading-relaxed text-right">
-                              {line || "\u00A0"}
-                            </p>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Examples */}
-                    {(entry.examples || editMode) && (
-                      <div>
-                        <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-2">
-                          Examples
-                        </p>
-                        {editMode ? (
-                          <textarea
-                            value={formExamples}
-                            onChange={(e) => setFormExamples(e.target.value)}
-                            dir="rtl"
-                            rows={2}
-                            placeholder="No examples yet…"
-                            className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-base text-black/70 leading-relaxed text-right resize-none outline-none transition-colors placeholder:text-black/25 focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
-                          />
-                        ) : (
-                          <div dir="rtl" className="space-y-1">
-                            {formExamples.split("\n").map((line, i) => (
-                              <p key={i} className="text-base text-black/60 leading-relaxed text-right">
-                                {line || "\u00A0"}
-                              </p>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Divider */}
-                    <div className="border-t border-black/10" />
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-3">
-                      {/* Edit toggle */}
-                      {editMode ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleCancelEdit}
-                          className="border-black/10 text-black/60"
-                        >
-                          <X className="w-3.5 h-3.5 mr-1.5" />
-                          Cancel
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setEditMode(true)}
-                          className="border-black/10 text-black/60"
-                        >
-                          <Pencil className="w-3.5 h-3.5 mr-1.5" />
-                          Edit
-                        </Button>
-                      )}
-
-                      <div className="flex-1" />
-
-                      {/* Skip */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleSkip}
-                        disabled={annotate.isPending}
-                        className="border-black/10 text-black/60"
-                      >
-                        <SkipForward className="w-3.5 h-3.5 mr-1.5" />
-                        Skip
-                      </Button>
-
-                      {/* Submit */}
-                      <Button
-                        size="sm"
-                        onClick={handleSubmit}
-                        disabled={annotate.isPending}
-                        className="rounded-full px-5 group"
-                      >
-                        {annotate.isPending ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                          <>
-                            <CheckCheck className="w-3.5 h-3.5 mr-1.5 transition-transform duration-300 group-hover:scale-110" />
-                            Submit
-                          </>
-                        )}
-                      </Button>
-                    </div>
-
-                    {/* Mutation error */}
-                    {annotate.isError && (
-                      <p className="text-xs text-red-500 text-center">
-                        Failed to submit. Please try again.
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
+                <EntryCard datasetId={datasetId} entry={entry} />
               </motion.div>
             )}
           </AnimatePresence>
         </motion.div>
       </main>
+
+      <AddWordDialog
+        datasetId={datasetId}
+        open={addWordOpen}
+        onOpenChange={setAddWordOpen}
+      />
     </div>
   );
 }
