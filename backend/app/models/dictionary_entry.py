@@ -44,6 +44,7 @@ class DictionaryEntry(Base):
     )
 
     word = Column(Text, nullable=False, index=True)  # Source word
+    word_arabizi = Column(Text, nullable=True)  # Word in Arabizi/French transliteration
     meaning = Column(Text, nullable=False)  # Translation/definition
     examples = Column(Text, nullable=True)  # Single string example usage
     tags = Column(

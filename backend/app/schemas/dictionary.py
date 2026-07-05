@@ -77,8 +77,14 @@ class AnnotationResponse(BaseModel):
     )
     corrected_examples: Optional[str] = Field(None, description="Corrected examples")
     corrected_tags: Optional[list[str]] = Field(None, description="Corrected tags")
+    corrected_word: Optional[str] = Field(
+        None, description="Corrected word (original script)"
+    )
+    corrected_word_arabizi: Optional[str] = Field(
+        None, description="Corrected word in Arabizi/French transliteration"
+    )
     notes: Optional[str] = Field(None, description="Optional notes")
-    user_id: UUID = Field(..., description="User who made the annotation")
+    keycloak_sub: Optional[str] = Field(None, description="Keycloak subject (user ID) who made the annotation")
     created_at: datetime = Field(..., description="Annotation creation timestamp")
     updated_at: Optional[datetime] = Field(None, description="Last update timestamp")
 
@@ -92,6 +98,9 @@ class EntryResponse(BaseModel):
     id: UUID = Field(..., description="Entry unique ID")
     dataset_id: UUID = Field(..., description="Dataset ID")
     word: str = Field(..., description="The word")
+    word_arabizi: Optional[str] = Field(
+        None, description="The word in Arabizi/French transliteration"
+    )
     meaning: str = Field(..., description="Definition/meaning")
     examples: Optional[str] = Field(None, description="Example usage")
     tags: Optional[list[str]] = Field(None, description="Tags")
@@ -114,6 +123,9 @@ class CreateEntryRequest(BaseModel):
 
     dataset_id: UUID = Field(..., description="Dataset ID to add entry to")
     word: str = Field(..., min_length=1, description="The word")
+    word_arabizi: Optional[str] = Field(
+        None, description="The word in Arabizi/French transliteration"
+    )
     meaning: str = Field(..., min_length=1, description="Definition/meaning")
     examples: Optional[str] = Field(None, description="Optional example usage")
     tags: Optional[list[str]] = Field(None, description="Optional list of tags")
@@ -146,6 +158,10 @@ class UserEntriesResponse(BaseModel):
 class SubmitAnnotationRequest(BaseModel):
     """Request schema for submitting an annotation."""
 
+    confirmed: bool = Field(
+        False,
+        description="Set to true to confirm the entry as-is (no corrections needed)",
+    )
     corrected_meaning: Optional[str] = Field(
         None, max_length=10000, description="Corrected meaning/definition"
     )
@@ -153,6 +169,12 @@ class SubmitAnnotationRequest(BaseModel):
         None, max_length=5000, description="Corrected examples"
     )
     corrected_tags: Optional[list[str]] = Field(None, description="Corrected tags list")
+    corrected_word: Optional[str] = Field(
+        None, max_length=2000, description="Corrected word (original script)"
+    )
+    corrected_word_arabizi: Optional[str] = Field(
+        None, max_length=2000, description="Corrected word in Arabizi/French transliteration"
+    )
     notes: Optional[str] = Field(
         None, max_length=2000, description="Optional notes about the correction"
     )
