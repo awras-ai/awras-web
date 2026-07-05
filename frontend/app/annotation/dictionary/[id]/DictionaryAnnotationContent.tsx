@@ -43,6 +43,8 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
 
   // Form state
   const [editMode, setEditMode] = useState(false);
+  const [formWord, setFormWord] = useState("");
+  const [formWordArabizi, setFormWordArabizi] = useState("");
   const [formMeaning, setFormMeaning] = useState("");
   const [formExamples, setFormExamples] = useState("");
 
@@ -59,6 +61,8 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
   // Reset form when a new entry loads
   useEffect(() => {
     if (entry) {
+      setFormWord(entry.word);
+      setFormWordArabizi(entry.word_arabizi ?? "");
       setFormMeaning(entry.meaning);
       setFormExamples(entry.examples ?? "");
       setEditMode(false);
@@ -76,6 +80,12 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
   const handleSubmit = () => {
     if (!entry) return;
 
+    const correctedWord =
+      formWord.trim() !== entry.word ? formWord.trim() : undefined;
+    const correctedArabizi =
+      formWordArabizi.trim() !== (entry.word_arabizi ?? "")
+        ? formWordArabizi.trim()
+        : undefined;
     const correctedMeaning =
       formMeaning.trim() !== entry.meaning ? formMeaning.trim() : undefined;
     const correctedExamples =
@@ -83,12 +93,20 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
         ? formExamples.trim()
         : undefined;
     const hasChanges =
-      correctedMeaning !== undefined || correctedExamples !== undefined;
+      correctedWord !== undefined ||
+      correctedArabizi !== undefined ||
+      correctedMeaning !== undefined ||
+      correctedExamples !== undefined;
 
     annotate.mutate({
       entryId: entry.id,
       data: hasChanges
-        ? { corrected_meaning: correctedMeaning, corrected_examples: correctedExamples }
+        ? {
+            corrected_word: correctedWord,
+            corrected_word_arabizi: correctedArabizi,
+            corrected_meaning: correctedMeaning,
+            corrected_examples: correctedExamples,
+          }
         : { confirmed: true },
     });
   };
@@ -99,6 +117,8 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
 
   const handleCancelEdit = () => {
     if (entry) {
+      setFormWord(entry.word);
+      setFormWordArabizi(entry.word_arabizi ?? "");
       setFormMeaning(entry.meaning);
       setFormExamples(entry.examples ?? "");
     }
@@ -227,9 +247,43 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
                       <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-2">
                         Word
                       </p>
-                      <h2 className="text-3xl font-bold tracking-tight">
-                        {entry.word}
-                      </h2>
+                      {editMode ? (
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            value={formWordArabizi}
+                            onChange={(e) => setFormWordArabizi(e.target.value)}
+                            placeholder="Arabizi…"
+                            className="flex-1 rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-base text-black/60 leading-relaxed outline-none transition-colors placeholder:text-black/25 focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                          />
+                          <input
+                            type="text"
+                            value={formWord}
+                            onChange={(e) => setFormWord(e.target.value)}
+                            dir="rtl"
+                            placeholder="الكلمة…"
+                            className="flex-[2] rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-lg text-black/80 leading-relaxed text-right outline-none transition-colors placeholder:text-black/25 focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex items-baseline justify-between gap-4">
+                          {formWordArabizi ? (
+                            <span className="text-sm text-black/40 italic">
+                              {formWordArabizi}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-black/20 italic">
+                              No arabizi…
+                            </span>
+                          )}
+                          <h2
+                            dir="rtl"
+                            className="text-3xl font-bold tracking-tight text-right"
+                          >
+                            {formWord}
+                          </h2>
+                        </div>
+                      )}
                     </div>
 
                     {/* Meaning */}
@@ -241,13 +295,18 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
                         <textarea
                           value={formMeaning}
                           onChange={(e) => setFormMeaning(e.target.value)}
+                          dir="rtl"
                           rows={3}
-                          className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-base text-black/80 leading-relaxed resize-none outline-none transition-colors focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                          className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-base text-black/80 leading-relaxed text-right resize-none outline-none transition-colors focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
                         />
                       ) : (
-                        <p className="text-lg text-black/80 leading-relaxed">
-                          {formMeaning}
-                        </p>
+                        <div dir="rtl" className="space-y-1">
+                          {formMeaning.split("\n").map((line, i) => (
+                            <p key={i} className="text-lg text-black/80 leading-relaxed text-right">
+                              {line || "\u00A0"}
+                            </p>
+                          ))}
+                        </div>
                       )}
                     </div>
 
@@ -261,14 +320,19 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
                           <textarea
                             value={formExamples}
                             onChange={(e) => setFormExamples(e.target.value)}
+                            dir="rtl"
                             rows={2}
                             placeholder="No examples yet…"
-                            className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-base text-black/70 leading-relaxed resize-none outline-none transition-colors placeholder:text-black/25 focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                            className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-base text-black/70 leading-relaxed text-right resize-none outline-none transition-colors placeholder:text-black/25 focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
                           />
                         ) : (
-                          <p className="text-base text-black/60 leading-relaxed">
-                            {formExamples}
-                          </p>
+                          <div dir="rtl" className="space-y-1">
+                            {formExamples.split("\n").map((line, i) => (
+                              <p key={i} className="text-base text-black/60 leading-relaxed text-right">
+                                {line || "\u00A0"}
+                              </p>
+                            ))}
+                          </div>
                         )}
                       </div>
                     )}

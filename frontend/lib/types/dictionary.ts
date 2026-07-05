@@ -39,8 +39,10 @@ export interface Annotation {
   corrected_meaning?: string;
   corrected_examples?: string;
   corrected_tags?: string[];
+  corrected_word?: string;
+  corrected_word_arabizi?: string;
   notes?: string;
-  user_id: string;
+  keycloak_sub: string;
   created_at: string;
   updated_at: string;
 }
@@ -49,6 +51,7 @@ export interface Entry {
   id: string;
   dataset_id: string;
   word: string;
+  word_arabizi?: string;
   meaning: string;
   examples: string;
   tags: string[];
@@ -62,6 +65,7 @@ export interface Entry {
 export interface CreateEntryRequest {
   dataset_id: string;
   word: string;
+  word_arabizi?: string;
   meaning: string;
   examples?: string;
   tags?: string[];
@@ -72,5 +76,7 @@ export interface AnnotateRequest {
   corrected_meaning?: string;
   corrected_examples?: string;
   corrected_tags?: string[];
+  corrected_word?: string;
+  corrected_word_arabizi?: string;
   notes?: string;
 }
