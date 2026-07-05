@@ -3,21 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  ArrowLeft,
-  Loader2,
-  CheckCircle,
-  Plus,
-} from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useKeycloak } from "@/context/KeycloakContext";
 import { AnnotationHeader } from "@/components/annotation/AnnotationHeader";
-import {
-  useDatasetStats,
-  useNextEntry,
-} from "@/hooks/useDictionary";
+import { useDatasetStats, useNextEntry } from "@/hooks/useDictionary";
 import { NoEntriesAvailableError } from "@/lib/api/dictionary";
 import { EntryCard } from "./EntryCard";
 import { CreateEntryCard } from "./CreateEntryCard";
@@ -50,7 +42,10 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
   if (!initialized || !authenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <Loader2 className="h-8 w-8 animate-spin" style={{ color: "#14b8a6" }} />
+        <Loader2
+          className="h-8 w-8 animate-spin"
+          style={{ color: "#14b8a6" }}
+        />
       </div>
     );
   }
@@ -61,7 +56,8 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
 
   const userAnnotated = userStats?.annotated_by_user ?? 0;
   const totalEntries = overallStats?.total_entries ?? 0;
-  const userPct = totalEntries > 0 ? (userAnnotated / totalEntries) * 100 : 0;
+  const overallCompleted = overallStats?.completed_count ?? 0;
+  const overallPct = overallStats?.completion_percentage ?? 0;
 
   return (
     <div className="min-h-screen bg-white">
@@ -84,32 +80,50 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
           </Link>
 
           {/* Dataset name + progress */}
-          <div className="space-y-3">
-            <div className="flex items-baseline justify-between gap-4">
-              <div className="flex items-center gap-2 min-w-0">
-                <h1 className="text-xl font-bold tracking-tight truncate">
-                  {datasetName ?? "Dictionary"}
-                </h1>
-                {!addWordMode && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setAddWordMode(true)}
-                    className="border-black/10 text-black/60 flex-shrink-0 ml-1"
-                  >
-                    <Plus className="w-3.5 h-3.5 mr-1" />
-                    Add word
-                  </Button>
-                )}
-              </div>
-              <span className="text-xs text-black/40 flex-shrink-0">
-                {userAnnotated.toLocaleString()} annotated
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 min-w-0">
+              <h1 className="text-xl font-bold tracking-tight truncate">
+                {datasetName ?? "Dictionary"}
+              </h1>
+              {!addWordMode && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAddWordMode(true)}
+                  className="border-black/10 text-black/60 flex-shrink-0 ml-1"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1" />
+                  Add word
+                </Button>
+              )}
+            </div>
+
+            {/* Your contribution */}
+            <div className="flex justify-between items-baseline">
+              <span className="text-xs font-medium text-black/50">
+                Your contribution
+              </span>
+              <span className="text-xs tabular-nums">
+                <span style={{ color: "#14b8a6" }} className="font-semibold">
+                  {userAnnotated.toLocaleString()} words
+                </span>
+                {/* <span className="text-black/40"> words</span> */}
               </span>
             </div>
-            <Progress
-              value={userPct}
-              className="h-1.5 bg-black/5"
-            />
+
+            {/* Overall progress */}
+            <div className="space-y-1">
+              <div className="flex justify-between items-baseline">
+                <span className="text-xs font-medium text-black/50">
+                  Overall
+                </span>
+                <span className="text-xs tabular-nums text-black/40">
+                  {overallCompleted.toLocaleString()} /{" "}
+                  {totalEntries.toLocaleString()} · {Math.round(overallPct)}%
+                </span>
+              </div>
+              <Progress value={overallPct} className="h-1.5 bg-black/5" />
+            </div>
           </div>
 
           {/* Loading skeleton */}
@@ -145,7 +159,11 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
                   There are no more pending entries for you in this dataset.
                 </p>
                 <Link href="/annotation" className="mt-2">
-                  <Button variant="outline" size="sm" className="border-black/10">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-black/10"
+                  >
                     Back to tasks
                   </Button>
                 </Link>
