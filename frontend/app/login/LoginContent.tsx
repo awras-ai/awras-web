@@ -10,7 +10,7 @@ export function LoginContent() {
   useEffect(() => {
     if (!initialized) return;
     keycloak?.login({
-      redirectUri: `${window.location.origin}/dashboard`,
+      redirectUri: `${window.location.origin}/annotation`,
     });
   }, [initialized, keycloak]);
 

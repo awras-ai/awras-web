@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 function StatusIndicator() {
@@ -56,8 +57,8 @@ export function Hero() {
 
           {/* CTA Button */}
           <div className="flex-shrink-0">
-            <Button size="lg">
-              <a href="/login">Explore More</a>
+            <Button size="lg" asChild>
+              <Link href="/annotation">Help us Annotate Data</Link>
             </Button>
           </div>
         </div>

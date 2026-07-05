@@ -1,79 +1,44 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import Link from "next/link";
+import { X, ArrowRight } from "lucide-react";
 
-interface TimeLeft {
-  hours: number;
-  minutes: number;
-  seconds: number;
-  total: number;
-}
-
-function calculateTimeLeft(targetDate: Date): TimeLeft {
-  const difference = targetDate.getTime() - new Date().getTime();
-
-  if (difference <= 0) {
-    return { hours: 0, minutes: 0, seconds: 0, total: 0 };
-  }
-
-  return {
-    hours: Math.floor(difference / (1000 * 60 * 60)),
-    minutes: Math.floor((difference / 1000 / 60) % 60),
-    seconds: Math.floor((difference / 1000) % 60),
-    total: difference,
-  };
-}
-
-function formatTimeLeft(timeLeft: TimeLeft): string {
-  const pad = (num: number) => num.toString().padStart(2, "0");
-  return `${pad(timeLeft.hours)}:${pad(timeLeft.minutes)}:${pad(timeLeft.seconds)}`;
-}
+const DISMISSAL_KEY = "awras-announcement-dismissed";
 
 export function AnnouncementBar() {
-  const [isVisible, setIsVisible] = useState(true);
-  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
-
-  // Feb 16, 2026 at 12:00 AM
-  const countdownEndDate = new Date("2026-02-16T12:00:00");
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Calculate initial time left
-    setTimeLeft(calculateTimeLeft(countdownEndDate));
+    // Check if user has dismissed the announcement
+    const isDismissed = localStorage.getItem(DISMISSAL_KEY);
+    setIsVisible(!isDismissed);
+  }, []);
 
-    // Update every second
-    const countdownInterval = setInterval(() => {
-      const remaining = calculateTimeLeft(countdownEndDate);
-      setTimeLeft(remaining);
+  const handleDismiss = () => {
+    setIsVisible(false);
+    localStorage.setItem(DISMISSAL_KEY, "true");
+  };
 
-      // Clear interval when time is up
-      if (remaining.total <= 0) {
-        clearInterval(countdownInterval);
-      }
-    }, 1000);
-
-    return () => clearInterval(countdownInterval);
-  }, [countdownEndDate]);
-
-  // Don't render if countdown is finished or manually dismissed
-  if (!isVisible || (timeLeft && timeLeft.total <= 0)) {
+  if (!isVisible) {
     return null;
   }
 
   return (
-    <div className="sticky top-0 z-50 w-full bg-[#235CF3] text-white py-2 px-4">
+    <div className="relative z-50 w-full bg-[#14b8a6] text-white py-1 px-4">
       <div className="max-w-7xl mx-auto flex items-center justify-center relative">
-        <div className="flex items-center gap-2 text-xs sm:text-sm md:text-base font-medium">
+        <Link
+          href="/annotation"
+          className="flex items-center gap-2 text-sm md:text-base font-medium hover:opacity-90 transition-opacity group"
+        >
           <span>✨</span>
-          <span>
-            awras-chat is now available for{" "}
-            {timeLeft ? formatTimeLeft(timeLeft) : "00:00:00"} hours !
-          </span>
-        </div>
+          <span>Start annotating Darija words and definitions today</span>
+          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+        </Link>
 
         {/* Close button */}
         <button
-          onClick={() => setIsVisible(false)}
+          onClick={handleDismiss}
           className="absolute right-0 p-1 hover:bg-white/10 rounded-md transition-colors"
           aria-label="Dismiss announcement"
         >
