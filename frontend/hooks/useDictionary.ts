@@ -8,10 +8,12 @@ import {
   fetchEntry,
   createEntry,
   annotateEntry,
+  reportEntry,
 } from "@/lib/api/dictionary";
 import type {
   CreateEntryRequest,
   AnnotateRequest,
+  ReportRequest,
 } from "@/lib/types/dictionary";
 
 export const useDatasets = () => {
@@ -109,6 +111,26 @@ export const useAnnotateEntry = () => {
       entryId: string;
       data: AnnotateRequest;
     }) => annotateEntry(token!, entryId, data),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["entry", variables.entryId] });
+      queryClient.invalidateQueries({ queryKey: ["nextEntry"] });
+      queryClient.invalidateQueries({ queryKey: ["datasetStats"] });
+    },
+  });
+};
+
+export const useReportEntry = () => {
+  const { token } = useKeycloak();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      entryId,
+      data,
+    }: {
+      entryId: string;
+      data: ReportRequest;
+    }) => reportEntry(token!, entryId, data),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["entry", variables.entryId] });
       queryClient.invalidateQueries({ queryKey: ["nextEntry"] });

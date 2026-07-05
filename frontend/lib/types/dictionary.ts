@@ -80,3 +80,24 @@ export interface AnnotateRequest {
   corrected_word_arabizi?: string;
   notes?: string;
 }
+
+export type ReportReason =
+  | "duplicate"
+  | "offensive"
+  | "wrong_language"
+  | "more_than_a_word"
+  | "other";
+
+export interface Report {
+  id: string;
+  entry_id: string;
+  keycloak_sub?: string;
+  reason: ReportReason;
+  details?: string;
+  created_at: string;
+}
+
+export interface ReportRequest {
+  reason: ReportReason;
+  details?: string;
+}
