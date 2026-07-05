@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { LogOut } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useKeycloak } from "@/context/KeycloakContext";
 
 export function AnnotationHeader() {
@@ -28,27 +35,35 @@ export function AnnotationHeader() {
           Awras
         </Link>
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2.5">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="text-xs bg-black text-white font-medium">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-sm font-medium text-black/70 hidden sm:block truncate max-w-[160px]">
-              {displayName}
-            </span>
-          </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleLogout}
-            className="border-black/10 text-black/60 hover:text-black hover:border-black/20"
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14b8a6] focus-visible:ring-offset-2 transition-all hover:ring-2 hover:ring-black/10 hover:shadow-sm">
+              <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-105">
+                <AvatarFallback className="text-xs bg-black text-white font-medium">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-64">
+            <DropdownMenuLabel className="font-normal">
+              <p className="text-sm font-medium">{displayName}</p>
+              {user?.email && (
+                <p className="text-xs text-muted-foreground truncate" title={user.email}>
+                  {user.email}
+                </p>
+              )}
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="text-red-500 focus:text-red-500 cursor-pointer"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Log out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );

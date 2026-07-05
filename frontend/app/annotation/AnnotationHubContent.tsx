@@ -55,7 +55,10 @@ export function AnnotationHubContent() {
   if (!initialized || !authenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <Loader2 className="h-8 w-8 animate-spin" style={{ color: "#14b8a6" }} />
+        <Loader2
+          className="h-8 w-8 animate-spin"
+          style={{ color: "#14b8a6" }}
+        />
       </div>
     );
   }
@@ -80,17 +83,16 @@ export function AnnotationHubContent() {
           transition={{ duration: 0.3 }}
         >
           <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-3">
-            01 — Annotation Tasks
+            Annotation Tasks
           </p>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-12">
-            Choose a{" "}
-            <span style={{ color: "#14b8a6" }}>task.</span>
+            Choose a <span style={{ color: "#14b8a6" }}>task.</span>
           </h1>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Link href={dictionaryHref}>
               <Card className="border-black/10 shadow-sm hover:bg-neutral-50 transition-colors duration-200 cursor-pointer group h-full">
-                <CardContent className="p-6 md:p-8 flex flex-col gap-4 h-full">
+                <CardContent className="p-4 md:p-8 flex flex-col gap-4 h-full">
                   <div className="flex-1">
                     <div className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center bg-black/5 mb-4">
                       <BookOpen className="w-4 h-4 text-black/70" />
@@ -99,7 +101,8 @@ export function AnnotationHubContent() {
                       Dictionary Annotation
                     </h2>
                     <p className="text-sm text-black/60 leading-relaxed">
-                      Review and correct word definitions in Darija to help build our linguistic database.
+                      Review and correct word definitions in Darija to help
+                      build our linguistic database.
                     </p>
                   </div>
 
@@ -108,7 +111,8 @@ export function AnnotationHubContent() {
                       <span>Overall progress</span>
                       {total > 0 ? (
                         <span>
-                          {completed.toLocaleString()} / {total.toLocaleString()}
+                          {completed.toLocaleString()} /{" "}
+                          {total.toLocaleString()}
                         </span>
                       ) : (
                         <span>—</span>
