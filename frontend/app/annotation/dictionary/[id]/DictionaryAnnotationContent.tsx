@@ -20,7 +20,7 @@ import {
 } from "@/hooks/useDictionary";
 import { NoEntriesAvailableError } from "@/lib/api/dictionary";
 import { EntryCard } from "./EntryCard";
-import { AddWordDialog } from "./AddWordDialog";
+import { CreateEntryCard } from "./CreateEntryCard";
 
 interface Props {
   datasetId: string;
@@ -36,7 +36,7 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
   const isNoEntries =
     nextEntry.isError && nextEntry.error instanceof NoEntriesAvailableError;
 
-  const [addWordOpen, setAddWordOpen] = useState(false);
+  const [addWordMode, setAddWordMode] = useState(false);
 
   useEffect(() => {
     if (!initialized) return;
@@ -90,15 +90,17 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
                 <h1 className="text-xl font-bold tracking-tight truncate">
                   {datasetName ?? "Dictionary"}
                 </h1>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setAddWordOpen(true)}
-                  className="border-black/10 text-black/60 flex-shrink-0 ml-1"
-                >
-                  <Plus className="w-3.5 h-3.5 mr-1" />
-                  Add word
-                </Button>
+                {!addWordMode && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setAddWordMode(true)}
+                    className="border-black/10 text-black/60 flex-shrink-0 ml-1"
+                  >
+                    <Plus className="w-3.5 h-3.5 mr-1" />
+                    Add word
+                  </Button>
+                )}
               </div>
               <span className="text-xs text-black/40 flex-shrink-0">
                 {userAnnotated.toLocaleString()} annotated
@@ -172,26 +174,35 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
 
           {/* Entry card */}
           <AnimatePresence mode="wait">
-            {entry && (
+            {addWordMode ? (
               <motion.div
-                key={entry.id}
+                key="create-entry"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.2 }}
               >
-                <EntryCard datasetId={datasetId} entry={entry} />
+                <CreateEntryCard
+                  datasetId={datasetId}
+                  onDone={() => setAddWordMode(false)}
+                />
               </motion.div>
+            ) : (
+              entry && (
+                <motion.div
+                  key={entry.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <EntryCard datasetId={datasetId} entry={entry} />
+                </motion.div>
+              )
             )}
           </AnimatePresence>
         </motion.div>
       </main>
-
-      <AddWordDialog
-        datasetId={datasetId}
-        open={addWordOpen}
-        onOpenChange={setAddWordOpen}
-      />
     </div>
   );
 }
