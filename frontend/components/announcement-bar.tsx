@@ -29,10 +29,10 @@ export function AnnouncementBar() {
       <div className="max-w-7xl mx-auto flex items-center justify-center relative">
         <Link
           href="/annotation"
-          className="flex items-center gap-2 text-sm md:text-base font-medium hover:opacity-90 transition-opacity group"
+          className="flex items-center gap-2 text-xs md:text-sm font-medium hover:opacity-90 transition-opacity group"
         >
           <span>✨</span>
-          <span>Start annotating Darija words and definitions today</span>
+          <span>Start annotating Darija dictionary now</span>
           <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
         </Link>
 
