@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Pencil, X, SkipForward, CheckCheck, Flag } from "lucide-react";
+import {
+  Loader2,
+  Pencil,
+  X,
+  SkipForward,
+  CheckCheck,
+  Flag,
+} from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -158,13 +165,24 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
         <div className="border-t border-black/10" />
 
         {/* Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {editMode ? (
+            <Button
+              variant="outline"
+              size="icon-lg"
+              onClick={handleCancelEdit}
+              className="border-black/10 text-black/60 sm:hidden"
+              aria-label="Cancel edit"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          ) : null}
           {editMode ? (
             <Button
               variant="outline"
               size="sm"
               onClick={handleCancelEdit}
-              className="border-black/10 text-black/60"
+              className="border-black/10 text-black/60 hidden sm:inline-flex"
             >
               <X className="w-3.5 h-3.5 mr-1.5" />
               Cancel
@@ -173,9 +191,19 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
             <>
               <Button
                 variant="outline"
+                size="icon-lg"
+                onClick={() => setEditMode(true)}
+                disabled={annotate.isPending}
+                className="border-black/10 text-black/60 sm:hidden"
+                aria-label="Edit entry"
+              >
+                <Pencil className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => setEditMode(true)}
-                className="border-black/10 text-black/60"
+                className="border-black/10 text-black/60 hidden sm:inline-flex"
               >
                 <Pencil className="w-3.5 h-3.5 mr-1.5" />
                 Edit
@@ -183,10 +211,20 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
 
               <Button
                 variant="outline"
+                size="icon-lg"
+                onClick={() => setReportOpen(true)}
+                disabled={annotate.isPending}
+                className="border-red-500/20 text-red-500/70 hover:bg-red-500/5 hover:text-red-500 hover:border-red-500/40 sm:hidden"
+                aria-label="Report entry"
+              >
+                <Flag className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => setReportOpen(true)}
                 disabled={annotate.isPending}
-                className="border-red-500/20 text-red-500/70 hover:bg-red-500/5 hover:text-red-500 hover:border-red-500/40"
+                className="border-red-500/20 text-red-500/70 hover:bg-red-500/5 hover:text-red-500 hover:border-red-500/40 hidden sm:inline-flex"
               >
                 <Flag className="w-3.5 h-3.5 mr-1.5" />
                 Report
@@ -199,10 +237,20 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
           {/* Skip */}
           <Button
             variant="outline"
+            size="icon-lg"
+            onClick={handleSkip}
+            disabled={annotate.isPending}
+            className="border-black/10 text-black/60 sm:hidden"
+            aria-label="Skip entry"
+          >
+            <SkipForward className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="outline"
             size="sm"
             onClick={handleSkip}
             disabled={annotate.isPending}
-            className="border-black/10 text-black/60"
+            className="border-black/10 text-black/60 hidden sm:inline-flex"
           >
             <SkipForward className="w-3.5 h-3.5 mr-1.5" />
             Skip
@@ -210,10 +258,23 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
 
           {/* Submit */}
           <Button
+            size="icon-lg"
+            onClick={handleSubmit}
+            disabled={annotate.isPending}
+            className="group sm:hidden"
+            aria-label="Submit annotation"
+          >
+            {annotate.isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <CheckCheck className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
+            )}
+          </Button>
+          <Button
             size="sm"
             onClick={handleSubmit}
             disabled={annotate.isPending}
-            className="rounded-full px-5 group"
+            className="px-5 group hidden sm:inline-flex"
           >
             {annotate.isPending ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
