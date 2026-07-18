@@ -3,6 +3,7 @@ Pydantic schemas for Dictionary API.
 """
 
 from datetime import datetime
+from enum import Enum
 from typing import Optional
 from uuid import UUID
 
@@ -178,6 +179,50 @@ class SubmitAnnotationRequest(BaseModel):
     notes: Optional[str] = Field(
         None, max_length=2000, description="Optional notes about the correction"
     )
+
+
+# =============================================================================
+# Report Schemas
+# =============================================================================
+
+
+class ReportReason(str, Enum):
+    """Allowed reasons for reporting a dictionary entry."""
+
+    DUPLICATE = "duplicate"
+    OFFENSIVE = "offensive"
+    WRONG_LANGUAGE = "wrong_language"
+    MORE_THAN_A_WORD = "more_than_a_word"
+    OTHER = "other"
+
+
+class SubmitReportRequest(BaseModel):
+    """Request schema for submitting a report against a dictionary entry."""
+
+    reason: ReportReason = Field(..., description="Reason category for the report")
+    details: Optional[str] = Field(
+        None,
+        max_length=2000,
+        description="Optional free-text explanation for the report",
+    )
+
+
+class ReportResponse(BaseModel):
+    """Response schema for a report."""
+
+    id: UUID = Field(..., description="Report unique ID")
+    entry_id: UUID = Field(..., description="Reported entry ID")
+    keycloak_sub: Optional[str] = Field(
+        None, description="Keycloak subject (user ID) who submitted the report"
+    )
+    reason: ReportReason = Field(..., description="Reason category for the report")
+    details: Optional[str] = Field(
+        None, description="Optional free-text explanation for the report"
+    )
+    created_at: datetime = Field(..., description="Report creation timestamp")
+
+    class Config:
+        from_attributes = True
 
 
 # =============================================================================

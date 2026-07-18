@@ -74,6 +74,11 @@ class DictionaryEntry(Base):
         uselist=False,  # One annotation per entry
         cascade="all, delete-orphan",
     )
+    reports = relationship(
+        "DictionaryReport",
+        back_populates="entry",
+        cascade="all, delete-orphan",
+    )
 
     def __repr__(self) -> str:
         return f"<DictionaryEntry {self.word} [{self.status}]>"

@@ -13,6 +13,7 @@ from app.models.voice_entry import VoiceEntry
 from app.models.voice_annotation import VoiceAnnotation
 from app.models.dictionary_entry import DictionaryEntry
 from app.models.dictionary_annotation import DictionaryAnnotation
+from app.models.dictionary_report import DictionaryReport
 
 __all__ = [
     "TranslationDataset",
@@ -24,4 +25,5 @@ __all__ = [
     "VoiceAnnotation",
     "DictionaryEntry",
     "DictionaryAnnotation",
+    "DictionaryReport",
 ]

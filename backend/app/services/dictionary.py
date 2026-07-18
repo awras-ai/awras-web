@@ -11,7 +11,7 @@ from typing import Any, Optional
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session as DBSession
 
-from app.models import DictionaryAnnotation, DictionaryEntry, DictionaryDataset
+from app.models import DictionaryAnnotation, DictionaryEntry, DictionaryDataset, DictionaryReport
 
 logger = logging.getLogger(__name__)
 
@@ -550,6 +550,88 @@ class DictionaryService:
         )
 
     # =========================================================================
+    # REPORTING
+    # =========================================================================
+
+    @staticmethod
+    def submit_report(
+        db: DBSession,
+        entry_id: uuid.UUID,
+        keycloak_sub: str,
+        reason: str,
+        details: Optional[str] = None,
+    ) -> tuple[Optional[DictionaryReport], Optional[str]]:
+        """
+        Submit a report flagging a dictionary entry as problematic.
+
+        Reports are collected as data; there is no workflow status. Submitting
+        a report sets the entry status to "completed" so the entry is removed
+        from the annotation queue (same effect as annotating).
+
+        Rules:
+        - Entry must exist and be pending.
+        - User must not have already annotated OR reported this entry.
+        - User cannot report an entry they themselves submitted.
+
+        Args:
+            db: Database session
+            entry_id: Entry UUID
+            keycloak_sub: Keycloak sub of the reporting user
+            reason: ReportReason string value
+            details: Optional free-text explanation
+
+        Returns:
+            Tuple of (DictionaryReport, None) on success
+            or (None, error_message) on failure
+        """
+        entry = DictionaryService.get_entry(db, entry_id)
+        if not entry:
+            return None, "Entry not found"
+
+        if entry.status != "pending":
+            return None, "Entry already annotated"
+
+        existing_annotation = (
+            db.query(DictionaryAnnotation)
+            .filter(
+                DictionaryAnnotation.entry_id == entry_id,
+                DictionaryAnnotation.keycloak_sub == keycloak_sub,
+            )
+            .first()
+        )
+        if existing_annotation:
+            return None, "You have already annotated this entry"
+
+        existing_report = (
+            db.query(DictionaryReport)
+            .filter(
+                DictionaryReport.entry_id == entry_id,
+                DictionaryReport.keycloak_sub == keycloak_sub,
+            )
+            .first()
+        )
+        if existing_report:
+            return None, "You have already reported this entry"
+
+        if entry.is_user_submitted and entry.submitted_by_sub == keycloak_sub:
+            return None, "You cannot report your own entry"
+
+        report = DictionaryReport(
+            entry_id=entry_id,
+            keycloak_sub=keycloak_sub,
+            reason=reason,
+            details=details.strip() if details else None,
+        )
+        db.add(report)
+
+        entry.status = "completed"
+
+        db.commit()
+        db.refresh(report)
+
+        return report, None
+
+    # =========================================================================
     # STATISTICS
     # =========================================================================
 
@@ -597,6 +679,9 @@ class DictionaryService:
         """
         Get statistics for a dataset including user-specific metrics.
 
+        "annotated_by_user" folds in both annotations and reports submitted by
+        the user (i.e. entries the user has resolved in any way).
+
         Args:
             db: Database session
             dataset_id: Dataset UUID
@@ -610,7 +695,7 @@ class DictionaryService:
         stats = DictionaryService.get_dataset_stats(db, dataset_id)
 
         # Count entries annotated by this user in this dataset
-        user_annotated = (
+        user_annotation_count = (
             db.query(DictionaryAnnotation)
             .join(DictionaryEntry)
             .filter(
@@ -619,6 +704,19 @@ class DictionaryService:
             )
             .count()
         )
+
+        # Count entries reported by this user in this dataset
+        user_report_count = (
+            db.query(DictionaryReport)
+            .join(DictionaryEntry)
+            .filter(
+                DictionaryEntry.dataset_id == dataset_id,
+                DictionaryReport.keycloak_sub == keycloak_sub,
+            )
+            .count()
+        )
+
+        user_annotated = user_annotation_count + user_report_count
 
         # Count entries submitted by this user in this dataset
         user_submitted = (

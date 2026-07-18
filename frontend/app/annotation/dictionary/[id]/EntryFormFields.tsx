@@ -34,7 +34,7 @@ export function EntryFormFields({
             value={wordArabizi}
             onChange={(e) => onWordArabiziChange(e.target.value)}
             placeholder="Arabizi…"
-            className="flex-1 rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-base text-black/60 leading-relaxed outline-none transition-colors placeholder:text-black/25 focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+            className="min-w-0 flex-1 rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-base text-black/60 leading-relaxed outline-none transition-colors placeholder:text-black/25 focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
           />
           <input
             type="text"
@@ -42,7 +42,7 @@ export function EntryFormFields({
             onChange={(e) => onWordChange(e.target.value)}
             dir="rtl"
             placeholder="الكلمة…"
-            className="flex-[2] rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-lg text-black/80 leading-relaxed text-right outline-none transition-colors placeholder:text-black/25 focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+            className="min-w-0 flex-[2] rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-lg text-black/80 leading-relaxed text-right outline-none transition-colors placeholder:text-black/25 focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
           />
         </div>
       </div>

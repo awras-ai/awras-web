@@ -6,6 +6,8 @@ import type {
   CreateEntryRequest,
   Annotation,
   AnnotateRequest,
+  Report,
+  ReportRequest,
 } from "@/lib/types/dictionary";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
@@ -131,5 +133,44 @@ export const annotateEntry = async (
   );
 
   if (!res.ok) throw new Error("Failed to annotate entry");
+  return res.json();
+};
+
+export class ReportError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ReportError";
+  }
+}
+
+export const reportEntry = async (
+  token: string,
+  entryId: string,
+  data: ReportRequest,
+): Promise<Report> => {
+  const res = await fetch(
+    `${BASE_URL}api/v1/dictionary/entries/${entryId}/report`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    },
+  );
+
+  if (!res.ok) {
+    let detail = "Failed to report entry";
+    try {
+      const body = await res.json();
+      if (typeof body?.detail === "string" && body.detail.length > 0) {
+        detail = body.detail;
+      }
+    } catch {
+      // response body wasn't JSON; keep default
+    }
+    throw new ReportError(detail);
+  }
   return res.json();
 };

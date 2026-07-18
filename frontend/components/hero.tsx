@@ -21,7 +21,7 @@ function StatusIndicator() {
 
 export function Hero() {
   return (
-    <section className="relative flex items-center px-4 pt-32 pb-24 md:pt-48 md:pb-40 overflow-hidden">
+    <section className="relative flex items-center px-4 pt-24 pb-24 md:pt-30 md:pb-40 overflow-hidden">
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-0 right-0 w-96 h-96 bg-black/5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/5 rounded-full blur-3xl"></div>
