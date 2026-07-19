@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
+import { NextIntlClientProvider } from "next-intl";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import Script from "next/script";
+import { getMessages } from "next-intl/server";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -69,7 +71,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -82,9 +84,7 @@ export default function RootLayout({
     logo: "https://awras.site/logo.png",
     description:
       "An ecosystem dedicated to preserving and empowering the Algerian dialect (Darija) through advanced Artificial Intelligence.",
-    sameAs: [
-      "https://github.com/awras-ai",
-    ],
+    sameAs: ["https://github.com/awras-ai"],
     knowsAbout: [
       "Artificial Intelligence",
       "Natural Language Processing",
@@ -115,6 +115,7 @@ export default function RootLayout({
       "query-input": "required name=search_term_string",
     },
   };
+  const messages = await getMessages();
 
   return (
     <html lang="en">
@@ -122,10 +123,12 @@ export default function RootLayout({
         <Script
           id="organization-schema"
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
         />
         <Script
-          id="website-schema"
+          id="website-scheimport {NextIntlClientProvider} from 'next-intl';ma"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteSchema) }}
         />
@@ -133,7 +136,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${interDisplay.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
+        <NextIntlClientProvider messages={messages}>
+          <Providers>{children}</Providers>
+        </NextIntlClientProvider>
         <Toaster />
         <Script
           data-goatcounter="https://awras.goatcounter.com/count"
