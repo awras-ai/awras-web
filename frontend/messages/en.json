@@ -126,5 +126,120 @@
     "socialHuggingFace": "HuggingFace",
     "socialInstagram": "Instagram",
     "copyright": "© {year} Awras. All rights reserved. Built for Algeria 🇩🇿"
+  },
+  "Login": {
+    "metaTitle": "Sign In",
+    "metaDescription": "Sign in to your Awras account to access the Algerian AI ecosystem and contribute to Darija language preservation.",
+    "ogTitle": "Sign In | Awras - Algerian AI Platform",
+    "ogDescription": "Access your Awras account to contribute to Algerian Darija AI research and language preservation.",
+    "twitterTitle": "Sign In | Awras - Algerian AI Platform",
+    "twitterDescription": "Access your Awras account to contribute to Algerian Darija AI research.",
+    "redirecting": "Redirecting to login..."
+  },
+  "Signup": {
+    "metaTitle": "Create Account",
+    "metaDescription": "Join the Awras community and contribute to the preservation of Algerian Darija. Create your free account to access AI tools and participate in language research.",
+    "ogTitle": "Create Account | Awras - Algerian AI Platform",
+    "ogDescription": "Join Awras and help preserve Algerian Darija through AI. Create your account to contribute to language preservation.",
+    "twitterTitle": "Create Account | Awras - Algerian AI Platform",
+    "twitterDescription": "Join Awras and help preserve Algerian Darija through AI research and community contribution.",
+    "redirecting": "Redirecting to sign up..."
+  },
+  "AnnotationHub": {
+    "metaTitle": "Annotation",
+    "metaDescription": "Choose an annotation task",
+    "label": "Annotation Tasks",
+    "headline": "Choose a <accent>task.</accent>",
+    "dictionaryTitle": "Dictionary Annotation",
+    "dictionaryDescription": "Review and correct word definitions in Darija to help build our linguistic database.",
+    "overallProgress": "Overall progress",
+    "comingSoon": "Coming Soon",
+    "translationTitle": "Translation Dataset",
+    "translationDescription": "Translate phrases from English to Arabic Darija to expand our parallel corpus.",
+    "transliterationTitle": "Transliteration Dataset",
+    "transliterationDescription": "Convert Arabizi text to Arabic Darija script to normalize user-generated content."
+  },
+  "AnnotationHeader": {
+    "defaultUserName": "User",
+    "logout": "Log out"
+  },
+  "DictionaryAnnotation": {
+    "metaTitle": "Annotate Dictionary",
+    "backToTasks": "Back to tasks",
+    "addWord": "Add word",
+    "yourContribution": "Your contribution",
+    "wordsAnnotated": "{count} words",
+    "overall": "Overall",
+    "overallProgress": "{completed} / {total} · {pct}%",
+    "allCaughtUp": "All caught up!",
+    "noMoreEntries": "There are no more pending entries for you in this dataset.",
+    "failedToLoadEntry": "Failed to load the next entry.",
+    "retry": "Retry",
+    "dictionaryFallback": "Dictionary"
+  },
+  "EntryCard": {
+    "word": "Word",
+    "meaning": "Meaning",
+    "examples": "Examples",
+    "noArabizi": "No arabizi…",
+    "noExamplesYet": "No examples yet…",
+    "cancel": "Cancel",
+    "cancelEditAria": "Cancel edit",
+    "edit": "Edit",
+    "editAria": "Edit entry",
+    "report": "Report",
+    "reportAria": "Report entry",
+    "skip": "Skip",
+    "skipAria": "Skip entry",
+    "submit": "Submit",
+    "submitAria": "Submit annotation",
+    "failedToSubmit": "Failed to submit. Please try again."
+  },
+  "EntryFormFields": {
+    "word": "Word",
+    "meaning": "Meaning",
+    "examples": "Examples",
+    "arabiziPlaceholder": "Arabizi…",
+    "examplesPlaceholder": "No examples yet…"
+  },
+  "CreateEntryCard": {
+    "cancel": "Cancel",
+    "addWord": "Add word",
+    "failedToCreate": "Failed to create entry. Please try again."
+  },
+  "ReportEntryDialog": {
+    "title": "Report this entry",
+    "description": "Flag this entry as problematic. It will be removed from the queue and counted toward dataset completion.",
+    "reasonLabel": "Reason",
+    "reasonPlaceholder": "Select a reason...",
+    "detailsLabel": "Details (optional)",
+    "detailsPlaceholder": "Add more context to help us understand the issue...",
+    "charCount": "{count} / {max}",
+    "cancel": "Cancel",
+    "submitReport": "Submit report",
+    "successToast": "Report submitted. Thanks for the heads up.",
+    "genericError": "Failed to submit report. Please try again.",
+    "reasons": {
+      "duplicate": {
+        "label": "Duplicate",
+        "description": "This entry already exists in the dataset."
+      },
+      "offensive": {
+        "label": "Offensive",
+        "description": "Contains inappropriate or offensive content."
+      },
+      "wrongLanguage": {
+        "label": "Wrong language",
+        "description": "The word or meaning is in the wrong language."
+      },
+      "moreThanAWord": {
+        "label": "More than a word",
+        "description": "Contains a phrase or multiple words instead of a single word."
+      },
+      "other": {
+        "label": "Other",
+        "description": "Something else is wrong with this entry."
+      }
+    }
   }
 }

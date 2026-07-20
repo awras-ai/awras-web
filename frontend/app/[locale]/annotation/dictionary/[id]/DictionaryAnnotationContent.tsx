@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocale, useTranslations } from "next-intl";
 import { ArrowLeft, Loader2, CheckCircle, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,6 +20,8 @@ interface Props {
 }
 
 export function DictionaryAnnotationContent({ datasetId }: Props) {
+  const t = useTranslations("DictionaryAnnotation");
+  const locale = useLocale();
   const { initialized, authenticated, keycloak } = useKeycloak();
 
   const { data: statsData } = useDatasetStats(datasetId);
@@ -34,10 +37,10 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
     if (!initialized) return;
     if (!authenticated) {
       keycloak?.login({
-        redirectUri: `${window.location.origin}/annotation/dictionary/${datasetId}`,
+        redirectUri: `${window.location.origin}/${locale}/annotation/dictionary/${datasetId}`,
       });
     }
-  }, [initialized, authenticated, keycloak, datasetId]);
+  }, [initialized, authenticated, keycloak, datasetId, locale]);
 
   if (!initialized || !authenticated) {
     return (
@@ -75,25 +78,25 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
             href="/annotation"
             className="inline-flex items-center gap-1.5 text-sm text-black/40 hover:text-black transition-colors"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Back to tasks
+            <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" />
+            {t("backToTasks")}
           </Link>
 
           {/* Dataset name + progress */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 min-w-0">
               <h1 className="text-xl font-bold tracking-tight truncate">
-                {datasetName ?? "Dictionary"}
+                {datasetName ?? t("dictionaryFallback")}
               </h1>
               {!addWordMode && (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setAddWordMode(true)}
-                  className="border-black/10 text-black/60 flex-shrink-0 ml-1"
+                  className="border-black/10 text-black/60 flex-shrink-0 ms-1"
                 >
-                  <Plus className="w-3.5 h-3.5 mr-1" />
-                  Add word
+                  <Plus className="w-3.5 h-3.5 me-1" />
+                  {t("addWord")}
                 </Button>
               )}
             </div>
@@ -101,13 +104,12 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
             {/* Your contribution */}
             <div className="flex justify-between items-baseline">
               <span className="text-xs font-medium text-black/50">
-                Your contribution
+                {t("yourContribution")}
               </span>
               <span className="text-xs tabular-nums">
                 <span style={{ color: "#14b8a6" }} className="font-semibold">
-                  {userAnnotated.toLocaleString()} words
+                  {t("wordsAnnotated", { count: userAnnotated.toLocaleString() })}
                 </span>
-                {/* <span className="text-black/40"> words</span> */}
               </span>
             </div>
 
@@ -115,11 +117,14 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
             <div className="space-y-1">
               <div className="flex justify-between items-baseline">
                 <span className="text-xs font-medium text-black/50">
-                  Overall
+                  {t("overall")}
                 </span>
                 <span className="text-xs tabular-nums text-black/40">
-                  {overallCompleted.toLocaleString()} /{" "}
-                  {totalEntries.toLocaleString()} · {Math.round(overallPct)}%
+                  {t("overallProgress", {
+                    completed: overallCompleted.toLocaleString(),
+                    total: totalEntries.toLocaleString(),
+                    pct: Math.round(overallPct),
+                  })}
                 </span>
               </div>
               <Progress value={overallPct} className="h-1.5 bg-black/5" />
@@ -153,10 +158,10 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
                   style={{ color: "#14b8a6" }}
                 />
                 <h2 className="text-lg font-semibold tracking-tight">
-                  All caught up!
+                  {t("allCaughtUp")}
                 </h2>
                 <p className="text-sm text-black/60">
-                  There are no more pending entries for you in this dataset.
+                  {t("noMoreEntries")}
                 </p>
                 <Link href="/annotation" className="mt-2">
                   <Button
@@ -164,7 +169,7 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
                     size="sm"
                     className="border-black/10"
                   >
-                    Back to tasks
+                    {t("backToTasks")}
                   </Button>
                 </Link>
               </CardContent>
@@ -176,7 +181,7 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
             <Card className="border-black/10 shadow-sm">
               <CardContent className="p-8 flex flex-col items-center text-center gap-3">
                 <p className="text-sm text-black/50">
-                  Failed to load the next entry.
+                  {t("failedToLoadEntry")}
                 </p>
                 <Button
                   variant="outline"
@@ -184,7 +189,7 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
                   className="border-black/10"
                   onClick={() => nextEntry.refetch()}
                 >
-                  Retry
+                  {t("retry")}
                 </Button>
               </CardContent>
             </Card>

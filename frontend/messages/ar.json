@@ -126,5 +126,120 @@
     "socialHuggingFace": "HuggingFace",
     "socialInstagram": "Instagram",
     "copyright": "© {year} أوراس. جميع الحقوق محفوظة. صُنع من أجل الجزائر 🇩🇿"
+  },
+  "Login": {
+    "metaTitle": "تسجيل الدخول",
+    "metaDescription": "سجّل الدخول إلى حسابك في أوراس للوصول إلى منظومة الذكاء الاصطناعي الجزائرية والمساهمة في الحفاظ على الدارجة.",
+    "ogTitle": "تسجيل الدخول | أوراس - منصة الذكاء الاصطناعي الجزائرية",
+    "ogDescription": "ادخل إلى حسابك في أوراس للمساهمة في أبحاث الذكاء الاصطناعي للدارجة الجزائرية والحفاظ على اللغة.",
+    "twitterTitle": "تسجيل الدخول | أوراس - منصة الذكاء الاصطناعي الجزائرية",
+    "twitterDescription": "ادخل إلى حسابك في أوراس للمساهمة في أبحاث الذكاء الاصطناعي للدارجة الجزائرية.",
+    "redirecting": "جارٍ التحويل إلى تسجيل الدخول..."
+  },
+  "Signup": {
+    "metaTitle": "إنشاء حساب",
+    "metaDescription": "انضم إلى مجتمع أوراس وساهم في الحفاظ على الدارجة الجزائرية. أنشئ حسابك المجاني للوصول إلى أدوات الذكاء الاصطناعي والمشاركة في أبحاث اللغة.",
+    "ogTitle": "إنشاء حساب | أوراس - منصة الذكاء الاصطناعي الجزائرية",
+    "ogDescription": "انضم إلى أوراس وساهم في الحفاظ على الدارجة الجزائرية عبر الذكاء الاصطناعي. أنشئ حسابك للمساهمة في الحفاظ على اللغة.",
+    "twitterTitle": "إنشاء حساب | أوراس - منصة الذكاء الاصطناعي الجزائرية",
+    "twitterDescription": "انضم إلى أوراس وساهم في الحفاظ على الدارجة الجزائرية عبر أبحاث الذكاء الاصطناعي ومساهمة المجتمع.",
+    "redirecting": "جارٍ التحويل إلى إنشاء حساب..."
+  },
+  "AnnotationHub": {
+    "metaTitle": "التوثيق",
+    "metaDescription": "اختر مهمة توثيق",
+    "label": "مهام التوثيق",
+    "headline": "اختر <accent>مهمة.</accent>",
+    "dictionaryTitle": "توثيق القاموس",
+    "dictionaryDescription": "راجع وصحّح تعريفات الكلمات في الدارجة للمساهمة في بناء قاعدة بياناتنا اللغوية.",
+    "overallProgress": "التقدّم الإجمالي",
+    "comingSoon": "قريباً",
+    "translationTitle": "مجموعة بيانات الترجمة",
+    "translationDescription": "ترجم عبارات من الإنجليزية إلى الدارجة الجزائرية لتوسيع مجموعتنا المتوازية من البيانات.",
+    "transliterationTitle": "مجموعة بيانات التحويل الصوتي",
+    "transliterationDescription": "حوّل نصوص الأرابيزي إلى الدارجة الجزائرية بالحروف العربية لتوحيد المحتوى الذي ينشئه المستخدمون."
+  },
+  "AnnotationHeader": {
+    "defaultUserName": "مستخدم",
+    "logout": "تسجيل الخروج"
+  },
+  "DictionaryAnnotation": {
+    "metaTitle": "توثيق القاموس",
+    "backToTasks": "العودة إلى المهام",
+    "addWord": "إضافة كلمة",
+    "yourContribution": "مساهمتك",
+    "wordsAnnotated": "{count} كلمة",
+    "overall": "الإجمالي",
+    "overallProgress": "{completed} / {total} · {pct}%",
+    "allCaughtUp": "لقد أنجزت كل شيء!",
+    "noMoreEntries": "لا توجد إدخالات معلّقة أخرى لك في هذه المجموعة.",
+    "failedToLoadEntry": "فشل تحميل الإدخال التالي.",
+    "retry": "إعادة المحاولة",
+    "dictionaryFallback": "القاموس"
+  },
+  "EntryCard": {
+    "word": "الكلمة",
+    "meaning": "المعنى",
+    "examples": "أمثلة",
+    "noArabizi": "لا يوجد أرابيزي…",
+    "noExamplesYet": "لا توجد أمثلة بعد…",
+    "cancel": "إلغاء",
+    "cancelEditAria": "إلغاء التعديل",
+    "edit": "تعديل",
+    "editAria": "تعديل الإدخال",
+    "report": "الإبلاغ",
+    "reportAria": "الإبلاغ عن الإدخال",
+    "skip": "تخطي",
+    "skipAria": "تخطي الإدخال",
+    "submit": "إرسال",
+    "submitAria": "إرسال التوثيق",
+    "failedToSubmit": "فشل الإرسال. حاول مرة أخرى."
+  },
+  "EntryFormFields": {
+    "word": "الكلمة",
+    "meaning": "المعنى",
+    "examples": "أمثلة",
+    "arabiziPlaceholder": "أرابيزي…",
+    "examplesPlaceholder": "لا توجد أمثلة بعد…"
+  },
+  "CreateEntryCard": {
+    "cancel": "إلغاء",
+    "addWord": "إضافة كلمة",
+    "failedToCreate": "فشل إنشاء الإدخال. حاول مرة أخرى."
+  },
+  "ReportEntryDialog": {
+    "title": "الإبلاغ عن هذا الإدخال",
+    "description": "أبلغ عن هذا الإدخال بصفته مشكلة. سيُزال من قائمة الانتظار ويُحتسب ضمن نسبة إنجاز المجموعة.",
+    "reasonLabel": "السبب",
+    "reasonPlaceholder": "اختر سبباً...",
+    "detailsLabel": "تفاصيل (اختياري)",
+    "detailsPlaceholder": "أضف مزيداً من السياق لمساعدتنا على فهم المشكلة...",
+    "charCount": "{count} / {max}",
+    "cancel": "إلغاء",
+    "submitReport": "إرسال البلاغ",
+    "successToast": "تم إرسال البلاغ. شكراً على تنبيهنا.",
+    "genericError": "فشل إرسال البلاغ. حاول مرة أخرى.",
+    "reasons": {
+      "duplicate": {
+        "label": "مكرر",
+        "description": "هذا الإدخال موجود بالفعل في المجموعة."
+      },
+      "offensive": {
+        "label": "مسيء",
+        "description": "يحتوي على محتوى غير لائق أو مسيء."
+      },
+      "wrongLanguage": {
+        "label": "لغة خاطئة",
+        "description": "الكلمة أو المعنى بلغة غير صحيحة."
+      },
+      "moreThanAWord": {
+        "label": "أكثر من كلمة",
+        "description": "يحتوي على عبارة أو عدة كلمات بدلاً من كلمة واحدة."
+      },
+      "other": {
+        "label": "أخرى",
+        "description": "هناك خطأ آخر في هذا الإدخال."
+      }
+    }
   }
 }

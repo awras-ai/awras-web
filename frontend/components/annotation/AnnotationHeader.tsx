@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { LogOut } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -14,9 +15,11 @@ import {
 import { useKeycloak } from "@/context/KeycloakContext";
 
 export function AnnotationHeader() {
+  const t = useTranslations("AnnotationHeader");
+  const locale = useLocale();
   const { keycloak, user } = useKeycloak();
 
-  const displayName = user?.name || user?.email || "User";
+  const displayName = user?.name || user?.email || t("defaultUserName");
   const initials = displayName
     .split(" ")
     .map((p: string) => p.charAt(0))
@@ -25,7 +28,7 @@ export function AnnotationHeader() {
     .slice(0, 2);
 
   const handleLogout = () => {
-    keycloak?.logout({ redirectUri: `${window.location.origin}/` });
+    keycloak?.logout({ redirectUri: `${window.location.origin}/${locale}` });
   };
 
   return (
@@ -59,8 +62,8 @@ export function AnnotationHeader() {
               onClick={handleLogout}
               className="text-red-500 focus:text-red-500 cursor-pointer"
             >
-              <LogOut className="mr-2 h-4 w-4" />
-              Log out
+              <LogOut className="me-2 h-4 w-4" />
+              {t("logout")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
