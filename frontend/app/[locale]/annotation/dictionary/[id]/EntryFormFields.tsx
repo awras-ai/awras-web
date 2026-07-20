@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 interface EntryFormFieldsProps {
   word: string;
   onWordChange: (value: string) => void;
@@ -21,19 +23,21 @@ export function EntryFormFields({
   examples,
   onExamplesChange,
 }: EntryFormFieldsProps) {
+  const t = useTranslations("EntryFormFields");
+
   return (
     <>
       {/* Word */}
       <div>
         <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-2">
-          Word
+          {t("word")}
         </p>
         <div className="flex gap-3">
           <input
             type="text"
             value={wordArabizi}
             onChange={(e) => onWordArabiziChange(e.target.value)}
-            placeholder="Arabizi…"
+            placeholder={t("arabiziPlaceholder")}
             className="min-w-0 flex-1 rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-base text-black/60 leading-relaxed outline-none transition-colors placeholder:text-black/25 focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
           />
           <input
@@ -50,7 +54,7 @@ export function EntryFormFields({
       {/* Meaning */}
       <div>
         <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-2">
-          Meaning
+          {t("meaning")}
         </p>
         <textarea
           value={meaning}
@@ -64,14 +68,14 @@ export function EntryFormFields({
       {/* Examples */}
       <div>
         <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-2">
-          Examples
+          {t("examples")}
         </p>
         <textarea
           value={examples}
           onChange={(e) => onExamplesChange(e.target.value)}
           dir="rtl"
           rows={2}
-          placeholder="No examples yet…"
+          placeholder={t("examplesPlaceholder")}
           className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2.5 text-base text-black/70 leading-relaxed text-right resize-none outline-none transition-colors placeholder:text-black/25 focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
         />
       </div>

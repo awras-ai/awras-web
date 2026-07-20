@@ -128,6 +128,10 @@
   }
 }
 
+[dir="rtl"] body {
+  font-family: var(--font-arabic), var(--font-sans);
+}
+
 /* Accordion animations */
 @keyframes accordion-down {
   from {

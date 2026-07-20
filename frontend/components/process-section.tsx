@@ -1,43 +1,28 @@
 import { Database, Brain, Rocket, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { getTranslations } from "next-intl/server";
 
-const processSteps = [
-  {
-    id: "01",
-    label: "COLLECTION",
-    title: "Data Collection",
-    description:
-      "Gathering diverse datasets of Algerian Darija from various sources including text, audio, and cultural content to build a comprehensive foundation.",
-    icon: Database,
-  },
-  {
-    id: "02",
-    label: "TRAINING",
-    title: "Model Training",
-    description:
-      "Fine-tuning advanced AI models on the collected data, ensuring they understand context, cultural nuances, and regional variations of Algerian dialect.",
-    icon: Brain,
-  },
-  {
-    id: "03",
-    label: "DEPLOYMENT",
-    title: "Evaluation & Deployment",
-    description:
-      "Rigorous testing and validation of model performance followed by deployment to production environments for real-world usage.",
-    icon: Rocket,
-  },
-  {
-    id: "04",
-    label: "FEEDBACK",
-    title: "User Feedback & Improvement",
-    description:
-      "Continuous learning from user interactions and feedback to refine models, improve accuracy, and adapt to evolving language usage patterns.",
-    icon: Users,
-  },
-];
+const stepIcons = {
+  collection: Database,
+  training: Brain,
+  deployment: Rocket,
+  feedback: Users,
+} as const;
 
-export function ProcessSection() {
+const stepKeys = ["collection", "training", "deployment", "feedback"] as const;
+
+export async function ProcessSection() {
+  const t = await getTranslations("Process");
+
+  const processSteps = stepKeys.map((key, index) => ({
+    id: String(index + 1).padStart(2, "0"),
+    label: t(`steps.${key}.label`),
+    title: t(`steps.${key}.title`),
+    description: t(`steps.${key}.description`),
+    icon: stepIcons[key],
+  }));
+
   return (
     <section
       id="process"
@@ -47,11 +32,15 @@ export function ProcessSection() {
         {/* Header Section */}
         <div className="mb-8">
           <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-3">
-            02 — The Process
+            02 — {t("label")}
           </p>
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
-            How we build <br className="hidden sm:block" />
-            <span style={{ color: "#14b8a6" }}>Stuff.</span>
+            {t.rich("headline", {
+              break: () => <br className="hidden sm:block" />,
+              accent: (chunks) => (
+                <span style={{ color: "#14b8a6" }}>{chunks}</span>
+              ),
+            })}
           </h2>
         </div>
 
