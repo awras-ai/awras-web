@@ -23,15 +23,6 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: list[str]
 
-    # AI MODEL
-    MODEL_API_KEY: str = ""
-    MODEL_BASE_URL: str = "https://api.deepseek.com"
-    MODEL_NAME: str = ""
-    MODEL_CUSTOM_HEADER_KEY: str = ""
-    MODEL_CUSTOM_HEADER_VALUE: str = ""
-    MODEL_TEMPERATURE: float = 0.7
-    MODEL_MAX_TOKENS: int = 512
-
     # API
     API_V1_PREFIX: str = "/api/v1"
 
@@ -39,9 +30,6 @@ class Settings(BaseSettings):
     KEYCLOAK_ISSUER: str = "http://localhost:8080/realms/awras"
     KEYCLOAK_CLIENT_ID: str = "awras-backend"
     KEYCLOAK_CLIENT_SECRET: str = ""
-
-    # Better Auth (shared secret for future JWE cookie decryption)
-    BETTER_AUTH_SECRET: str = ""
 
     # Cloudflare R2 (for object storage)
     R2_ENDPOINT_URL: str = ""

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Flag, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -32,44 +33,45 @@ interface ReportEntryDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const REPORT_REASONS: {
-  value: ReportReason;
-  label: string;
-  description: string;
-}[] = [
-  {
-    value: "duplicate",
-    label: "Duplicate",
-    description: "This entry already exists in the dataset.",
-  },
-  {
-    value: "offensive",
-    label: "Offensive",
-    description: "Contains inappropriate or offensive content.",
-  },
-  {
-    value: "wrong_language",
-    label: "Wrong language",
-    description: "The word or meaning is in the wrong language.",
-  },
-  {
-    value: "more_than_a_word",
-    label: "More than a word",
-    description:
-      "Contains a phrase or multiple words instead of a single word.",
-  },
-  {
-    value: "other",
-    label: "Other",
-    description: "Something else is wrong with this entry.",
-  },
-];
+function getReportReasons(
+  t: ReturnType<typeof useTranslations>,
+): { value: ReportReason; label: string; description: string }[] {
+  return [
+    {
+      value: "duplicate",
+      label: t("reasons.duplicate.label"),
+      description: t("reasons.duplicate.description"),
+    },
+    {
+      value: "offensive",
+      label: t("reasons.offensive.label"),
+      description: t("reasons.offensive.description"),
+    },
+    {
+      value: "wrong_language",
+      label: t("reasons.wrongLanguage.label"),
+      description: t("reasons.wrongLanguage.description"),
+    },
+    {
+      value: "more_than_a_word",
+      label: t("reasons.moreThanAWord.label"),
+      description: t("reasons.moreThanAWord.description"),
+    },
+    {
+      value: "other",
+      label: t("reasons.other.label"),
+      description: t("reasons.other.description"),
+    },
+  ];
+}
 
 export function ReportEntryDialog({
   entryId,
   open,
   onOpenChange,
 }: ReportEntryDialogProps) {
+  const t = useTranslations("ReportEntryDialog");
+  const REPORT_REASONS = getReportReasons(t);
   const report = useReportEntry();
 
   const [reason, setReason] = useState<ReportReason | "">("");
@@ -97,7 +99,7 @@ export function ReportEntryDialog({
       },
       {
         onSuccess: () => {
-          toast.success("Report submitted. Thanks for the heads up.");
+          toast.success(t("successToast"));
           onOpenChange(false);
         },
       },
@@ -107,7 +109,7 @@ export function ReportEntryDialog({
   const errorMessage = report.isError
     ? report.error instanceof ReportError
       ? report.error.message
-      : "Failed to submit report. Please try again."
+      : t("genericError")
     : null;
 
   return (
@@ -116,23 +118,20 @@ export function ReportEntryDialog({
         <DialogHeader>
           <div className="flex items-center gap-2">
             <Flag className="w-4 h-4 text-red-500/80" />
-            <DialogTitle>Report this entry</DialogTitle>
+            <DialogTitle>{t("title")}</DialogTitle>
           </div>
-          <DialogDescription>
-            Flag this entry as problematic. It will be removed from the queue
-            and counted toward dataset completion.
-          </DialogDescription>
+          <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           <div className="space-y-2">
-            <Label htmlFor="report-reason">Reason</Label>
+            <Label htmlFor="report-reason">{t("reasonLabel")}</Label>
             <Select
               value={reason}
               onValueChange={(v) => setReason(v as ReportReason)}
             >
               <SelectTrigger id="report-reason" className="w-full">
-                <SelectValue placeholder="Select a reason..." />
+                <SelectValue placeholder={t("reasonPlaceholder")} />
               </SelectTrigger>
               <SelectContent>
                 {REPORT_REASONS.map((r) => (
@@ -150,18 +149,18 @@ export function ReportEntryDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="report-details">Details (optional)</Label>
+            <Label htmlFor="report-details">{t("detailsLabel")}</Label>
             <Textarea
               id="report-details"
               value={details}
               onChange={(e) => setDetails(e.target.value.slice(0, 2000))}
-              placeholder="Add more context to help us understand the issue..."
+              placeholder={t("detailsPlaceholder")}
               rows={4}
               maxLength={2000}
               className="resize-none"
             />
-            <p className="text-[10px] text-black/40 text-right tabular-nums">
-              {details.length} / 2000
+            <p className="text-[10px] text-black/40 text-end tabular-nums">
+              {t("charCount", { count: details.length, max: 2000 })}
             </p>
           </div>
 
@@ -178,7 +177,7 @@ export function ReportEntryDialog({
             disabled={report.isPending}
             className="border-black/10 text-black/60"
           >
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             size="sm"
@@ -190,8 +189,8 @@ export function ReportEntryDialog({
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
             ) : (
               <>
-                <Flag className="w-3.5 h-3.5 mr-1.5" />
-                Submit report
+                <Flag className="w-3.5 h-3.5 me-1.5" />
+                {t("submitReport")}
               </>
             )}
           </Button>

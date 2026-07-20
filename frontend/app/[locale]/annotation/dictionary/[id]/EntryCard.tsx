@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import {
   Loader2,
   Pencil,
@@ -31,6 +32,7 @@ function renderMultiline(content: string) {
 }
 
 export function EntryCard({ datasetId, entry }: EntryCardProps) {
+  const t = useTranslations("EntryCard");
   const queryClient = useQueryClient();
   const annotate = useAnnotateEntry();
 
@@ -112,7 +114,7 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
             {/* Word */}
             <div>
               <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-2">
-                Word
+                {t("word")}
               </p>
               <div className="flex items-baseline justify-between gap-4">
                 {formWordArabizi ? (
@@ -121,7 +123,7 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
                   </span>
                 ) : (
                   <span className="text-sm text-black/20 italic">
-                    No arabizi…
+                    {t("noArabizi")}
                   </span>
                 )}
                 <h2
@@ -136,7 +138,7 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
             {/* Meaning */}
             <div>
               <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-2">
-                Meaning
+                {t("meaning")}
               </p>
               <div dir="rtl" className="space-y-1">
                 {renderMultiline(formMeaning)}
@@ -146,7 +148,7 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
             {/* Examples */}
             <div>
               <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-2">
-                Examples
+                {t("examples")}
               </p>
               {entry.examples ? (
                 <div dir="rtl" className="space-y-1">
@@ -154,7 +156,7 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
                 </div>
               ) : (
                 <span className="text-sm text-black/20 italic">
-                  No examples yet…
+                  {t("noExamplesYet")}
                 </span>
               )}
             </div>
@@ -172,7 +174,7 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
               size="icon-lg"
               onClick={handleCancelEdit}
               className="border-black/10 text-black/60 sm:hidden"
-              aria-label="Cancel edit"
+              aria-label={t("cancelEditAria")}
             >
               <X className="w-4 h-4" />
             </Button>
@@ -184,8 +186,8 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
               onClick={handleCancelEdit}
               className="border-black/10 text-black/60 hidden sm:inline-flex"
             >
-              <X className="w-3.5 h-3.5 mr-1.5" />
-              Cancel
+              <X className="w-3.5 h-3.5 me-1.5" />
+              {t("cancel")}
             </Button>
           ) : (
             <>
@@ -195,7 +197,7 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
                 onClick={() => setEditMode(true)}
                 disabled={annotate.isPending}
                 className="border-black/10 text-black/60 sm:hidden"
-                aria-label="Edit entry"
+                aria-label={t("editAria")}
               >
                 <Pencil className="w-4 h-4" />
               </Button>
@@ -205,8 +207,8 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
                 onClick={() => setEditMode(true)}
                 className="border-black/10 text-black/60 hidden sm:inline-flex"
               >
-                <Pencil className="w-3.5 h-3.5 mr-1.5" />
-                Edit
+                <Pencil className="w-3.5 h-3.5 me-1.5" />
+                {t("edit")}
               </Button>
 
               <Button
@@ -215,7 +217,7 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
                 onClick={() => setReportOpen(true)}
                 disabled={annotate.isPending}
                 className="border-red-500/20 text-red-500/70 hover:bg-red-500/5 hover:text-red-500 hover:border-red-500/40 sm:hidden"
-                aria-label="Report entry"
+                aria-label={t("reportAria")}
               >
                 <Flag className="w-4 h-4" />
               </Button>
@@ -226,8 +228,8 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
                 disabled={annotate.isPending}
                 className="border-red-500/20 text-red-500/70 hover:bg-red-500/5 hover:text-red-500 hover:border-red-500/40 hidden sm:inline-flex"
               >
-                <Flag className="w-3.5 h-3.5 mr-1.5" />
-                Report
+                <Flag className="w-3.5 h-3.5 me-1.5" />
+                {t("report")}
               </Button>
             </>
           )}
@@ -241,9 +243,9 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
             onClick={handleSkip}
             disabled={annotate.isPending}
             className="border-black/10 text-black/60 sm:hidden"
-            aria-label="Skip entry"
+            aria-label={t("skipAria")}
           >
-            <SkipForward className="w-4 h-4" />
+            <SkipForward className="w-4 h-4 rtl:rotate-180" />
           </Button>
           <Button
             variant="outline"
@@ -252,8 +254,8 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
             disabled={annotate.isPending}
             className="border-black/10 text-black/60 hidden sm:inline-flex"
           >
-            <SkipForward className="w-3.5 h-3.5 mr-1.5" />
-            Skip
+            <SkipForward className="w-3.5 h-3.5 me-1.5 rtl:rotate-180" />
+            {t("skip")}
           </Button>
 
           {/* Submit */}
@@ -262,7 +264,7 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
             onClick={handleSubmit}
             disabled={annotate.isPending}
             className="group sm:hidden"
-            aria-label="Submit annotation"
+            aria-label={t("submitAria")}
           >
             {annotate.isPending ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -280,8 +282,8 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
             ) : (
               <>
-                <CheckCheck className="w-3.5 h-3.5 mr-1.5 transition-transform duration-300 group-hover:scale-110" />
-                Submit
+                <CheckCheck className="w-3.5 h-3.5 me-1.5 transition-transform duration-300 group-hover:scale-110" />
+                {t("submit")}
               </>
             )}
           </Button>
@@ -290,7 +292,7 @@ export function EntryCard({ datasetId, entry }: EntryCardProps) {
         {/* Mutation error */}
         {annotate.isError && (
           <p className="text-xs text-red-500 text-center">
-            Failed to submit. Please try again.
+            {t("failedToSubmit")}
           </p>
         )}
 

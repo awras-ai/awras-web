@@ -1,14 +1,6 @@
-const items = [
-  "Darija Datasets",
-  "NLP Models",
-  "Speech Recognition",
-  "Text-to-Speech",
-  "Translation",
-  "Transliteration",
-  // "Dialect Analysis",
-];
+import { getTranslations } from "next-intl/server";
 
-function MarqueeContent() {
+function MarqueeContent({ items }: { items: string[] }) {
   return (
     <>
       {items.map((item) => (
@@ -32,12 +24,22 @@ function MarqueeContent() {
   );
 }
 
-export function Marquee() {
+export async function Marquee() {
+  const t = await getTranslations("Marquee");
+  const items = [
+    t("item1"),
+    t("item2"),
+    t("item3"),
+    t("item4"),
+    t("item5"),
+    t("item6"),
+  ];
+
   return (
     <div className="group relative border-y border-white/10 bg-black py-4 overflow-hidden">
       <div className="flex animate-marquee whitespace-nowrap will-change-transform group-hover:[animation-play-state:paused]">
-        <MarqueeContent />
-        <MarqueeContent />
+        <MarqueeContent items={items} />
+        <MarqueeContent items={items} />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Loader2, X, CheckCheck } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ interface CreateEntryCardProps {
 }
 
 export function CreateEntryCard({ datasetId, onDone }: CreateEntryCardProps) {
+  const t = useTranslations("CreateEntryCard");
   const queryClient = useQueryClient();
   const create = useCreateEntry();
 
@@ -66,8 +68,8 @@ export function CreateEntryCard({ datasetId, onDone }: CreateEntryCardProps) {
             disabled={create.isPending}
             className="border-black/10 text-black/60"
           >
-            <X className="w-3.5 h-3.5 mr-1.5" />
-            Cancel
+            <X className="w-3.5 h-3.5 me-1.5" />
+            {t("cancel")}
           </Button>
 
           <div className="flex-1" />
@@ -82,8 +84,8 @@ export function CreateEntryCard({ datasetId, onDone }: CreateEntryCardProps) {
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
             ) : (
               <>
-                <CheckCheck className="w-3.5 h-3.5 mr-1.5 transition-transform duration-300 group-hover:scale-110" />
-                Add word
+                <CheckCheck className="w-3.5 h-3.5 me-1.5 transition-transform duration-300 group-hover:scale-110" />
+                {t("addWord")}
               </>
             )}
           </Button>
@@ -91,7 +93,7 @@ export function CreateEntryCard({ datasetId, onDone }: CreateEntryCardProps) {
 
         {create.isError && (
           <p className="text-xs text-red-500 text-center">
-            Failed to create entry. Please try again.
+            {t("failedToCreate")}
           </p>
         )}
       </CardContent>
