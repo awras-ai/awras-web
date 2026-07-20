@@ -1,0 +1,130 @@
+{
+  "Metadata": {
+    "titleDefault": "Awras - Preserving Algerian Darija with AI",
+    "description": "An ecosystem dedicated to preserving and empowering the Algerian dialect (Darija) through advanced Artificial Intelligence.",
+    "ogTitle": "Awras - The Future of Algerian AI",
+    "ogDescription": "Preserving and empowering Algerian Darija using state-of-the-art Artificial Intelligence.",
+    "ogImageAlt": "Awras - Algerian AI Ecosystem",
+    "twitterTitle": "Awras - The Future of Algerian AI",
+    "twitterDescription": "Preserving and empowering Algerian Darija using state-of-the-art Artificial Intelligence.",
+    "keywords": [
+      "Algeria",
+      "AI",
+      "Darija",
+      "Artificial Intelligence",
+      "NLP",
+      "North Africa",
+      "Maghreb",
+      "LLM",
+      "dz",
+      "hadra",
+      "hadretna",
+      "Language Preservation"
+    ],
+    "orgKnowsAbout": [
+      "Artificial Intelligence",
+      "Natural Language Processing",
+      "Algerian Darija",
+      "Arabic Dialects",
+      "Speech Recognition",
+      "Machine Learning"
+    ],
+    "orgAreaServed": "Algeria",
+    "orgContactType": "General Inquiry"
+  },
+  "AnnouncementBar": {
+    "message": "Start annotating Darija dictionary now",
+    "dismissAriaLabel": "Dismiss announcement"
+  },
+  "Navbar": {
+    "mission": "Mission",
+    "process": "Process",
+    "faq": "FAQ",
+    "homeAriaLabel": "Awras Home",
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu",
+    "cta": "Explore More"
+  },
+  "Hero": {
+    "badge": "BUILDING THE FUTURE FOR ALGERIAN AI",
+    "headline": "Empowering <accent>Algerian Darija</accent> with artificial intelligence.",
+    "description": "An ecosystem dedicated to preserving and understanding the Algerian dialect. Small language models, curated datasets, and tools built for the future.",
+    "cta": "Help us Annotate Data"
+  },
+  "Marquee": {
+    "item1": "Darija Datasets",
+    "item2": "NLP Models",
+    "item3": "Speech Recognition",
+    "item4": "Text-to-Speech",
+    "item5": "Translation",
+    "item6": "Transliteration"
+  },
+  "Mission": {
+    "label": "Our Mission",
+    "headline": "Preserving Darija, <break></break><accent>Empowering Algeria.</accent>",
+    "body": "Awras is on a mission to digitize the Algerian soul by building an AI ecosystem that truly speaks our language. We are dedicated to preserving Darija through high-fidelity LLMs and speech tools that capture the unique cultural nuances and regional accents of Algeria, empowering local innovation with a foundation that is authentically ours."
+  },
+  "Process": {
+    "label": "The Process",
+    "headline": "How we build <break></break><accent>Stuff.</accent>",
+    "steps": {
+      "collection": {
+        "label": "COLLECTION",
+        "title": "Data Collection",
+        "description": "Gathering diverse datasets of Algerian Darija from various sources including text, audio, and cultural content to build a comprehensive foundation."
+      },
+      "training": {
+        "label": "TRAINING",
+        "title": "Model Training",
+        "description": "Fine-tuning advanced AI models on the collected data, ensuring they understand context, cultural nuances, and regional variations of Algerian dialect."
+      },
+      "deployment": {
+        "label": "DEPLOYMENT",
+        "title": "Evaluation & Deployment",
+        "description": "Rigorous testing and validation of model performance followed by deployment to production environments for real-world usage."
+      },
+      "feedback": {
+        "label": "FEEDBACK",
+        "title": "User Feedback & Improvement",
+        "description": "Continuous learning from user interactions and feedback to refine models, improve accuracy, and adapt to evolving language usage patterns."
+      }
+    }
+  },
+  "FAQ": {
+    "label": "FAQ",
+    "headline": "Frequently Asked <accent>Questions.</accent>",
+    "items": {
+      "whatIsAwras": {
+        "question": "What is Awras?",
+        "answer": "Awras is an open-ended project focused on the linguistic preservation and digital evolution of the Algerian dialect. By developing specialized datasets and models for LLM (Large Language Model), ASR (Automatic Speech Recognition) and TTS (Text-to-Speech), we are ensuring that Darija is a first-class citizen in the age of generative AI."
+      },
+      "whyDarijaMatters": {
+        "question": "Why darija matters?",
+        "answer": "Either you consider it as a language or a dialect, it is somthing that is being spoken for a long time, many parts of our history is only told or registered in videos. making these models will enable us to mine the knowledge and culture that is being stored in these videos, and make it accessible. \n Also because it's cool 🙂."
+      },
+      "howToContribute": {
+        "question": "How can I contribute to Awras?",
+        "answer": "Anyone passionate about building cool stuff, you don't need to be a coder to build the future of Darija! Engineers can join our dev team, while native speakers can contribute high-quality voice data, translations through our community platform."
+      },
+      "howAwrasBenefits": {
+        "question": "How does Awras benefit Algeria?",
+        "answer": "Awras helps bridge the digital divide by making AI technology accessible in Algerian Darija. This enables better accessibility for non-French/Arabic speakers, preserves our linguistic heritage, and creates opportunities for local businesses and developers to build culturally-relevant AI applications."
+      },
+      "whatIsNext": {
+        "question": "What is next after awras-chat-v0?",
+        "answer": "Stay tuned for our upcoming platform launch where you can easily upload and share your contributions with the community. weather it's an audio data, translation, or even a cool darija slang or rare expressions!"
+      }
+    },
+    "contactPrompt": "Still have questions?",
+    "contactLink": "Contact us"
+  },
+  "Footer": {
+    "headline": "Let's build the future <accent>together.</accent>",
+    "body": "An initiative for Algerian AI models. Join us in preserving Darija and shaping the future of language technology.",
+    "socialGithub": "GitHub",
+    "socialWebsite": "Website",
+    "socialHuggingFace": "HuggingFace",
+    "socialInstagram": "Instagram",
+    "copyright": "© {year} Awras. All rights reserved. Built for Algeria 🇩🇿"
+  }
+}

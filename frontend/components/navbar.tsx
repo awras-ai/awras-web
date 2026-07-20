@@ -1,17 +1,19 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Navbar() {
+  const t = useTranslations("Navbar");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { href: "#mission", label: "Mission" },
-    { href: "#process", label: "Process" },
-    { href: "#faq", label: "FAQ" },
+    { href: "#mission", label: t("mission") },
+    { href: "#process", label: t("process") },
+    { href: "#faq", label: t("faq") },
     // { href: "#about", label: "About" },
     // { href: "/contact", label: "Contact" },
   ];
@@ -23,7 +25,7 @@ export function Navbar() {
         <Link
           href="/"
           className="flex items-center gap-3"
-          aria-label="Awras Home"
+          aria-label={t("homeAriaLabel")}
         >
           <span className="text-2xl font-bold tracking-tighter text-black">
             awras
@@ -65,7 +67,7 @@ export function Navbar() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             <span className="sr-only">
-              {mobileMenuOpen ? "Close menu" : "Open menu"}
+              {mobileMenuOpen ? t("closeMenu") : t("openMenu")}
             </span>
             {mobileMenuOpen ? (
               <X className="h-5 w-5" aria-hidden="true" />
@@ -102,9 +104,9 @@ export function Navbar() {
                   href="/annotation"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Explore More
+                  {t("cta")}
                   <ArrowUpRight
-                    className="w-4 h-4 ml-1.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    className="w-4 h-4 ms-1.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 rtl:-rotate-90"
                     aria-hidden="true"
                   />
                 </Link>
