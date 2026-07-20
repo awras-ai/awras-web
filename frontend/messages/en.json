@@ -43,7 +43,11 @@
     "homeAriaLabel": "Awras Home",
     "closeMenu": "Close menu",
     "openMenu": "Open menu",
-    "cta": "Explore More"
+    "cta": "Explore More",
+    "language": "Language",
+    "languageAriaLabel": "Change language",
+    "english": "English",
+    "arabic": "Arabic"
   },
   "Hero": {
     "badge": "BUILDING THE FUTURE FOR ALGERIAN AI",

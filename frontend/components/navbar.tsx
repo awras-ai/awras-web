@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LanguageSelector } from "@/components/language-selector";
 
 export function Navbar() {
   const t = useTranslations("Navbar");
@@ -44,7 +45,9 @@ export function Navbar() {
             </Link>
           ))}
 
-          {/* <div className="mx-3 w-px h-5 bg-neutral-300" aria-hidden="true" /> */}
+          <div className="mx-3 w-px h-5 bg-neutral-300" aria-hidden="true" />
+
+          <LanguageSelector />
 
           {/* <Button asChild className="ml-2 group rounded-full px-6 py-5 text-[14px] font-medium shadow-sm"> */}
           {/*   <Link href="/annotation"> */}
@@ -59,6 +62,7 @@ export function Navbar() {
 
         {/* Mobile Controls */}
         <div className="flex md:hidden items-center gap-2">
+          <LanguageSelector />
           <button
             type="button"
             className="inline-flex items-center justify-center p-2 rounded-full text-neutral-800 hover:bg-neutral-100 focus:outline-none"
