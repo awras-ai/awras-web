@@ -87,40 +87,42 @@ services:
     networks:
       - awras_internal_network
 
-  # Keycloak identity provider
-  keycloak:
-    image: quay.io/keycloak/keycloak:26.0
-    container_name: keycloak
-    command: start-dev
-    environment:
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/${KEYCLOAK_DB_NAME:-keycloak}
-      KC_DB_USERNAME: ${POSTGRES_USER}
-      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
-      KC_DB_SCHEMA: public
-      KC_BOOTSTRAP_ADMIN: ${KEYCLOAK_ADMIN}
-      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-      KC_HEALTH_ENABLED: "true"
-      KC_HOSTNAME_STRICT: "false"
-      KC_HOSTNAME_STRICT_HTTPS: "false"
-    ports:
-      - "${KEYCLOAK_PORT:-8080}:8080"
-    volumes:
-      - keycloak_data:/opt/keycloak/data
-      - ${KEYCLOAK_THEME_PATH:-./keycloak-theme/dist_keycloak}:/opt/keycloak/providers:ro
-    restart: unless-stopped
-    healthcheck:
-      test:
-        ["CMD-SHELL", "timeout 5 bash -c '</dev/tcp/localhost/8080' || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 90s
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - awras_internal_network
+  # Keycloak
+  # NOTE: To connect to keycloak use the dev realm of the deployed keycloak instance
+
+  # keycloak:
+  #   image: quay.io/keycloak/keycloak:26.0
+  #   container_name: keycloak
+  #   command: start-dev
+  #   environment:
+  #     KC_DB: postgres
+  #     KC_DB_URL: jdbc:postgresql://postgres:5432/${KEYCLOAK_DB_NAME:-keycloak}
+  #     KC_DB_USERNAME: ${POSTGRES_USER}
+  #     KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+  #     KC_DB_SCHEMA: public
+  #     KC_BOOTSTRAP_ADMIN: ${KEYCLOAK_ADMIN}
+  #     KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+  #     KC_HEALTH_ENABLED: "true"
+  #     KC_HOSTNAME_STRICT: "false"
+  #     KC_HOSTNAME_STRICT_HTTPS: "false"
+  #   ports:
+  #     - "${KEYCLOAK_PORT:-8080}:8080"
+  #   volumes:
+  #     - keycloak_data:/opt/keycloak/data
+  #     - ${KEYCLOAK_THEME_PATH:-./keycloak-theme/dist_keycloak}:/opt/keycloak/providers:ro
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test:
+  #       ["CMD-SHELL", "timeout 5 bash -c '</dev/tcp/localhost/8080' || exit 1"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 90s
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - awras_internal_network
 
   # Next.js application
   frontend:
@@ -161,7 +163,7 @@ services:
 
 volumes:
   postgres_data:
-  keycloak_data:
+  # keycloak_data:
 
 networks:
   awras_internal_network:
