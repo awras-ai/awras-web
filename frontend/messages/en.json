@@ -53,8 +53,20 @@
   "Hero": {
     "badge": "BUILDING THE FUTURE FOR ALGERIAN AI",
     "headline": "Empowering <accent>Algerian Darija</accent> with artificial intelligence.",
-    "description": "An ecosystem dedicated to preserving and understanding the Algerian dialect. Small language models, curated datasets, and tools built for the future.",
-    "cta": "Help us Annotate Data"
+    "description": "Join our community to help build language datasets and improve AI models for Darija.",
+    "cta": "Help us Annotate Data",
+    "contributionLabel": "CONTRIBUTE TO THE DATASET",
+    "contributeTitle": "Choose a task to contribute to our dataset",
+    "actionTextTitle": "Start annotating",
+    "actionTextDesc": "Review and rate the accuracy of Darija dictionary word definitions and text data.",
+    "actionTextTag": "Dictionary",
+    "actionTranslationTitle": "Start translating",
+    "actionTranslationDesc": "Translate provided text data into Darija to help build our language dataset.",
+    "actionTranslationTag": "Parallel Corpus",
+    "actionVoiceTitle": "Start recording",
+    "actionVoiceDesc": "Record your voice in Darija to contribute to our audio collection.",
+    "actionVoiceTag": "Speech Audio",
+    "discoverNow": "Discover now"
   },
   "Marquee": {
     "item1": "Darija Datasets",
@@ -223,7 +235,9 @@
     "headline": "Top <accent>Contributors.</accent>",
     "noData": "No contributions yet.",
     "you": "You",
-    "contributions": "contributions"
+    "contributions": "contributions",
+    "cta": "Start annotating",
+    "ctaDescription": "Join the contributors and help preserve Darija."
   },
   "ReportEntryDialog": {
     "title": "Report this entry",
