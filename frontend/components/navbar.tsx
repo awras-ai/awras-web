@@ -12,11 +12,10 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { href: "#mission", label: t("mission") },
-    { href: "#process", label: t("process") },
-    { href: "#faq", label: t("faq") },
-    // { href: "#about", label: "About" },
-    // { href: "/contact", label: "Contact" },
+    { href: "/#mission", label: t("mission") },
+    { href: "/#process", label: t("process") },
+    { href: "/#faq", label: t("faq") },
+    { href: "/leaderboard", label: t("leaderboard") },
   ];
 
   return (
