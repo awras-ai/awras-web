@@ -235,7 +235,9 @@
     "headline": "<accent>أبرز</accent> المساهمين.",
     "noData": "لا توجد مساهمات بعد.",
     "you": "أنت",
-    "contributions": "مساهمة"
+    "contributions": "مساهمة",
+    "cta": "ابدأ التوثيق",
+    "ctaDescription": "انضم إلى المساهمين وساعد في الحفاظ على الدارجة."
   },
   "ReportEntryDialog": {
     "title": "الإبلاغ عن هذا الإدخال",

@@ -235,7 +235,9 @@
     "headline": "Top <accent>Contributors.</accent>",
     "noData": "No contributions yet.",
     "you": "You",
-    "contributions": "contributions"
+    "contributions": "contributions",
+    "cta": "Start annotating",
+    "ctaDescription": "Join the contributors and help preserve Darija."
   },
   "ReportEntryDialog": {
     "title": "Report this entry",

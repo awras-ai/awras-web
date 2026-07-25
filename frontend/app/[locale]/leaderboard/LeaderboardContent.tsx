@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { Crown, Loader2 } from "lucide-react";
+import { ArrowRight, Crown, Loader2 } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useLeaderboard } from "@/hooks/useLeaderboard";
 
@@ -47,6 +48,17 @@ export function LeaderboardContent() {
           })}
         </h1>
         <p className="text-sm text-black/40">{t("noData")}</p>
+
+        <div className="mt-16 text-center">
+          <Link
+            href="/annotation"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-black text-white rounded-full font-semibold text-base hover:scale-105 transition-transform"
+          >
+            {t("cta")}
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+          <p className="mt-4 text-sm text-black/40">{t("ctaDescription")}</p>
+        </div>
       </main>
     );
   }
@@ -156,6 +168,17 @@ export function LeaderboardContent() {
               ))}
             </div>
           )}
+
+          <div className="mt-16 text-center">
+            <Link
+              href="/annotation"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-black text-white rounded-full font-semibold text-base hover:scale-105 transition-transform"
+            >
+              {t("cta")}
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            <p className="mt-4 text-sm text-black/40">{t("ctaDescription")}</p>
+          </div>
         </motion.div>
       </main>
     </div>
