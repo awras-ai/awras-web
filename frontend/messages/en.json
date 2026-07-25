@@ -40,6 +40,7 @@
     "mission": "Mission",
     "process": "Process",
     "faq": "FAQ",
+    "leaderboard": "Leaderboard",
     "homeAriaLabel": "Awras Home",
     "closeMenu": "Close menu",
     "openMenu": "Open menu",
@@ -210,6 +211,19 @@
     "cancel": "Cancel",
     "addWord": "Add word",
     "failedToCreate": "Failed to create entry. Please try again."
+  },
+  "Leaderboard": {
+    "metaTitle": "Leaderboard",
+    "metaDescription": "See the top contributors to Awras Darija preservation.",
+    "ogTitle": "Leaderboard | Awras",
+    "ogDescription": "See the top contributors to Awras Darija preservation.",
+    "twitterTitle": "Leaderboard | Awras",
+    "twitterDescription": "See the top contributors to Awras Darija preservation.",
+    "label": "Leaderboard",
+    "headline": "Top <accent>Contributors.</accent>",
+    "noData": "No contributions yet.",
+    "you": "You",
+    "contributions": "contributions"
   },
   "ReportEntryDialog": {
     "title": "Report this entry",

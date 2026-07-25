@@ -54,6 +54,7 @@ export function AnnotationHubContent() {
     if (!initialized) return;
     if (!authenticated) {
       keycloak?.login({
+        locale,
         redirectUri: `${window.location.origin}/${locale}/annotation`,
       });
     }

@@ -13,6 +13,7 @@ export function LoginContent() {
   useEffect(() => {
     if (!initialized) return;
     keycloak?.login({
+      locale,
       redirectUri: `${window.location.origin}/${locale}/annotation`,
     });
   }, [initialized, keycloak, locale]);

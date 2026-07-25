@@ -37,6 +37,7 @@ export function DictionaryAnnotationContent({ datasetId }: Props) {
     if (!initialized) return;
     if (!authenticated) {
       keycloak?.login({
+        locale,
         redirectUri: `${window.location.origin}/${locale}/annotation/dictionary/${datasetId}`,
       });
     }
