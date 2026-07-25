@@ -3,7 +3,7 @@
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { LogOut } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,6 +42,7 @@ export function AnnotationHeader() {
           <DropdownMenuTrigger asChild>
             <button className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14b8a6] focus-visible:ring-offset-2 transition-all hover:ring-2 hover:ring-black/10 hover:shadow-sm">
               <Avatar className="h-8 w-8 cursor-pointer transition-transform hover:scale-105">
+                <AvatarImage src={user?.picture || undefined} />
                 <AvatarFallback className="text-xs bg-black text-white font-medium">
                   {initials}
                 </AvatarFallback>
