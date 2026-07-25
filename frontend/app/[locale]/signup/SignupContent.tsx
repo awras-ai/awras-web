@@ -14,6 +14,7 @@ export function SignupContent() {
     if (!initialized) return;
     keycloak?.login({
       action: "register",
+      locale,
       redirectUri: `${window.location.origin}/${locale}/annotation`,
     });
   }, [initialized, keycloak, locale]);
