@@ -132,7 +132,7 @@ export function LeaderboardContent() {
             <div className="border border-black/10 rounded-xl overflow-hidden">
               {rest.map((entry, i) => (
                 <div
-                  key={entry.user.sub}
+                  key={entry.rank}
                   className={`flex items-center gap-4 px-5 py-3.5 ${
                     i > 0 ? "border-t border-black/5" : ""
                   } ${entry.is_current_user ? "bg-black/[0.02]" : ""}`}

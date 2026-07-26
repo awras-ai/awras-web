@@ -106,7 +106,7 @@ class LeaderboardService:
         except Exception:
             logger.warning("Keycloak enrichment failed, returning raw subs", exc_info=True)
             user_info_map = {
-                sub: {"name": "Unknown user", "username": "", "picture": None}
+                sub: {"name": "Unknown user", "picture": None}
                 for sub in subs
             }
 
@@ -117,7 +117,7 @@ class LeaderboardService:
         for rank, (sub, cnt) in enumerate(ranked, start=1):
             user_info = user_info_map.get(
                 sub,
-                {"name": "Unknown user", "username": "", "picture": None},
+                {"name": "Unknown user", "picture": None},
             )
             total = cnt["annotation_count"] + cnt["report_count"]
             result.append(
