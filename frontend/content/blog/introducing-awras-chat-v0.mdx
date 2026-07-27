@@ -1,0 +1,37 @@
+export const meta = {
+  slug: "introducing-awras-chat-v0",
+  category: "research",
+  title: "Introducing awras-chat-v0, a chat model that answers in Darija.",
+  excerpt:
+    "Trained on 1.2M community-annotated pairs, evaluated on five regional accents. What worked, what still breaks, and how the leaderboard shaped the dataset.",
+  author: "Amine Bouhaik",
+  date: "2026-07-14",
+  readTime: 12,
+  featured: true,
+};
+
+Today we are releasing awras-chat-v0, our first conversational model that
+replies in Algerian Darija instead of falling back to Modern Standard Arabic or
+French. It is small, it is opinionated, and it exists because contributors
+annotated 1.2M pairs over eight months.
+
+## What we built
+
+The base is a 7B open-weights model, continued-pretrained on 4.1B tokens of
+Algerian web text and transcribed speech, then instruction-tuned on the
+community pairs. Every pair carries the annotator's region so we can weight
+dialects instead of averaging them into a flat register nobody speaks.
+
+## What we measured
+
+We evaluated on five regional accents — Algérois, Oranais, Constantinois,
+Chaoui and Kabyle-influenced Darija — with native speakers scoring fluency and
+faithfulness blind. Fluency lands above 4.1/5 everywhere except Chaoui, where
+we are still short on data.
+
+## What comes next
+
+Code-switching mid-sentence remains the biggest failure mode, and transliteration
+between Arabizi and Arabic script is unreliable in long answers. Both are data
+problems before they are modelling problems, which is where the annotation
+queue goes next.

@@ -1,0 +1,33 @@
+export const meta = {
+  slug: "40-hour-speech-corpus",
+  category: "research",
+  title: "Building a 40-hour Algerian speech corpus from scratch.",
+  excerpt:
+    "Recording protocol, consent, noise floors and why we kept the street.",
+  author: "Bahaeddine Hemmem",
+  date: "2026-06-14",
+  readTime: 11,
+  featured: false,
+};
+
+Forty hours is not a large corpus by global standards. For Algerian Darija
+speech with verified transcripts and explicit consent, it is the largest we know
+of that is openly licensed.
+
+## What we built
+
+The protocol is deliberately low-tech: phone microphones, a fixed prompt list,
+and a two-pass transcript review. Contributors record where they live, so the
+corpus contains cafés, kitchens and traffic instead of studio silence.
+
+## What we measured
+
+Word error rate on a held-out set is 18.4% for our baseline recogniser, and only
+2 points worse on the noisiest quartile — evidence that keeping ambient sound
+made the models more robust rather than less.
+
+## What comes next
+
+Speaker balance is skewed male, roughly 63/37, and the age distribution thins
+out above fifty. The next collection round targets both gaps before we grow the
+total hours.

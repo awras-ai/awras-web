@@ -15,6 +15,7 @@ export function Navbar() {
     { href: "/#mission", label: t("mission") },
     { href: "/#process", label: t("process") },
     { href: "/#faq", label: t("faq") },
+    { href: "/blog", label: t("blog") },
     { href: "/leaderboard", label: t("leaderboard") },
   ];
 

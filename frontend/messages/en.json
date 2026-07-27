@@ -40,6 +40,7 @@
     "mission": "Mission",
     "process": "Process",
     "faq": "FAQ",
+    "blog": "Blog",
     "leaderboard": "Leaderboard",
     "homeAriaLabel": "Awras Home",
     "closeMenu": "Close menu",
@@ -143,6 +144,27 @@
     "socialHuggingFace": "HuggingFace",
     "socialInstagram": "Instagram",
     "copyright": "© {year} Awras. All rights reserved. Built for Algeria 🇩🇿"
+  },
+  "Blog": {
+    "metaTitle": "Blog",
+    "metaDescription": "Model releases, product changelogs and stories from the contributors annotating Algerian Darija.",
+    "ogTitle": "Blog | Awras",
+    "ogDescription": "Model releases, product changelogs and stories from the contributors annotating Algerian Darija.",
+    "twitterTitle": "Blog | Awras",
+    "twitterDescription": "Model releases, product changelogs and stories from the contributors annotating Algerian Darija.",
+    "label": "04 — Blog",
+    "headline": "Building Darija AI, <accent>in the open.</accent>",
+    "description": "Model releases, product changelogs and stories from the contributors annotating Algeria's language, one line at a time.",
+    "allPosts": "All posts",
+    "categories": {
+      "research": "Research",
+      "product": "Product",
+      "community": "Community"
+    },
+    "searchPlaceholder": "Search posts",
+    "readTime": "{minutes} min read",
+    "readRelease": "Read the release",
+    "noResults": "No posts match your search."
   },
   "Login": {
     "metaTitle": "Sign In",

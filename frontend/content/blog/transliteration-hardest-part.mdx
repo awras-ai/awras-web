@@ -1,0 +1,33 @@
+export const meta = {
+  slug: "transliteration-hardest-part",
+  category: "research",
+  title: "Transliteration is the hardest part of Darija NLP.",
+  excerpt:
+    "Arabizi, Arabic script and French loanwords in the same sentence.",
+  author: "Taki Eddine Akef",
+  date: "2026-07-02",
+  readTime: 9,
+  featured: false,
+};
+
+A single Algerian sentence can carry Arabic script, Arabizi digits and a French
+loanword spelled three different ways. Tokenizers hate it, and so do our
+evaluation metrics.
+
+## What we built
+
+We shipped a normalisation layer that maps Arabizi to Arabic script before
+training, while keeping the original surface form as metadata. The model sees a
+consistent script; the dataset keeps the evidence of how people actually write.
+
+## What we measured
+
+Normalisation lifted retrieval accuracy on our internal benchmark by 11 points,
+but it also erased spelling signals that identify a writer's region. We now
+report both scores, normalised and raw, so the trade-off stays visible.
+
+## What comes next
+
+The mapping is still rule-based and breaks on names and brand words. A learned
+transliterator trained on annotator-confirmed pairs is the next milestone, and
+it needs roughly 50k more aligned examples.
