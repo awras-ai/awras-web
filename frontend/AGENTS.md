@@ -16,6 +16,13 @@ and voice rules to React components.
 Every `.mdx` file in `frontend/content/blog/` is a published article. This section is the
 contract for writing one. Read it before creating or editing a post.
 
+**A new article means two files, not one.** When a user asks you to create a post, write
+both `frontend/content/blog/{slug}.mdx` (English) and
+`frontend/content/blog/ar/{slug}.mdx` (Arabic) in the same pass — see
+[Translating a post (Arabic)](#translating-a-post-arabic) for what to translate vs. copy.
+Don't ship the English file alone and treat Arabic as a follow-up unless the user
+explicitly asks for one locale only.
+
 The article body's design system lives in `frontend/components/blog/mdx/`.
 
 ---
@@ -74,7 +81,9 @@ Notes:
 
 `frontend/content/blog/{slug}.mdx` is the **canonical** post (English). Its Arabic
 counterpart is `frontend/content/blog/ar/{slug}.mdx` — same filename, same frontmatter
-*shape*.
+*shape*. **Write both files whenever you create a new post** — see the note at the top of
+[Blog articles](#blog-articles). The fallback below exists for posts that predate this
+rule or get edited one locale at a time, not as the normal way to ship a new article.
 
 - **Translate**: `title`, `excerpt`, `imageCaption`, and the entire MDX body (headings,
   prose, table cells that are prose, `<Stat>` labels, `<Pullquote>` text/`cite`).
@@ -82,9 +91,10 @@ counterpart is `frontend/content/blog/ar/{slug}.mdx` — same filename, same fro
   `Blog.categories.*` in `frontend/messages/*.json` already handles display), `author`,
   `date`, `readTime`, `featured`, `image`.
 - If `frontend/content/blog/ar/{slug}.mdx` doesn't exist, `/ar/blog/{slug}` falls back to
-  the English file automatically — a new English-only post won't break the Arabic build.
-  So a translation can lag; it just shouldn't be half-done (don't create the Arabic file
-  until you're translating the whole post).
+  the English file automatically, so a missing translation degrades gracefully instead of
+  breaking the Arabic build — but for a **new** post this should never be the end state;
+  write the Arabic file in the same pass. Don't create it half-done (i.e. don't add the
+  file until you're translating the whole post).
 - Keep terminology consistent with `frontend/messages/ar.json` rather than inventing new
   phrasing — e.g. "الدارجة الجزائرية", "مساهم" (contributor), "توثيق" (annotation),
   "لوحة الصدارة" (leaderboard).
