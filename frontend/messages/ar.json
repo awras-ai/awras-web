@@ -164,7 +164,10 @@
     "searchPlaceholder": "ابحث في المقالات",
     "readTime": "{minutes} دقائق قراءة",
     "readRelease": "اقرأ الإصدار",
-    "noResults": "لا توجد مقالات مطابقة لبحثك."
+    "noResults": "لا توجد مقالات مطابقة لبحثك.",
+    "loadMore": "عرض المزيد",
+    "loadLess": "عرض أقل",
+    "showingCount": "عرض {count} من {total}"
   },
   "Login": {
     "metaTitle": "تسجيل الدخول",

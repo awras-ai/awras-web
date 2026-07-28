@@ -1,0 +1,30 @@
+---
+category: "product"
+title: "A review queue that stops good annotations from being overwritten."
+excerpt: "Disagreement scoring, reviewer routing and a much quieter inbox."
+author: "Rezig Abdelraouf"
+date: "2026-07-05"
+readTime: 6
+featured: false
+---
+
+Every annotation platform eventually has the same argument: two contributors
+disagree, and the last one to hit save wins. Ours no longer works that way.
+
+## What we built
+
+Conflicting submissions now open a review item instead of replacing each other.
+Items are scored by how far apart the annotations are and routed to a reviewer
+who has worked on that dialect before.
+
+## What we measured
+
+Silent overwrites dropped from roughly 340 a week to zero, and the median review
+item is resolved in under nine hours. Reviewer notifications fell by a third,
+because near-identical submissions no longer generate a conflict at all.
+
+## What comes next
+
+Routing still leans on a handful of experienced reviewers. The next iteration
+weights reviewer load alongside dialect familiarity so the queue does not
+concentrate on the same five people.

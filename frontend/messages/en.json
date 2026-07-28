@@ -164,7 +164,10 @@
     "searchPlaceholder": "Search posts",
     "readTime": "{minutes} min read",
     "readRelease": "Read the release",
-    "noResults": "No posts match your search."
+    "noResults": "No posts match your search.",
+    "loadMore": "Load more",
+    "loadLess": "Show less",
+    "showingCount": "Showing {count} of {total}"
   },
   "Login": {
     "metaTitle": "Sign In",

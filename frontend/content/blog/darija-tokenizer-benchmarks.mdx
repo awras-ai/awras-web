@@ -1,0 +1,30 @@
+---
+category: "research"
+title: "Why off-the-shelf tokenizers waste half a Darija sentence."
+excerpt: "Fertility rates, Latin-script noise and the case for a custom vocabulary."
+author: "Bahaeddine Hemmem"
+date: "2026-06-28"
+readTime: 9
+featured: false
+---
+
+A tokenizer trained mostly on English and Modern Standard Arabic treats Darija
+the way it treats a typo: it splits it until the pieces look familiar.
+
+## What we built
+
+We benchmarked four public tokenizers against a 12,000-sentence sample of our
+corpus, half in Arabic script and half in Latin-script Arabizi, then trained a
+byte-level replacement on the same data.
+
+## What we measured
+
+Fertility — tokens produced per word — ran between 3.1 and 4.6 on the public
+tokenizers, against 1.7 for ours. Arabizi was the worst case everywhere: numeral
+substitutions like 3, 7 and 9 fragment almost every word they appear in.
+
+## What comes next
+
+Lower fertility means more sentence per context window and cheaper inference,
+but it also means retraining every downstream checkpoint. We are publishing the
+vocabulary first and the migrated models once the evaluations line up.

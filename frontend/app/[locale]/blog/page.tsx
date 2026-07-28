@@ -12,13 +12,13 @@ export default function BlogPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-24">
-      <p className="text-xs font-semibold text-black/40 tracking-widest uppercase mb-3">
+      <p className="text-xl font-semibold text-black/40 tracking-widest uppercase mb-3">
         {t("label")}
       </p>
       <h1 className="text-4xl md:text-6xl font-bold tracking-tight max-w-3xl text-balance">
         {t.rich("headline", {
           accent: (chunks) => (
-            <span style={{ color: "#14b8a6" }}>{chunks}</span>
+            <span style={{ color: "--var-accent" }}>{chunks}</span>
           ),
         })}
       </h1>
