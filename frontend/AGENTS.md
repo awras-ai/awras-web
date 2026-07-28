@@ -57,7 +57,7 @@ author: "Full Name"
 date: "2026-07-14" # YYYY-MM-DD
 readTime: 12 # integer, minutes
 featured: false # exactly ONE post across all posts may be true
-image: "/blog/some-image.jpg" # optional; omit and a placeholder slot renders
+image: "/blog/{slug}.png" # optional; omit and a placeholder slot renders
 imageCaption: "Photo credit or context." # optional; only shows when image is set
 ---
 ```
@@ -66,6 +66,11 @@ Notes:
 
 - The **filename is the slug**. `introducing-awras-chat-v0.mdx` → `/blog/introducing-awras-chat-v0`.
   Use lowercase kebab-case.
+- Images live in `frontend/public/blog/`, named after the slug —
+  `public/blog/{slug}.png` — not a generic name like `thumbnail.png`. `image` must start
+  with a leading `/` (it's a root-relative path passed straight to `next/image`); a value
+  without one throws `URL constructor: … is not a valid URL` at render time. Both locale
+  files reference the same image.
 - Setting `featured: true` on a second post is a silent bug — `getFeaturedPosts()` returns
   the first match and the other quietly vanishes from the list.
 - `category` must be one of the three values above; it's used as a translation key
