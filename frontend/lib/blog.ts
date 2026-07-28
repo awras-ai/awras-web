@@ -1,16 +1,14 @@
-import matter from "gray-matter";
 import fs from "fs";
+import matter from "gray-matter";
 import path from "path";
-import { type Post, type Category } from "./types/blog";
+import { type Post } from "./types/blog";
 
 const POSTS_DIR = path.join(process.cwd(), "content/blog");
-
-const normalize = (text: string) => text.toLowerCase().replaceAll(" ", "");
 
 export function getAllPosts(): Post[] {
   const files = fs.readdirSync(POSTS_DIR);
   const allPostData = files.map((fileName) => {
-    const slug = fileName.replace(/\.md$/, "");
+    const slug = fileName.replace(/\.mdx$/, "");
     const fullPath = path.join(POSTS_DIR, fileName);
     const postContent = fs.readFileSync(fullPath, "utf-8");
 
@@ -23,17 +21,4 @@ export function getAllPosts(): Post[] {
 }
 export function getFeaturedPosts(posts: Post[]): Post | undefined {
   return posts.find((post) => post.featured);
-}
-
-export function filterPosts(posts: Post[], category: Category | "all"): Post[] {
-  return posts.filter(
-    (post) =>
-      !post.featured && (category == "all" || post.category === category),
-  );
-}
-
-export function searchPosts(posts: Post[], query: string) {
-  if (!query) return posts;
-  const q = normalize(query);
-  return posts.filter((post) => normalize(post.title).includes(q));
 }
