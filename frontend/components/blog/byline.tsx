@@ -1,9 +1,14 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-const formatDate = (date: string) =>
-  new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short" }).format(
-    new Date(date),
-  );
+// Algeria uses Western Arabic numerals, unlike ar-EG — matches the ar_DZ
+// OpenGraph locale already set in the root layout.
+const dateFormatLocale = (locale: string) => (locale === "ar" ? "ar-DZ" : locale);
+
+const formatDate = (date: string, locale: string) =>
+  new Intl.DateTimeFormat(dateFormatLocale(locale), {
+    day: "numeric",
+    month: "short",
+  }).format(new Date(date));
 
 const initials = (name: string) =>
   name
@@ -18,10 +23,12 @@ export function Byline({
   author,
   date,
   size,
+  locale,
 }: {
   author: string;
   date: string;
   size: "sm" | "default";
+  locale: string;
 }) {
   const small = size === "sm";
 
@@ -45,7 +52,7 @@ export function Byline({
           small ? "text-xs text-neutral-300" : "text-sm text-neutral-400"
         }
       >
-        {formatDate(date)}
+        {formatDate(date, locale)}
       </span>
     </div>
   );

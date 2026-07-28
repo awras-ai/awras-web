@@ -2,13 +2,14 @@
 
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Byline } from "./byline";
 import type { Post } from "@/lib/types/blog";
 
 export function FeaturedPost({ post }: { post: Post }) {
   const t = useTranslations("Blog");
+  const locale = useLocale();
 
   return (
     <Link
@@ -43,7 +44,12 @@ export function FeaturedPost({ post }: { post: Post }) {
         <p className="mt-4 text-black/50 leading-relaxed max-w-md">
           {post.excerpt}
         </p>
-        <Byline author={post.author} date={post.date} size="default" />
+        <Byline
+          author={post.author}
+          date={post.date}
+          size="default"
+          locale={locale}
+        />
         <div className="inline-flex items-center gap-2 mt-8 px-6 py-3.5 bg-black text-white rounded-full text-sm font-semibold group-hover:scale-105 transition-transform">
           {t("readRelease")}
           <ArrowRight className="w-4 h-4" />

@@ -1,13 +1,16 @@
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { getAllPosts, getFeaturedPosts } from "@/lib/blog";
 import { BlogSearchInput } from "@/components/blog/blog-search-input";
 import { BlogCategoryFilters } from "@/components/blog/blog-category-fillters";
 import { BlogList } from "@/components/blog/blog-list";
 import { FeaturedPost } from "@/components/blog/featured-posts";
 
-export default function BlogPage() {
-  const t = useTranslations("Blog");
-  const posts = getAllPosts();
+type Props = { params: Promise<{ locale: string }> };
+
+export default async function BlogPage({ params }: Props) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Blog" });
+  const posts = getAllPosts(locale);
   const featured = getFeaturedPosts(posts);
 
   return (

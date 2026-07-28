@@ -70,6 +70,29 @@ Notes:
 
 ---
 
+## Translating a post (Arabic)
+
+`frontend/content/blog/{slug}.mdx` is the **canonical** post (English). Its Arabic
+counterpart is `frontend/content/blog/ar/{slug}.mdx` — same filename, same frontmatter
+*shape*.
+
+- **Translate**: `title`, `excerpt`, `imageCaption`, and the entire MDX body (headings,
+  prose, table cells that are prose, `<Stat>` labels, `<Pullquote>` text/`cite`).
+- **Copy unchanged**: `category` (it's a translation key, not prose —
+  `Blog.categories.*` in `frontend/messages/*.json` already handles display), `author`,
+  `date`, `readTime`, `featured`, `image`.
+- If `frontend/content/blog/ar/{slug}.mdx` doesn't exist, `/ar/blog/{slug}` falls back to
+  the English file automatically — a new English-only post won't break the Arabic build.
+  So a translation can lag; it just shouldn't be half-done (don't create the Arabic file
+  until you're translating the whole post).
+- Keep terminology consistent with `frontend/messages/ar.json` rather than inventing new
+  phrasing — e.g. "الدارجة الجزائرية", "مساهم" (contributor), "توثيق" (annotation),
+  "لوحة الصدارة" (leaderboard).
+- `lib/blog.ts`'s `getAllPosts`/`getPostBySlug` take a `locale` and resolve per-file, not
+  per-directory — you never need to touch that resolution logic to add a translation.
+
+---
+
 ## Markdown conventions
 
 - **Never use `#`.** The page renders `title` as the `h1`. Section headings start at `##`.
@@ -189,3 +212,8 @@ The build must stay green and the route table must show `● /[locale]/blog/[slu
 new path included. If the post renders but looks wrong, check the compiled HTML at
 `frontend/.next/server/app/en/blog/<slug>.html` — a `<p>` nested inside a `<p>`, or an
 element with classes but no styling, means rule 1 or 2 above was broken.
+
+If you added or edited an Arabic translation, also check
+`frontend/.next/server/app/ar/blog/<slug>.html`: the title/excerpt/body should be in
+Arabic, `<html dir="rtl">`, and if you left the Arabic file out entirely, that same check
+should still show the English fallback rather than a 404.

@@ -23,8 +23,8 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const { locale, slug } = await params;
+  const post = getPostBySlug(locale, slug);
 
   if (!post) return {};
 
@@ -42,7 +42,7 @@ export default async function BlogPostPage({ params }: Props) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const post = getPostBySlug(slug);
+  const post = getPostBySlug(locale, slug);
   if (!post) notFound();
 
   const t = await getTranslations({ locale, namespace: "Blog" });
@@ -86,7 +86,7 @@ export default async function BlogPostPage({ params }: Props) {
       </p>
 
       <div className="mt-8 py-5.5 border-y border-black/10 [&>div]:mt-0">
-        <Byline author={author} date={date} size="default" />
+        <Byline author={author} date={date} size="default" locale={locale} />
       </div>
 
       <figure className="mt-11">

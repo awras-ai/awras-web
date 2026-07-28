@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Byline } from "./byline";
 import type { Post } from "@/lib/types/blog";
 
 export function PostCard({ post }: { post: Post }) {
   const t = useTranslations("Blog");
+  const locale = useLocale();
 
   return (
     <Link href={`/blog/${post.slug}`} className="group">
@@ -34,7 +35,7 @@ export function PostCard({ post }: { post: Post }) {
       <p className="mt-2 text-sm text-neutral-500 leading-relaxed text-balance">
         {post.excerpt}
       </p>
-      <Byline author={post.author} date={post.date} size="sm" />
+      <Byline author={post.author} date={post.date} size="sm" locale={locale} />
     </Link>
   );
 }
