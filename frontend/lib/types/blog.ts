@@ -5,6 +5,7 @@ export type Post = {
   category: Category;
   title: string;
   image?: string;
+  imageCaption?: string;
   excerpt: string;
   author: string;
   date: string;

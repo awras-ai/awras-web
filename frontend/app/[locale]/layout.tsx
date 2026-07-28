@@ -5,7 +5,11 @@ import { Geist, Geist_Mono, Inter, IBM_Plex_Sans_Arabic } from "next/font/google
 import "./globals.css";
 import { Providers } from "./providers";
 import Script from "next/script";
-import { getMessages, getTranslations } from "next-intl/server";
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from "next-intl/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -77,6 +81,9 @@ export default async function RootLayout({
 }> &
   Props) {
   const { locale } = await params;
+  // Required for statically rendered routes (e.g. /[locale]/blog/[slug]) —
+  // without it next-intl falls back to the default locale at build time.
+  setRequestLocale(locale);
   const dir = locale === "ar" ? "rtl" : "ltr";
   const t = await getTranslations({ locale, namespace: "Metadata" });
 
@@ -111,7 +118,7 @@ export default async function RootLayout({
       "query-input": "required name=search_term_string",
     },
   };
-  const messages = await getMessages();
+  const messages = await getMessages({ locale });
 
   return (
     <html lang={locale} dir={dir}>

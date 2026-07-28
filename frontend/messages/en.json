@@ -156,6 +156,10 @@
     "headline": "Building Darija AI, <accent>in the open.</accent>",
     "description": "Model releases, product changelogs and stories from the contributors annotating Algeria's language, one line at a time.",
     "allPosts": "All posts",
+    "backToBlog": "Back to blog",
+    "articleCtaTitle": "Every annotation lands in the next model.",
+    "articleCtaDescription": "Join 214 contributors preserving Darija.",
+    "articleCtaAction": "Start annotating",
     "categories": {
       "research": "Research",
       "product": "Product",
