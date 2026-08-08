@@ -92,7 +92,6 @@ class KeycloakService:
 
         return {
             "name": full_name or representation.get("username") or "Unknown user",
-            "username": representation.get("username") or "",
             "email": representation.get("email"),
             "picture": picture,
         }
@@ -113,7 +112,7 @@ class KeycloakService:
             logger.warning("Failed to fetch Keycloak user %s: %s", sub, e)
         except Exception:
             logger.warning("Unexpected error fetching Keycloak user %s", sub, exc_info=True)
-        return {"name": "Unknown user", "username": "", "email": None, "picture": None}
+        return {"name": "Unknown user", "email": None, "picture": None}
 
     @staticmethod
     def get_users_by_subs(subs: list[str]) -> dict[str, dict[str, Any]]:

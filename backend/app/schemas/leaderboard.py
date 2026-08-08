@@ -9,7 +9,6 @@ class LeaderboardUser(BaseModel):
     """User info from Keycloak for the leaderboard."""
 
     name: str = Field(..., description="User's display name")
-    username: str = Field(..., description="Keycloak username")
     picture: str | None = Field(
         None, description="Profile picture URL (from Keycloak attributes)"
     )

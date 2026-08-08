@@ -1,8 +1,5 @@
 export interface LeaderboardUser {
-  sub: string;
   name: string;
-  username: string;
-  email: string | null;
   picture: string | null;
 }
 
