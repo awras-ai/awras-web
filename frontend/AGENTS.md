@@ -57,7 +57,7 @@ author: "Full Name"
 date: "2026-07-14" # YYYY-MM-DD
 readTime: 12 # integer, minutes
 featured: false # exactly ONE post across all posts may be true
-image: "/blog/{slug}.png" # optional; omit and a placeholder slot renders
+image: "/blog/{slug}.png" # optional; omit and no image slot renders
 imageCaption: "Photo credit or context." # optional; only shows when image is set
 ---
 ```

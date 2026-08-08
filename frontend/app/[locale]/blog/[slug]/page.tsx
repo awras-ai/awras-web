@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, ImageIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
@@ -89,9 +89,9 @@ export default async function BlogPostPage({ params }: Props) {
         <Byline author={author} date={date} size="default" locale={locale} />
       </div>
 
-      <figure className="mt-11">
-        <div className="h-64 md:h-108 rounded-2xl overflow-hidden relative bg-neutral-100">
-          {image ? (
+      {image ? (
+        <figure className="mt-11">
+          <div className="h-64 md:h-108 rounded-2xl overflow-hidden relative bg-neutral-100">
             <Image
               src={image}
               alt={title}
@@ -100,18 +100,14 @@ export default async function BlogPostPage({ params }: Props) {
               className="object-cover"
               priority
             />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <ImageIcon className="w-8 h-8 text-neutral-300" />
-            </div>
-          )}
-        </div>
-        {imageCaption ? (
-          <figcaption className="mt-3.5 text-center text-sm text-neutral-400">
-            {imageCaption}
-          </figcaption>
-        ) : null}
-      </figure>
+          </div>
+          {imageCaption ? (
+            <figcaption className="mt-3.5 text-center text-sm text-neutral-400">
+              {imageCaption}
+            </figcaption>
+          ) : null}
+        </figure>
+      ) : null}
 
       <div className="mt-14">
         <MDXContent content={post.content} />
