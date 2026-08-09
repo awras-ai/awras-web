@@ -8,7 +8,6 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
-    Query,
     Request,
     UploadFile,
     status,
@@ -34,6 +33,7 @@ from app.schemas.translation import (
 from app.services.translation import TranslationService
 
 router = APIRouter(prefix="/translation", tags=["Translation"])
+router_admin = APIRouter(prefix="/translation", tags=["Translation Admin"])
 
 
 # =============================================================================
@@ -41,7 +41,7 @@ router = APIRouter(prefix="/translation", tags=["Translation"])
 # =============================================================================
 
 
-@router.post(
+@router_admin.post(
     "/datasets",
     response_model=DatasetResponse,
     status_code=status.HTTP_201_CREATED,
@@ -77,8 +77,6 @@ async def create_dataset(
     - 401: Not authenticated
     - 403: Not authorized (not admin)
     """
-    # Convert Column[UUID] to UUID if needed
-    created_by_id = user.sub if isinstance(user.sub, UUID) else user.sub
     dataset = TranslationService.create_dataset(
         db=db,
         name=data.name,
@@ -86,12 +84,12 @@ async def create_dataset(
         target_language=data.target_language,
         description=data.description,
         category=data.category,
-        created_by_id=created_by_id,
+        created_by_sub=user.sub,
     )
     return dataset
 
 
-@router.post(
+@router_admin.post(
     "/datasets/{dataset_id}/upload",
     response_model=UploadResponse,
     status_code=status.HTTP_201_CREATED,
@@ -100,7 +98,7 @@ async def create_dataset(
 @limiter.limit("5/minute")
 async def upload_csv(
     request: Request,
-    dataset_id: str,
+    dataset_id: UUID,
     file: UploadFile,
     db: Session = Depends(get_db),
     user: KeycloakUser = Depends(require_admin_auth),
@@ -188,8 +186,6 @@ async def upload_csv(
 @limiter.limit("60/minute")
 async def list_datasets(
     request: Request,
-    skip: int = Query(0, ge=0, description="Number of records to skip"),
-    limit: int = Query(50, ge=1, le=100, description="Maximum records to return"),
     db: Session = Depends(get_db),
     user: KeycloakUser = Depends(require_auth),
 ) -> DatasetListResponse:
@@ -198,11 +194,7 @@ async def list_datasets(
 
     **Requires authentication.**
 
-    Returns a paginated list of all datasets ordered by creation date (newest first).
-
-    Args:
-    - **skip**: Number of records to skip (pagination offset)
-    - **limit**: Maximum number of records to return (1-100)
+    Returns a list of all datasets ordered by creation date (newest first).
 
     Returns:
     - **datasets**: List of dataset objects
@@ -212,8 +204,9 @@ async def list_datasets(
     - 200: Datasets retrieved successfully
     - 401: Not authenticated
     """
-    datasets = TranslationService.get_datasets(db, skip=skip, limit=limit)
-    return DatasetListResponse(datasets=datasets, total=len(datasets))
+    datasets = TranslationService.get_datasets(db)
+    total = TranslationService.get_datasets_count(db)
+    return DatasetListResponse(datasets=datasets, total=total)
 
 
 @router.get(
@@ -224,7 +217,7 @@ async def list_datasets(
 @limiter.limit("60/minute")
 async def get_dataset(
     request: Request,
-    dataset_id: str,
+    dataset_id: UUID,
     db: Session = Depends(get_db),
     user: KeycloakUser = Depends(require_auth),
 ) -> DatasetResponse:
@@ -261,7 +254,7 @@ async def get_dataset(
 @limiter.limit("30/minute")
 async def get_dataset_stats(
     request: Request,
-    dataset_id: str,
+    dataset_id: UUID,
     db: Session = Depends(get_db),
     user: KeycloakUser = Depends(require_auth),
 ) -> DatasetStatsDetailResponse:
@@ -294,47 +287,26 @@ async def get_dataset_stats(
             detail="Dataset not found",
         )
 
-    # Get overall stats
     overall_stats = TranslationService.get_dataset_stats(db, dataset_id)
-
-    # Count user's annotations for this dataset
-    from app.models import TranslationAnnotation, TranslationEntry
-
-    user_annotated_count = (
-        db.query(TranslationAnnotation)
-        .join(TranslationEntry, TranslationAnnotation.entry_id == TranslationEntry.id)
-        .filter(TranslationEntry.dataset_id == dataset_id)
-        .filter(TranslationAnnotation.user_id == user.sub)
-        .count()
-    )
-
-    remaining = overall_stats["pending_count"]
-    user_total = overall_stats["total_entries"]
-    user_percentage = (user_annotated_count / user_total * 100) if user_total > 0 else 0
-
-    # Count user's annotations for this dataset
-    from app.models import TranslationAnnotation, TranslationEntry
-
-    user_annotated_count = (
-        db.query(TranslationAnnotation)
-        .join(TranslationEntry, TranslationAnnotation.entry_id == TranslationEntry.id)
-        .filter(TranslationEntry.dataset_id == dataset_id)
-        .filter(TranslationAnnotation.user_id == user.sub)
-        .count()
-    )
-
-    remaining = overall_stats["pending_count"]
-    user_total = overall_stats["total_entries"]
-    user_percentage = (user_annotated_count / user_total * 100) if user_total > 0 else 0
+    user_stats = TranslationService.get_user_dataset_stats(db, dataset_id, user.sub)
 
     return DatasetStatsDetailResponse(
         dataset=dataset,
         overall_stats=DatasetStatsResponse(**overall_stats),
         user_stats=UserDatasetStatsResponse(
-            total_entries=user_total,
-            annotated_by_user=user_annotated_count,
-            remaining_for_user=remaining,
-            user_completion_percentage=round(user_percentage, 2),
+            total_entries=user_stats["total_entries"],
+            annotated_by_user=user_stats["user_annotated_count"],
+            remaining_for_user=user_stats["user_remaining_count"],
+            user_completion_percentage=(
+                round(
+                    user_stats["user_annotated_count"]
+                    / user_stats["total_entries"]
+                    * 100,
+                    2,
+                )
+                if user_stats["total_entries"] > 0
+                else 0
+            ),
         ),
     )
 
@@ -352,7 +324,7 @@ async def get_dataset_stats(
 @limiter.limit("30/minute")
 async def get_next_entry(
     request: Request,
-    dataset_id: str,
+    dataset_id: UUID,
     db: Session = Depends(get_db),
     user: KeycloakUser = Depends(require_auth),
 ) -> EntryResponse:
@@ -395,7 +367,7 @@ async def get_next_entry(
 @limiter.limit("60/minute")
 async def get_entry(
     request: Request,
-    entry_id: str,
+    entry_id: UUID,
     db: Session = Depends(get_db),
     user: KeycloakUser = Depends(require_auth),
 ) -> EntryResponse:
@@ -436,7 +408,7 @@ async def get_entry(
 @limiter.limit("20/minute")
 async def submit_annotation(
     request: Request,
-    entry_id: str,
+    entry_id: UUID,
     data: SubmitAnnotationRequest,
     db: Session = Depends(get_db),
     user: KeycloakUser = Depends(require_auth),
@@ -471,7 +443,7 @@ async def submit_annotation(
     annotation, error = TranslationService.submit_annotation(
         db=db,
         entry_id=entry_id,
-        user_id=user.sub,
+        keycloak_sub=user.sub,
         corrected_translation=data.corrected_translation,
         notes=data.notes,
     )
