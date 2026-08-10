@@ -1,12 +1,12 @@
 """
 Leaderboard service.
 
-Aggregates contribution counts from dictionary_annotations and
-dictionary_reports grouped by keycloak_sub, then enriches each sub
-with user info from the Keycloak Admin API.
+Aggregates contribution counts from dictionary_annotations,
+dictionary_reports, and translation_annotations grouped by keycloak_sub,
+then enriches each sub with user info from the Keycloak Admin API.
 
-Designed so adding translation/voice annotation counts later is
-just one more query merged into the aggregation step.
+Designed so adding voice annotation counts later is just one more
+query merged into the aggregation step.
 """
 
 import logging
@@ -15,7 +15,11 @@ from typing import Any
 from sqlalchemy import func
 from sqlalchemy.orm import Session as DBSession
 
-from app.models import DictionaryAnnotation, DictionaryReport
+from app.models import (
+    DictionaryAnnotation,
+    DictionaryReport,
+    TranslationAnnotation,
+)
 from app.services.keycloak import KeycloakService
 
 logger = logging.getLogger(__name__)
@@ -31,8 +35,9 @@ class LeaderboardService:
         """
         Build the top contributors leaderboard.
 
-        Counts annotations + reports per user, sorts by total descending,
-        and enriches each keycloak_sub with user info from Keycloak.
+        Counts dictionary annotations, translation annotations, and reports
+        per user, sorts by total descending, and enriches each keycloak_sub
+        with user info from Keycloak.
 
         Args:
             db: Database session
@@ -41,7 +46,7 @@ class LeaderboardService:
                          If provided, the matching entry will have is_current_user=True.
 
         Returns:
-            List of dicts with rank, user info, and contribution counts,
+            List of dicts with rank, user info, and total count,
             sorted by total_count descending.
         """
         # ------------------------------------------------------------------
@@ -70,7 +75,22 @@ class LeaderboardService:
         )
 
         # ------------------------------------------------------------------
-        # 3. Merge counts per sub
+        # 3. Aggregate translation annotation counts per user
+        # ------------------------------------------------------------------
+        translation_annotation_rows = (
+            db.query(
+                TranslationAnnotation.keycloak_sub,
+                func.count(TranslationAnnotation.id).label(
+                    "translation_annotation_count"
+                ),
+            )
+            .filter(TranslationAnnotation.keycloak_sub.isnot(None))
+            .group_by(TranslationAnnotation.keycloak_sub)
+            .all()
+        )
+
+        # ------------------------------------------------------------------
+        # 4. Merge counts per sub
         # ------------------------------------------------------------------
         counts: dict[str, dict[str, int]] = {}
 
@@ -83,6 +103,11 @@ class LeaderboardService:
             sub = row.keycloak_sub
             counts.setdefault(sub, {"annotation_count": 0, "report_count": 0})
             counts[sub]["report_count"] = row.report_count
+
+        for row in translation_annotation_rows:
+            sub = row.keycloak_sub
+            counts.setdefault(sub, {"annotation_count": 0, "report_count": 0})
+            counts[sub]["annotation_count"] += row.translation_annotation_count
 
         # Sort by total descending, then by sub for stability
         ranked = sorted(
@@ -98,20 +123,21 @@ class LeaderboardService:
             return []
 
         # ------------------------------------------------------------------
-        # 4. Enrich with Keycloak user info
+        # 5. Enrich with Keycloak user info
         # ------------------------------------------------------------------
         subs = [sub for sub, _ in ranked]
         try:
             user_info_map = KeycloakService.get_users_by_subs(subs)
         except Exception:
-            logger.warning("Keycloak enrichment failed, returning raw subs", exc_info=True)
+            logger.warning(
+                "Keycloak enrichment failed, returning raw subs", exc_info=True
+            )
             user_info_map = {
-                sub: {"name": "Unknown user", "picture": None}
-                for sub in subs
+                sub: {"name": "Unknown user", "picture": None} for sub in subs
             }
 
         # ------------------------------------------------------------------
-        # 5. Build final list with rank
+        # 6. Build final list with rank
         # ------------------------------------------------------------------
         result = []
         for rank, (sub, cnt) in enumerate(ranked, start=1):
@@ -124,8 +150,6 @@ class LeaderboardService:
                 {
                     "rank": rank,
                     "user": user_info,
-                    "annotation_count": cnt["annotation_count"],
-                    "report_count": cnt["report_count"],
                     "total_count": total,
                     "is_current_user": current_sub is not None and sub == current_sub,
                 }

@@ -3,18 +3,28 @@
 import { Link } from "@/i18n/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowUpRight, ChevronDown, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageSelector } from "@/components/language-selector";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Navbar() {
   const t = useTranslations("Navbar");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navLinks = [
+  const anchorLinks = [
     { href: "/#mission", label: t("mission") },
     { href: "/#process", label: t("process") },
     { href: "/#faq", label: t("faq") },
+  ];
+
+  const routeLinks = [
+    { href: "/blog", label: t("blog") },
     { href: "/leaderboard", label: t("leaderboard") },
   ];
 
@@ -34,7 +44,21 @@ export function Navbar() {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-2">
-          {navLinks.map((link) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger className="relative flex items-center gap-1 px-4 py-2 text-[14px] font-medium tracking-tight text-neutral-800 hover:text-black transition-colors focus:outline-none">
+              {t("explore")}
+              <ChevronDown className="h-4 w-4" aria-hidden="true" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-44">
+              {anchorLinks.map((link) => (
+                <DropdownMenuItem asChild key={link.href}>
+                  <Link href={link.href}>{link.label}</Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {routeLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -88,7 +112,24 @@ export function Navbar() {
           className="md:hidden border-t border-neutral-200/50 bg-white/95 backdrop-blur-xl"
         >
           <div className="px-6 pt-4 pb-8 space-y-2">
-            {navLinks.map((link) => (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex w-full items-center justify-between px-4 py-2 text-base font-medium text-neutral-800 hover:text-black hover:bg-neutral-50 rounded-md transition-colors focus:outline-none">
+                {t("explore")}
+                <ChevronDown className="h-4 w-4" aria-hidden="true" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                {anchorLinks.map((link) => (
+                  <DropdownMenuItem
+                    asChild
+                    key={link.href}
+                    onSelect={() => setMobileMenuOpen(false)}
+                  >
+                    <Link href={link.href}>{link.label}</Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {routeLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}

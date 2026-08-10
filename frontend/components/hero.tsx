@@ -56,14 +56,6 @@ export async function Hero() {
         </svg>
       </div>
 
-      {/* Massive Bottom Green Gradient (Moneco Style) */}
-      <div 
-        className="absolute inset-0 pointer-events-none z-10"
-        style={{
-          background: "radial-gradient(ellipse 120% 70% at 50% 110%, rgba(20, 184, 166, 0.35) 0%, rgba(20, 184, 166, 0.1) 50%, transparent 100%)"
-        }}
-      ></div>
-
       <div className="max-w-5xl mx-auto w-full my-auto space-y-10 md:space-y-12 relative z-20">
 
         {/* Centered Top Block */}

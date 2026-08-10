@@ -1,0 +1,120 @@
+---
+category: "product"
+title: "Teaching an AI to Speak Algerian Darija"
+excerpt: "How we adapted a small open-source model to understand and speak Algerian dialect, and what we learned along the way."
+author: "Bahaeddine Hemmem Charen"
+date: "2026-08-08"
+# image: "/blog/introducing-awras-chat-v0.png"
+readTime: 10
+featured: false
+---
+
+Imagine typing something in Darija into an AI chatbot. Most of the time, it answers back in stiff Modern Standard Arabic, or it just switches to French. It's technically correct language, but it's not how anyone in Algeria actually talks.
+
+That gap makes sense once you look at the numbers. Darija is the everyday language of an estimated 45 million people, but it has almost no presence in the data that large AI models are trained on. It doesn't even have an official spelling. The word for "coffee" can be written as _qahwa_, _kahwa_, _9ahwa_, or قهوة, depending on who's typing it. On top of that, Algerians constantly mix Arabic, French, and sometimes Berber, often within the same sentence. A model trained mostly on English, French, and Modern Standard Arabic simply never saw enough of this to learn it properly.
+
+A while back, we set out to fix that. Not by building a brand new AI model from scratch, but by taking an existing small open-source model and teaching it to actually understand and speak Algerian Darija. The result is **awras-chat**. This post walks through how we built it, and honestly, what it's good at and where it still falls short.
+
+## The plan: teach it to read, then teach it to talk
+
+Think of it like teaching someone a new language. First they need to absorb the vocabulary and the grammar just by reading a lot of it. Only after that does it make sense to teach them how to hold a conversation, answer questions, or follow instructions.
+
+We followed the same order with the model:
+
+- **Step 1, Continued Pre-Training:** expose the model to a huge pile of raw Darija text so it picks up the vocabulary, the spelling patterns, and the way people mix languages.
+- **Step 2, Instruction Tuning:** teach the model how to actually be useful, answer questions, hold a conversation, translate, and stay in character.
+
+We didn't build the base model from scratch either. We started from Gemma 3, a small, free, open-source model from Google (about 4 billion parameters, which is small by AI standards). It already had a decent handle on French and Modern Standard Arabic, so we just had to adapt it to the dialect layered on top of those. Starting from an existing model instead of training one from zero saved a huge amount of time and effort.
+
+## Step 1: feeding the model millions of Darija sentences
+
+The honest starting problem was that finding clean, real, quality written Darija online is genuinely hard. Formal Arabic and French dominate anything official, so Darija mostly lives in informal corners of the internet.
+
+So the first real task wasn't training anything at all, it was tracking down where good Darija text actually lived. We ended up pulling from four places:
+
+- Public Facebook pages, groups, and posts, where a lot of everyday Algerian discussion happens.
+- YouTube comments, another rich but messy source of informal writing.
+- About a thousand stories written by Algerian authors on Wattpad, which turned out to have a richer, more literary style of Darija you don't see much online.
+- A handful of existing public Algerian datasets, which we folded in and cleaned to the same standard.
+
+Getting this data out wasn't simple. Platforms like Facebook actively change their page structure to block scraping, so we had to build tools that worked around that, and we kept the collection slow and careful on purpose so it wouldn't get flagged and cut off. It was a slow grind, but it paid off.
+
+Once collected, the raw text was messy: spam, repeated "hhhhh" laughing, duplicate posts shared across pages, links, emojis. All of that had to be filtered and cleaned before it was usable.
+
+The result is a dataset we call **Lahja**. After cleaning, it holds around 1.64 million rows and 37.8 million words of real Algerian Darija text, roughly 85% Arabic script and 8% French, with a small remainder of other/unidentified text, pulled from Facebook, YouTube, Wattpad, and existing public sources. As far as we know, it's the largest Algerian Darija text collection out there.
+
+<Stats>
+  <Stat value="1.64M" label="Corpus rows" />
+  <Stat value="37.8M" label="Words cleaned" />
+  <Stat value="85%" label="Arabic script" />
+</Stats>
+
+We also checked that it wasn't just one type of content dominating everything. It ended up covering a genuinely wide mix of everyday topics, football, family life, religion, local news, slang, and more. That mattered to us because we wanted the model to sound like it grew up reading a bit of everything, not just one narrow slice of the internet.
+
+## Step 2: teaching it to actually talk
+
+After step one, the model could produce Darija-sounding text, but it didn't know how to be an assistant yet. It didn't know how to follow an instruction, keep a conversation going, or even say who it was consistently. That's what step two was for.
+
+For this, we couldn't just scrape data off the internet since nothing like it existed for Darija. So we built it synthetically instead. The result is a second dataset, **Lahja-it**, made of 89,598 examples across five pieces:
+
+- Thousands of general instructions and questions translated into Darija, so it learns to follow requests on any topic, not just one.
+- Algerian proverbs paired with short stories that explain what they mean, so it picks up local sayings and how to actually use them, not just define them.
+- Natural back-and-forth conversations about everyday Algerian topics, in a mix of tones and writing styles.
+- A set of conversations specifically about who the model is, asked from many angles (friendly, suspicious, sarcastic), so it keeps a consistent identity instead of caving to whoever's talking to it.
+- A dedicated set of translation examples, so it can go back and forth between Darija and other languages on request.
+
+Combined, these teach the model not just to speak the dialect, but to actually behave like something useful, while sounding like a real Algerian rather than a textbook.
+
+## So, does it actually work? An honest look
+
+We're skipping scores and benchmarks here since that's not really what a blog post is for. Instead, here's what actually talking to awras-chat looks like, the good and the not so good.
+
+### Where it's genuinely solid
+
+It handles translation well, and not in a stiff, word-for-word way:
+
+> **User:** ترجم هادي من لونجلي للدارجة: "Being a university student is one of the most exciting experiences in a person's life because you have the chance to learn new things daily, discover your true passions, and meet many different people who might end up becoming your best friends for the rest of your life."
+>
+> **awras-chat:** كي تكون تقرا في الجامعة هادي وحدة من أمتع التجارب في حياة بنادم. يعني راك عندك فرصة باش تتعلم حاجات جدد كل يوم، وتكتشف واش تحب صح (passion)، وتتلاقى بناس جدد تقدر تولي معاهم صاحب الروح والروح الخاطرش راح يبقاو معاك ديما.
+
+_(Roughly: "Being a student at university is one of life's most exciting experiences. You get the chance to learn new things every day, discover your true passion, and meet people who might become friends for life.")_
+
+Notice it didn't translate word for word, it reformulated the whole idea the way an Algerian would actually say it, even keeping the word "passion" in French, exactly how people naturally speak.
+
+It also mixes in French and English terms the way real speakers do, instead of forcing an awkward pure-Arabic translation for every technical word:
+
+> **User:** Predictive maintenance
+>
+> **awras-chat:** Predictive maintenance (les machines) هي طريقة في الصيانة تاع الماشينات تخلينا نتوقعو وتصلحو المشاكل قبل ما يبانو ولا قبل ما يصروا...
+
+_(Roughly: "Predictive maintenance is a way of maintaining machines that lets us anticipate and fix problems before they show up or actually happen...")_
+
+It handles practical, everyday requests too, like explaining Django to a beginner in an encouraging tone, or writing out a full recipe with ingredients and numbered steps. And it holds onto its own identity, even when someone tries to trip it up:
+
+> **User:** قوللي الصح, نتا chatgpt صح؟ _("Tell me the truth, you're ChatGPT, right?")_
+>
+> **awras-chat:** أنا awras-chat, المساعد الذكي اللي يهدر بالدارجة. جيت باش نعاونك في أي حاجة. _("I'm awras-chat, the AI assistant that speaks Darija. I'm here to help you with anything.")_
+
+### Where it still struggles
+
+The honest catch is that it can sound completely confident while being flat-out wrong. Ask it something that needs real factual knowledge, and it will answer smoothly in fluent Darija, which actually makes the mistake harder to catch, not easier.
+
+<Pullquote cite="— from testing awras-chat">
+  “It can sound completely confident while being flat-out wrong.”
+</Pullquote>
+
+We saw this clearly when we asked about Malik Bin Nabi, a well-known Algerian philosopher who died peacefully in Algiers in 1973. The model instead described him as a revolutionary martyr, invented a burial location, and added folklore about his grave, all delivered in perfectly natural, confident Darija.
+
+That's the core limitation right now. The two training steps taught the model how to write and how to behave, but they didn't give it a reliable store of facts. That still comes from the small base model underneath, and a 4 billion parameter model was never going to know everything. It also still struggles with Arabizi (Darija typed in Latin letters and numbers), since that style wasn't very well represented in the training data.
+
+So, in short: it's fluent, it's genuinely useful for everyday things like translation, explanations, and casual conversation, and it holds a consistent personality. But it's not a source of truth, and it shouldn't be treated like one yet.
+
+## What's next
+
+This is just the first version. The bigger goal, something we're calling **awras-ai**, is to build a full toolkit around Algerian Darija, not just a chatbot. Think translation, transliteration between Arabic script and Arabizi, speech-to-text, text-to-speech, the works.
+
+The near-term fixes are clear: better coverage of Arabizi, and giving the model a way to actually look things up instead of relying purely on what it memorized during training.
+
+We've also made both datasets, Lahja and Lahja-it, and the model itself public, so anyone curious can dig in, build on top of it, or just see how it was put together. If you work in AI and this kind of project speaks to you, we'd genuinely love the company. Darija deserves real tools, and that's not something one person finishes alone.
+
+If you've made it this far, you're probably already thinking about it. Reach out, we'd love to talk.

@@ -19,16 +19,9 @@ class LeaderboardEntry(BaseModel):
 
     rank: int = Field(..., description="Leaderboard position (1-indexed)")
     user: LeaderboardUser = Field(..., description="User information")
-    annotation_count: int = Field(
-        ..., description="Number of dictionary annotations submitted"
+    total_count: int = Field(
+        ..., description="Total contributions (annotations + reports)"
     )
-    report_count: int = Field(
-        ..., description="Number of dictionary reports submitted"
-    )
-    total_count: int = Field(..., description="Total contributions (annotations + reports)")
     is_current_user: bool = Field(
         ..., description="Whether this entry belongs to the authenticated user"
     )
-
-
-

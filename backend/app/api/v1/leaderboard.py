@@ -2,8 +2,8 @@
 Leaderboard API endpoint.
 
 Shows users ranked by their contribution counts.
-Currently counts dictionary annotations and reports;
-translation and voice annotations will be added later.
+Counts dictionary annotations, translation annotations, and reports;
+voice annotations will be added later.
 """
 
 from fastapi import APIRouter, Depends, Query, Request
@@ -39,6 +39,7 @@ async def get_leaderboard(
 
     Users are ranked by their total number of contributions, which includes:
     - **Dictionary annotations**: entries confirmed or corrected by the user
+    - **Translation annotations**: entries validated or corrected by the user
     - **Dictionary reports**: entries flagged as problematic by the user
 
     If the request is authenticated, the current user's entry will have

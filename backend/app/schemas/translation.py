@@ -55,8 +55,9 @@ class DatasetResponse(BaseModel):
     target_language: str = Field(..., description="Target language code")
     description: Optional[str] = Field(None, description="Dataset description")
     category: Optional[str] = Field(None, description="Dataset category")
-    created_by_id: Optional[UUID] = Field(None, description="Creator user ID")
+    created_by_sub: Optional[str] = Field(None, description="Creator Keycloak sub")
     created_at: datetime = Field(..., description="Creation timestamp")
+    updated_at: Optional[datetime] = Field(None, description="Last update timestamp")
 
     class Config:
         from_attributes = True
@@ -129,8 +130,11 @@ class AnnotationResponse(BaseModel):
     id: UUID = Field(..., description="Annotation unique ID")
     corrected_translation: str = Field(..., description="Corrected translation")
     notes: Optional[str] = Field(None, description="Optional notes")
-    user_id: UUID = Field(..., description="User who made the annotation")
+    keycloak_sub: Optional[str] = Field(
+        None, description="Keycloak subject (user ID) who made the annotation"
+    )
     created_at: datetime = Field(..., description="Annotation creation timestamp")
+    updated_at: Optional[datetime] = Field(None, description="Last update timestamp")
 
     class Config:
         from_attributes = True

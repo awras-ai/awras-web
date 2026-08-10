@@ -40,7 +40,9 @@
     "mission": "Mission",
     "process": "Process",
     "faq": "FAQ",
+    "blog": "Blog",
     "leaderboard": "Leaderboard",
+    "explore": "Explore",
     "homeAriaLabel": "Awras Home",
     "closeMenu": "Close menu",
     "openMenu": "Open menu",
@@ -144,6 +146,34 @@
     "socialInstagram": "Instagram",
     "copyright": "© {year} Awras. All rights reserved. Built for Algeria 🇩🇿"
   },
+  "Blog": {
+    "metaTitle": "Blog",
+    "metaDescription": "Model releases, product changelogs and stories from the contributors annotating Algerian Darija.",
+    "ogTitle": "Blog | Awras",
+    "ogDescription": "Model releases, product changelogs and stories from the contributors annotating Algerian Darija.",
+    "twitterTitle": "Blog | Awras",
+    "twitterDescription": "Model releases, product changelogs and stories from the contributors annotating Algerian Darija.",
+    "label": "Blog",
+    "headline": "Building Darija AI, <accent>in the open.</accent>",
+    "description": "Model releases, product changelogs and stories from the contributors annotating Algeria's language, one line at a time.",
+    "allPosts": "All posts",
+    "backToBlog": "Back to blog",
+    "articleCtaTitle": "Every annotation lands in the next model.",
+    "articleCtaDescription": "Join our contributors preserving Darija.",
+    "articleCtaAction": "Start annotating",
+    "categories": {
+      "research": "Research",
+      "product": "Product",
+      "community": "Community"
+    },
+    "searchPlaceholder": "Search posts",
+    "readTime": "{minutes} min read",
+    "readRelease": "Read the release",
+    "noResults": "No posts match your search.",
+    "loadMore": "Load more",
+    "loadLess": "Show less",
+    "showingCount": "Showing {count} of {total}"
+  },
   "Login": {
     "metaTitle": "Sign In",
     "metaDescription": "Sign in to your Awras account to access the Algerian AI ecosystem and contribute to Darija language preservation.",
@@ -170,11 +200,9 @@
     "dictionaryTitle": "Dictionary Annotation",
     "dictionaryDescription": "Review and correct word definitions in Darija to help build our linguistic database.",
     "overallProgress": "Overall progress",
-    "comingSoon": "Coming Soon",
     "translationTitle": "Translation Dataset",
     "translationDescription": "Translate phrases from English to Arabic Darija to expand our parallel corpus.",
-    "transliterationTitle": "Transliteration Dataset",
-    "transliterationDescription": "Convert Arabizi text to Arabic Darija script to normalize user-generated content."
+    "empty": "No annotation tasks have been added to the platform yet. Check back soon!"
   },
   "AnnotationHeader": {
     "defaultUserName": "User",
@@ -218,6 +246,36 @@
     "examples": "Examples",
     "arabiziPlaceholder": "Arabizi…",
     "examplesPlaceholder": "No examples yet…"
+  },
+  "TranslationAnnotation": {
+    "metaTitle": "Annotate Translation",
+    "backToTasks": "Back to tasks",
+    "yourContribution": "Your contribution",
+    "translationsDone": "{count} translations",
+    "overall": "Overall",
+    "overallProgress": "{completed} / {total} · {pct}%",
+    "allCaughtUp": "All caught up!",
+    "noMoreEntries": "There are no more pending translations for you in this dataset.",
+    "failedToLoadEntry": "Failed to load the next translation.",
+    "retry": "Retry",
+    "translationFallback": "Translation"
+  },
+  "TranslationEntryCard": {
+    "sourceText": "Source text",
+    "referenceTranslation": "Reference translation",
+    "cancel": "Cancel",
+    "cancelEditAria": "Cancel edit",
+    "edit": "Edit",
+    "editAria": "Edit translation",
+    "skip": "Skip",
+    "skipAria": "Skip translation",
+    "confirm": "Confirm",
+    "confirmAria": "Confirm translation",
+    "failedToSubmit": "Failed to submit. Please try again."
+  },
+  "TranslationEntryFormFields": {
+    "translation": "Your translation",
+    "translationPlaceholder": "Type the translation…"
   },
   "CreateEntryCard": {
     "cancel": "Cancel",

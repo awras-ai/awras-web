@@ -6,18 +6,14 @@ import csv
 import io
 import logging
 import uuid
-from datetime import datetime, timezone
 from typing import Any, Optional
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session as DBSession
-from sqlalchemy.exc import IntegrityError
 
-from app.core.config import get_settings
 from app.models import TranslationAnnotation, TranslationEntry, TranslationDataset
 
 logger = logging.getLogger(__name__)
-settings = get_settings()
 
 
 class TranslationService:
@@ -107,6 +103,19 @@ class TranslationService:
             .limit(limit)
             .all()
         )
+
+    @staticmethod
+    def get_datasets_count(db: DBSession) -> int:
+        """
+        Get total count of datasets.
+
+        Args:
+            db: Database session
+
+        Returns:
+            Total number of datasets
+        """
+        return db.query(TranslationDataset).count()
 
     # =========================================================================
     # CSV UPLOAD
@@ -254,7 +263,7 @@ class TranslationService:
         """
         annotated_ids = (
             db.query(TranslationAnnotation.entry_id)
-            .filter(TranslationAnnotation.user_id == user_id)
+            .filter(TranslationAnnotation.keycloak_sub == keycloak_sub)
             .subquery()
         )
 
@@ -308,7 +317,7 @@ class TranslationService:
             db.query(TranslationAnnotation)
             .filter(
                 TranslationAnnotation.entry_id == entry_id,
-                TranslationAnnotation.user_id == user_id,
+                TranslationAnnotation.keycloak_sub == keycloak_sub,
             )
             .first()
         )
@@ -320,7 +329,7 @@ class TranslationService:
 
         annotation = TranslationAnnotation(
             entry_id=entry_id,
-            user_id=user_id,
+            keycloak_sub=keycloak_sub,
             corrected_translation=corrected_translation.strip(),
             notes=notes.strip() if notes else None,
         )
@@ -373,3 +382,60 @@ class TranslationService:
             "completed_count": completed,
             "completion_percentage": round(percentage, 2),
         }
+
+    @staticmethod
+    def get_user_dataset_stats(
+        db: DBSession, dataset_id: uuid.UUID, keycloak_sub: str
+    ) -> dict[str, Any]:
+        """
+        Get statistics for a dataset including user-specific metrics.
+
+        Args:
+            db: Database session
+            dataset_id: Dataset UUID
+            keycloak_sub: Keycloak sub of the current user
+
+        Returns:
+            Dictionary with overall stats plus user_annotated_count and
+            user_remaining_count (pending entries the user has not annotated).
+        """
+        # Get base dataset stats
+        stats = TranslationService.get_dataset_stats(db, dataset_id)
+
+        # Count entries annotated by this user in this dataset
+        user_annotated = (
+            db.query(TranslationAnnotation)
+            .join(TranslationEntry)
+            .filter(
+                TranslationEntry.dataset_id == dataset_id,
+                TranslationAnnotation.keycloak_sub == keycloak_sub,
+            )
+            .count()
+        )
+
+        # Get IDs of entries already annotated by this user
+        annotated_ids = (
+            db.query(TranslationAnnotation.entry_id)
+            .filter(TranslationAnnotation.keycloak_sub == keycloak_sub)
+            .subquery()
+        )
+
+        # Count pending entries the user can still annotate
+        user_remaining = (
+            db.query(TranslationEntry)
+            .filter(
+                TranslationEntry.dataset_id == dataset_id,
+                TranslationEntry.status == "pending",
+                ~TranslationEntry.id.in_(db.query(annotated_ids.c.entry_id)),
+            )
+            .count()
+        )
+
+        stats.update(
+            {
+                "user_annotated_count": user_annotated,
+                "user_remaining_count": user_remaining,
+            }
+        )
+
+        return stats
