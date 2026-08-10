@@ -1,0 +1,203 @@
+"use client";
+
+import { useEffect } from "react";
+import { Link } from "@/i18n/navigation";
+import { motion } from "framer-motion";
+import { useLocale, useTranslations } from "next-intl";
+import { ArrowLeft, Loader2, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { useKeycloak } from "@/context/KeycloakContext";
+import { AnnotationHeader } from "@/components/annotation/AnnotationHeader";
+import {
+  useTranslationDatasetStats,
+  useTranslationNextEntry,
+} from "@/hooks/useTranslation";
+import { NoEntriesAvailableError } from "@/lib/api/dictionary";
+import { TranslationEntryCard } from "./TranslationEntryCard";
+
+interface Props {
+  datasetId: string;
+}
+
+export function TranslationAnnotationContent({ datasetId }: Props) {
+  const t = useTranslations("TranslationAnnotation");
+  const locale = useLocale();
+  const { initialized, authenticated, keycloak } = useKeycloak();
+
+  const { data: statsData } = useTranslationDatasetStats(datasetId);
+  const nextEntry = useTranslationNextEntry(datasetId);
+
+  const entry = nextEntry.data;
+  const isNoEntries =
+    nextEntry.isError && nextEntry.error instanceof NoEntriesAvailableError;
+
+  useEffect(() => {
+    if (!initialized) return;
+    if (!authenticated) {
+      keycloak?.login({
+        locale,
+        redirectUri: `${window.location.origin}/${locale}/annotation/translation/${datasetId}`,
+      });
+    }
+  }, [initialized, authenticated, keycloak, datasetId, locale]);
+
+  if (!initialized || !authenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <Loader2
+          className="h-8 w-8 animate-spin"
+          style={{ color: "#14b8a6" }}
+        />
+      </div>
+    );
+  }
+
+  const userStats = statsData?.user_stats;
+  const overallStats = statsData?.overall_stats;
+  const datasetName = statsData?.dataset.name;
+
+  const userAnnotated = userStats?.annotated_by_user ?? 0;
+  const totalEntries = overallStats?.total_entries ?? 0;
+  const overallCompleted = overallStats?.completed_count ?? 0;
+  const overallPct = overallStats?.completion_percentage ?? 0;
+
+  return (
+    <div className="min-h-screen bg-white">
+      <AnnotationHeader />
+
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-12 md:py-20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="space-y-8"
+        >
+          {/* Back link */}
+          <Link
+            href="/annotation"
+            className="inline-flex items-center gap-1.5 text-sm text-black/40 hover:text-black transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" />
+            {t("backToTasks")}
+          </Link>
+
+          {/* Dataset name + progress */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 min-w-0">
+              <h1 className="text-xl font-bold tracking-tight truncate">
+                {datasetName ?? t("translationFallback")}
+              </h1>
+            </div>
+
+            {/* Your contribution */}
+            <div className="flex justify-between items-baseline">
+              <span className="text-xs font-medium text-black/50">
+                {t("yourContribution")}
+              </span>
+              <span className="text-xs tabular-nums">
+                <span style={{ color: "#14b8a6" }} className="font-semibold">
+                  {t("translationsDone", {
+                    count: userAnnotated.toLocaleString(),
+                  })}
+                </span>
+              </span>
+            </div>
+
+            {/* Overall progress */}
+            <div className="space-y-1">
+              <div className="flex justify-between items-baseline">
+                <span className="text-xs font-medium text-black/50">
+                  {t("overall")}
+                </span>
+                <span className="text-xs tabular-nums text-black/40">
+                  {t("overallProgress", {
+                    completed: overallCompleted.toLocaleString(),
+                    total: totalEntries.toLocaleString(),
+                    pct: Math.round(overallPct),
+                  })}
+                </span>
+              </div>
+              <Progress value={overallPct} className="h-1.5 bg-black/5" />
+            </div>
+          </div>
+
+          {/* Loading skeleton */}
+          {nextEntry.isLoading && (
+            <Card className="border-black/10 shadow-sm">
+              <CardContent className="p-8 space-y-5 animate-pulse">
+                <div className="h-8 bg-black/5 rounded w-1/3" />
+                <div className="space-y-2">
+                  <div className="h-3 bg-black/5 rounded w-16" />
+                  <div className="h-4 bg-black/5 rounded w-full" />
+                  <div className="h-4 bg-black/5 rounded w-5/6" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-3 bg-black/5 rounded w-16" />
+                  <div className="h-4 bg-black/5 rounded w-3/4" />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* No entries state */}
+          {isNoEntries && (
+            <Card className="border-black/10 shadow-sm">
+              <CardContent className="p-10 flex flex-col items-center text-center gap-3">
+                <CheckCircle
+                  className="w-10 h-10"
+                  style={{ color: "#14b8a6" }}
+                />
+                <h2 className="text-lg font-semibold tracking-tight">
+                  {t("allCaughtUp")}
+                </h2>
+                <p className="text-sm text-black/60">{t("noMoreEntries")}</p>
+                <Link href="/annotation" className="mt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-black/10"
+                  >
+                    {t("backToTasks")}
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Generic error */}
+          {nextEntry.isError && !isNoEntries && (
+            <Card className="border-black/10 shadow-sm">
+              <CardContent className="p-8 flex flex-col items-center text-center gap-3">
+                <p className="text-sm text-black/50">
+                  {t("failedToLoadEntry")}
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-black/10"
+                  onClick={() => nextEntry.refetch()}
+                >
+                  {t("retry")}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Entry card */}
+          {entry && (
+            <motion.div
+              key={entry.id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <TranslationEntryCard datasetId={datasetId} entry={entry} />
+            </motion.div>
+          )}
+        </motion.div>
+      </main>
+    </div>
+  );
+}

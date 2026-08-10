@@ -200,11 +200,9 @@
     "dictionaryTitle": "Dictionary Annotation",
     "dictionaryDescription": "Review and correct word definitions in Darija to help build our linguistic database.",
     "overallProgress": "Overall progress",
-    "comingSoon": "Coming Soon",
     "translationTitle": "Translation Dataset",
     "translationDescription": "Translate phrases from English to Arabic Darija to expand our parallel corpus.",
-    "transliterationTitle": "Transliteration Dataset",
-    "transliterationDescription": "Convert Arabizi text to Arabic Darija script to normalize user-generated content."
+    "empty": "No annotation tasks have been added to the platform yet. Check back soon!"
   },
   "AnnotationHeader": {
     "defaultUserName": "User",
@@ -248,6 +246,36 @@
     "examples": "Examples",
     "arabiziPlaceholder": "Arabizi…",
     "examplesPlaceholder": "No examples yet…"
+  },
+  "TranslationAnnotation": {
+    "metaTitle": "Annotate Translation",
+    "backToTasks": "Back to tasks",
+    "yourContribution": "Your contribution",
+    "translationsDone": "{count} translations",
+    "overall": "Overall",
+    "overallProgress": "{completed} / {total} · {pct}%",
+    "allCaughtUp": "All caught up!",
+    "noMoreEntries": "There are no more pending translations for you in this dataset.",
+    "failedToLoadEntry": "Failed to load the next translation.",
+    "retry": "Retry",
+    "translationFallback": "Translation"
+  },
+  "TranslationEntryCard": {
+    "sourceText": "Source text",
+    "referenceTranslation": "Reference translation",
+    "cancel": "Cancel",
+    "cancelEditAria": "Cancel edit",
+    "edit": "Edit",
+    "editAria": "Edit translation",
+    "skip": "Skip",
+    "skipAria": "Skip translation",
+    "confirm": "Confirm",
+    "confirmAria": "Confirm translation",
+    "failedToSubmit": "Failed to submit. Please try again."
+  },
+  "TranslationEntryFormFields": {
+    "translation": "Your translation",
+    "translationPlaceholder": "Type the translation…"
   },
   "CreateEntryCard": {
     "cancel": "Cancel",

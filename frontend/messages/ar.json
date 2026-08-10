@@ -200,11 +200,9 @@
     "dictionaryTitle": "توثيق القاموس",
     "dictionaryDescription": "راجع وصحّح تعريفات الكلمات في الدارجة للمساهمة في بناء قاعدة بياناتنا اللغوية.",
     "overallProgress": "التقدّم الإجمالي",
-    "comingSoon": "قريباً",
     "translationTitle": "مجموعة بيانات الترجمة",
     "translationDescription": "ترجم عبارات من الإنجليزية إلى الدارجة الجزائرية لتوسيع مجموعتنا المتوازية من البيانات.",
-    "transliterationTitle": "مجموعة بيانات التحويل الصوتي",
-    "transliterationDescription": "حوّل نصوص الأرابيزي إلى الدارجة الجزائرية بالحروف العربية لتوحيد المحتوى الذي ينشئه المستخدمون."
+    "empty": "لم تُضف أي مهام توثيق إلى المنصة بعد. عُد لاحقاً!"
   },
   "AnnotationHeader": {
     "defaultUserName": "مستخدم",
@@ -248,6 +246,36 @@
     "examples": "أمثلة",
     "arabiziPlaceholder": "أرابيزي…",
     "examplesPlaceholder": "لا توجد أمثلة بعد…"
+  },
+  "TranslationAnnotation": {
+    "metaTitle": "توثيق الترجمة",
+    "backToTasks": "العودة إلى المهام",
+    "yourContribution": "مساهمتك",
+    "translationsDone": "{count} ترجمة",
+    "overall": "الإجمالي",
+    "overallProgress": "{completed} / {total} · {pct}%",
+    "allCaughtUp": "لقد أنجزت كل شيء!",
+    "noMoreEntries": "لا توجد ترجمات معلّقة أخرى لك في هذه المجموعة.",
+    "failedToLoadEntry": "فشل تحميل الترجمة التالية.",
+    "retry": "إعادة المحاولة",
+    "translationFallback": "الترجمة"
+  },
+  "TranslationEntryCard": {
+    "sourceText": "النص الأصلي",
+    "referenceTranslation": "الترجمة المرجعية",
+    "cancel": "إلغاء",
+    "cancelEditAria": "إلغاء التعديل",
+    "edit": "تعديل",
+    "editAria": "تعديل الترجمة",
+    "skip": "تخطي",
+    "skipAria": "تخطي الترجمة",
+    "confirm": "تأكيد",
+    "confirmAria": "تأكيد الترجمة",
+    "failedToSubmit": "فشل الإرسال. حاول مرة أخرى."
+  },
+  "TranslationEntryFormFields": {
+    "translation": "ترجمتك",
+    "translationPlaceholder": "اكتب الترجمة…"
   },
   "CreateEntryCard": {
     "cancel": "إلغاء",
