@@ -68,7 +68,8 @@
     "actionVoiceTitle": "ابدأ التسجيل",
     "actionVoiceDesc": "سجّل صوتك بالدارجة للمساهمة في مجموعات التسجيلات الصوتية.",
     "actionVoiceTag": "التسجيلات الصوتية",
-    "discoverNow": "اكتشف الآن"
+    "discoverNow": "اكتشف الآن",
+    "discordCta": "انضم إلى ديسكورد"
   },
   "Marquee": {
     "item1": "بيانات الدارجة",

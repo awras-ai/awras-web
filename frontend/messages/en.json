@@ -68,7 +68,8 @@
     "actionVoiceTitle": "Start recording",
     "actionVoiceDesc": "Record your voice in Darija to contribute to our audio collection.",
     "actionVoiceTag": "Speech Audio",
-    "discoverNow": "Discover now"
+    "discoverNow": "Discover now",
+    "discordCta": "Join our Discord"
   },
   "Marquee": {
     "item1": "Darija Datasets",
